@@ -3,8 +3,12 @@
   "name": "start-express-react",
   "version": "1.0.0",
   "scripts": {
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "check": "biome check --error-on-warnings --no-errors-on-unmatched --staged . && tsc --noEmit",
-    "dev": "tsx server"
+    "dev": "tsx server",
+    "start": "NODE_ENV=production tsx server"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -17,9 +21,11 @@
     "vite": "^6.0.5"
   },
   "dependencies": {
+    "compression": "^1.7.5",
     "express": "^4.21.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.1.0"
+    "react-router": "^7.1.0",
+    "sirv": "^3.0.0"
   }
 }
