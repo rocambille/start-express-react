@@ -12,7 +12,7 @@ services:
   database:
     image: mysql
     restart: always
-    env_file: ./database/.env
+    env_file: ./.env
     volumes:
       - type: bind
         source: ./database/schema.sql

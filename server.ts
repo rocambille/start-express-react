@@ -7,6 +7,8 @@ import type { ViteDevServer } from "vite";
 
 import expressRouter from "./src/express/router";
 
+import "./database/checkConnection";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -18,6 +20,8 @@ const cachedTemplate = isProduction
 
 async function createServer() {
   const app = express();
+
+  app.use(express.json());
 
   app.use(expressRouter);
 
@@ -107,7 +111,7 @@ async function createServer() {
     } catch (error) {
       // If an error is caught, let Vite fix the stack trace so it maps back
       // to your actual source code.
-      vite?.ssrFixStacktrace(error);
+      vite?.ssrFixStacktrace(error as Error);
       next(error);
     }
   });
@@ -115,7 +119,7 @@ async function createServer() {
   const port = 5173;
 
   app.listen(port, () => {
-    console.info(`Server is listening on port ${port}`);
+    console.info(`Listening on port ${port}`);
   });
 }
 

@@ -1,17 +1,18 @@
 {
   "type": "module",
-  "name": "start-express-react",
+  "name": "starter",
   "version": "1.0.0",
   "scripts": {
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "check": "biome check --error-on-warnings --no-errors-on-unmatched --staged . && tsc --noEmit",
-    "dev": "tsx server",
-    "start": "NODE_ENV=production tsx server"
+    "dev": "tsx --env-file=.env server",
+    "start": "NODE_ENV=production tsx --env-file=.env server"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@types/compression": "^1.7.5",
     "@types/express": "^5.0.0",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
@@ -23,6 +24,7 @@
   "dependencies": {
     "compression": "^1.7.5",
     "express": "^4.21.2",
+    "mysql2": "^3.11.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.1.0",
