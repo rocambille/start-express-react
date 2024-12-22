@@ -15,9 +15,9 @@ services:
     env_file: ./.env
     volumes:
       - type: bind
-        source: ./database/schema.sql
+        source: ./src/database/schema.sql
         target: /docker-entrypoint-initdb.d/schema.sql
-      - "./database/data:/var/lib/mysql"
+      - "./src/database/data:/var/lib/mysql"
     healthcheck:
         test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
         interval: 2s

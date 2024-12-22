@@ -5,9 +5,9 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import type { ViteDevServer } from "vite";
 
-import expressRouter from "./src/express/router";
+import "./src/database/checkConnection";
 
-import "./database/checkConnection";
+import expressRouter from "./src/express/router";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
