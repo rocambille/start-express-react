@@ -4,7 +4,7 @@ import type { RequestHandler } from "express";
 import itemRepository from "./itemRepository";
 
 // The B of BREAD - Browse (Read All) operation
-const browse: RequestHandler = async (req, res, next) => {
+const browse: RequestHandler = async (_req, res, next) => {
   try {
     // Fetch all items
     const items = await itemRepository.readAll();
