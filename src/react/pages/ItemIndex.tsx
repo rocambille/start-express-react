@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 function ItemIndex() {
   const [items, setItems] = useState([] as Item[]);
@@ -14,9 +15,12 @@ function ItemIndex() {
   return (
     <>
       <h1>Items</h1>
+      <Link to="/items/new">Ajouter</Link>
       <ul>
         {items.map((item) => (
-          <li key={item.id}>{item.title}</li>
+          <li key={item.id}>
+            <Link to={`/items/${item.id}`}>{item.title}</Link>
+          </li>
         ))}
       </ul>
     </>

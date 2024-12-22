@@ -23,3 +23,8 @@ services:
         interval: 2s
         timeout: 20s
         retries: 10
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

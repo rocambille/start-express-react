@@ -21,8 +21,7 @@ const browse: RequestHandler = async (_req, res, next) => {
 const read: RequestHandler = async (req, res, next) => {
   try {
     // Fetch a specific item based on the provided ID
-    const itemId = Number(req.params.id);
-    const item = await itemRepository.read(itemId);
+    const item = await itemRepository.read(+req.params.id);
 
     // If the item is not found, respond with HTTP 404 (Not Found)
     // Otherwise, respond with the item in JSON format
@@ -30,6 +29,32 @@ const read: RequestHandler = async (req, res, next) => {
       res.sendStatus(404);
     } else {
       res.json(item);
+    }
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
+  }
+};
+
+// The E of BREAD - Edit (Update) operation
+const edit: RequestHandler = async (req, res, next) => {
+  try {
+    // Extract the item data from the request body and params
+    const newItem = {
+      id: +req.params.id,
+      title: req.body.title,
+      user_id: req.body.user_id,
+    };
+
+    // Update the item
+    const affectedRows = await itemRepository.update(newItem);
+
+    // If the item is not found, respond with HTTP 404 (Not Found)
+    // Otherwise, respond with HTTP 204 (No Content)
+    if (affectedRows === 0) {
+      res.sendStatus(404);
+    } else {
+      res.sendStatus(204);
     }
   } catch (err) {
     // Pass any errors to the error-handling middleware
@@ -57,4 +82,18 @@ const add: RequestHandler = async (req, res, next) => {
   }
 };
 
-export default { browse, read, add };
+// The D of BREAD - Destroy (Delete) operation
+const destroy: RequestHandler = async (req, res, next) => {
+  try {
+    // Delete a specific item based on the provided ID
+    await itemRepository.delete(+req.params.id);
+
+    // Always respond with HTTP 204 (No Content)
+    res.sendStatus(204);
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
+  }
+};
+
+export default { browse, read, edit, add, destroy };
