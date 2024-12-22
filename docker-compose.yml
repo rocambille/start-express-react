@@ -1,0 +1,25 @@
+services:
+  server:
+    depends_on:
+      database:
+        condition: service_healthy
+    build: .
+    volumes:
+      - "./src:/app/src"
+    command: dev
+    ports:
+      - "5173:5173"
+  database:
+    image: mysql
+    restart: always
+    env_file: ./database/.env
+    volumes:
+      - type: bind
+        source: ./database/schema.sql
+        target: /docker-entrypoint-initdb.d/schema.sql
+      - "./database/data:/var/lib/mysql"
+    healthcheck:
+        test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+        interval: 2s
+        timeout: 20s
+        retries: 10
