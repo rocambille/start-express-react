@@ -21,8 +21,6 @@ const cachedTemplate = isProduction
 async function createServer() {
   const app = express();
 
-  app.use(express.json());
-
   app.use(expressRouter);
 
   let vite = null as ViteDevServer | null;
