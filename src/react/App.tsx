@@ -1,20 +1,13 @@
-import { NavLink, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
 import "./App.css";
+
+import NavBar from "./components/NavBar";
 
 function App() {
   return (
     <main>
-      <nav>
-        <ul>
-          <li>
-            <NavLink to="/">Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="/items">Items</NavLink>
-          </li>
-        </ul>
-      </nav>
+      <NavBar />
       <Outlet />
     </main>
   );

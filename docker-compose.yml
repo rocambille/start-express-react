@@ -9,6 +9,7 @@ services:
     command: dev
     ports:
       - "5173:5173"
+      - "24678:24678"
   database:
     image: mysql
     restart: always
