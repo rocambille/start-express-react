@@ -12,7 +12,7 @@ function ItemNew() {
   return (
     <ItemForm
       defaultValue={newItem}
-      onSubmit={(partialItem) => {
+      submit={(partialItem) => {
         fetch("/api/items", {
           method: "post",
           headers: {

@@ -10,9 +10,7 @@ function DeleteForm({ id, basePath }: DeleteFormProps) {
 
   return (
     <form
-      onSubmit={(event) => {
-        event.preventDefault();
-
+      action={() => {
         fetch(`/api${basePath}/${id}`, {
           method: "delete",
         }).then((response) => {

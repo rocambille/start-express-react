@@ -21,7 +21,7 @@ function ItemEdit() {
     item && (
       <ItemForm
         defaultValue={item}
-        onSubmit={(partialItem) => {
+        submit={(partialItem) => {
           fetch(`/api/items/${item.id}`, {
             method: "put",
             headers: {

@@ -3,22 +3,16 @@ import type { ReactNode } from "react";
 interface ItemFormProps {
   children: ReactNode;
   defaultValue: Omit<Item, "id" | "user_id">;
-  onSubmit: (partialItem: Omit<Item, "id" | "user_id">) => void;
+  submit: (partialItem: Omit<Item, "id" | "user_id">) => void;
 }
 
-function ItemForm({ children, defaultValue, onSubmit }: ItemFormProps) {
+function ItemForm({ children, defaultValue, submit }: ItemFormProps) {
   return (
     <form
-      onSubmit={(event) => {
-        event.preventDefault();
-
-        const formData = new FormData(event.currentTarget);
-
+      action={(formData) => {
         const title = formData.get("title") as string;
 
-        onSubmit({
-          title,
-        });
+        submit({ title });
       }}
     >
       <input type="text" name="title" defaultValue={defaultValue.title} />
