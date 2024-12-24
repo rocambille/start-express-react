@@ -14,10 +14,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const isProduction = process.env.NODE_ENV === "production";
 
-// Cached production assets
-const cachedTemplate = isProduction
-  ? await fs.readFileSync("./dist/client/index.html", "utf-8")
-  : "";
+// 1. Read index.html
+const indexHtml = fs.readFileSync(
+  path.resolve(
+    __dirname,
+    isProduction ? "dist/client/index.html" : "index.html",
+  ),
+  "utf-8",
+);
 
 async function createServer() {
   const app = express();
@@ -26,7 +30,12 @@ async function createServer() {
 
   let vite = null as ViteDevServer | null;
 
-  if (!isProduction) {
+  if (isProduction) {
+    const compression = (await import("compression")).default;
+    const sirv = (await import("sirv")).default;
+    app.use(compression());
+    app.use(sirv("./dist/client", { extensions: [] }));
+  } else {
     // Create Vite server in middleware mode and configure the app type as
     // 'custom', disabling Vite's own HTML serving logic so parent server
     // can take control
@@ -42,35 +51,42 @@ async function createServer() {
     // reference (with a new internal stack of Vite and plugin-injected
     // middlewares). The following is valid even after restarts.
     app.use(vite.middlewares);
-  } else {
-    const compression = (await import("compression")).default;
-    const sirv = (await import("sirv")).default;
-    app.use(compression());
-    app.use(sirv("./dist/client", { extensions: [] }));
   }
 
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
+    // The fetch api is ambiguous and depends on the context where it is executed :
+
+    // * in the browser, it will refer to the fetch api from window
+    //   => relative urls are working
+    // * on the server (and build phase), it will refer to the fetch api from node
+    //   => relative urls are not working
+
+    // We're using node API here and need to fix fetch for relative urls :
+    const nodeFetch = globalThis.fetch;
+
+    globalThis.fetch = (url) => {
+      if (url.startsWith("/")) {
+        return nodeFetch(`${req.protocol}://${req.get("host")}${url}`);
+      }
+
+      return nodeFetch(url);
+    };
+
     try {
       const getTemplateAndRender = async () => {
         if (isProduction) {
           const render = (await import("./dist/server/entry-server")).render;
-          return { template: cachedTemplate, render };
+          return { template: indexHtml, render };
         }
-
-        // 1. Read index.html
-        let template = fs.readFileSync(
-          path.resolve(__dirname, "index.html"),
-          "utf-8",
-        );
 
         // 2. Apply Vite HTML transforms. This injects the Vite HMR client,
         //    and also applies HTML transforms from Vite plugins, e.g. global
         //    preambles from @vitejs/plugin-react
-        template = await (vite as ViteDevServer).transformIndexHtml(
+        const template = await (vite as ViteDevServer).transformIndexHtml(
           url,
-          template,
+          indexHtml,
         );
 
         // 3. Load the server entry. ssrLoadModule automatically transforms
