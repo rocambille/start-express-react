@@ -1,46 +1,37 @@
-import { useEffect, useState } from "react";
+import { use } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import ItemForm from "../components/ItemForm";
 
-import { invalidateCache } from "../utils";
+import { fetchData, invalidateCache } from "../utils";
 
 function ItemEdit() {
   const navigate = useNavigate();
 
   const { id } = useParams();
-  const [item, setItem] = useState(null as Item | null);
 
-  useEffect(() => {
-    fetch(`/api/items/${id}`)
-      .then((response) => response.json())
-      .then((data: Item) => {
-        setItem(data);
-      });
-  }, [id]);
+  const item = use(fetchData(`/api/items/${id}`)) as Item;
 
   return (
-    item && (
-      <ItemForm
-        defaultValue={item}
-        submit={(partialItem) => {
-          fetch(`/api/items/${item.id}`, {
-            method: "put",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
-          }).then((response) => {
-            if (response.status === 204) {
-              invalidateCache("/api/items");
-              navigate(`/items/${item.id}`);
-            }
-          });
-        }}
-      >
-        <button type="submit">Modifier</button>
-      </ItemForm>
-    )
+    <ItemForm
+      defaultValue={item}
+      submit={(partialItem) => {
+        fetch(`/api/items/${item.id}`, {
+          method: "put",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
+        }).then((response) => {
+          if (response.status === 204) {
+            invalidateCache("/api/items");
+            navigate(`/items/${item.id}`);
+          }
+        });
+      }}
+    >
+      <button type="submit">Modifier</button>
+    </ItemForm>
   );
 }
 
