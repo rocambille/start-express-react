@@ -58,21 +58,23 @@ async function createServer() {
 
     // The fetch api is ambiguous and depends on the context where it is executed :
 
-    // * in the browser, it will refer to the fetch api from window
-    //   => relative urls are working
-    // * on the server (and build phase), it will refer to the fetch api from node
-    //   => relative urls are not working
+    // * in the browser, it will refer to the fetch API from window
+    //   => fetch("/api") is working
+    // * on the server (and build phase), it will refer to the fetch API from node
+    //   => fetch("/api") is not working
 
-    // We're using node API here and need to fix fetch for relative urls :
-    const nodeFetch = globalThis.fetch;
+    // We're using node API here and need to fix fetch for non-absolute urls :
+    {
+      const nodeFetch = globalThis.fetch;
 
-    globalThis.fetch = (url) => {
-      if (url.startsWith("/")) {
+      globalThis.fetch = (url) => {
+        if (url.includes("://")) {
+          return nodeFetch(url);
+        }
+
         return nodeFetch(`${req.protocol}://${req.get("host")}${url}`);
-      }
-
-      return nodeFetch(url);
-    };
+      };
+    }
 
     try {
       const getTemplateAndRender = async () => {
