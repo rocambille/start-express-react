@@ -1,7 +1,8 @@
+import express from "express";
 import fs from "node:fs";
 import path from "node:path";
+import { Transform } from "node:stream";
 import { fileURLToPath } from "node:url";
-import express from "express";
 import { createServer as createViteServer } from "vite";
 import type { ViteDevServer } from "vite";
 
@@ -52,14 +53,14 @@ async function createServer() {
     const url = req.originalUrl;
 
     try {
-      let template = null as string | null;
-      let render = null as
-        | ((fullUrl: string) => Promise<string | Response>)
-        | null;
+      const getTemplateAndRender = async () => {
+        if (isProduction) {
+          const render = (await import("./dist/server/entry-server")).render;
+          return { template: cachedTemplate, render };
+        }
 
-      if (!isProduction) {
         // 1. Read index.html
-        template = fs.readFileSync(
+        let template = fs.readFileSync(
           path.resolve(__dirname, "index.html"),
           "utf-8",
         );
@@ -75,37 +76,43 @@ async function createServer() {
         // 3. Load the server entry. ssrLoadModule automatically transforms
         //    ESM source code to be usable in Node.js! There is no bundling
         //    required, and provides efficient invalidation similar to HMR.
-        render = (
+        const render = (
           await (vite as ViteDevServer).ssrLoadModule("/src/entry-server")
         ).render;
-      } else {
-        template = cachedTemplate;
-        render = (await import("./dist/server/entry-server")).render;
-      }
+
+        return { template, render };
+      };
+
+      const { template, render } = await getTemplateAndRender();
 
       // 4. render the app HTML. This assumes entry-server.js's exported
       //     `render` function calls appropriate framework SSR APIs,
       //    e.g. ReactDOMServer.renderToString()
-      const responseOrHtml = await (
-        render as (fullUrl: string) => Promise<string | Response>
-      )(`${req.protocol}://${req.get("host")}${req.originalUrl}`);
+      const { pipe } = await render(
+        `${req.protocol}://${req.get("host")}${req.originalUrl}`,
+      );
 
-      if (responseOrHtml instanceof Response) {
-        responseOrHtml.headers.forEach((value, key) => {
-          res.set(key, value);
-        });
+      res.status(200);
 
-        res.status(responseOrHtml.status).end(responseOrHtml.body);
-      } else {
-        // 5. Inject the app-rendered HTML into the template.
-        const html = template.replace(
-          "<!--ssr-outlet-->",
-          () => responseOrHtml,
-        );
+      res.set({ "Content-Type": "text/html" });
 
-        // 6. Send the rendered HTML back.
-        res.status(200).set({ "Content-Type": "text/html" }).end(html);
-      }
+      const transformStream = new Transform({
+        transform(chunk, encoding, callback) {
+          res.write(chunk, encoding);
+          callback();
+        },
+      });
+
+      // 5. Inject the app-rendered HTML into the template.
+      const [htmlStart, htmlEnd] = template.split("<!--ssr-outlet-->");
+
+      res.write(htmlStart);
+
+      transformStream.on("finish", () => {
+        res.end(htmlEnd);
+      });
+
+      pipe(transformStream);
     } catch (error) {
       // If an error is caught, let Vite fix the stack trace so it maps back
       // to your actual source code.

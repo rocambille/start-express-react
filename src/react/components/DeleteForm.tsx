@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { invalidateCache } from "../utils";
 
 type DeleteFormProps = {
   id: number;
@@ -15,6 +16,7 @@ function DeleteForm({ id, basePath }: DeleteFormProps) {
           method: "delete",
         }).then((response) => {
           if (response.status === 204) {
+            invalidateCache(`/api${basePath}`);
             navigate(basePath);
           }
         });

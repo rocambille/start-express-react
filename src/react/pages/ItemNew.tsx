@@ -2,6 +2,8 @@ import { useNavigate } from "react-router";
 
 import ItemForm from "../components/ItemForm";
 
+import { invalidateCache } from "../utils";
+
 function ItemNew() {
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ function ItemNew() {
             }
           })
           .then(({ insertId }) => {
+            invalidateCache("/api/items");
             navigate(`/items/${insertId}`);
           });
       }}

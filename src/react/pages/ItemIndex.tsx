@@ -1,16 +1,9 @@
-import { useEffect, useState } from "react";
+import { use } from "react";
 import { Link } from "react-router";
+import { fetchData } from "../utils";
 
 function ItemIndex() {
-  const [items, setItems] = useState([] as Item[]);
-
-  useEffect(() => {
-    fetch("/api/items")
-      .then((response) => response.json())
-      .then((data: Item[]) => {
-        setItems(data);
-      });
-  }, []);
+  const items = use(fetchData("/api/items")) as Item[];
 
   return (
     <>

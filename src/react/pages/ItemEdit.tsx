@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router";
 
 import ItemForm from "../components/ItemForm";
 
+import { invalidateCache } from "../utils";
+
 function ItemEdit() {
   const navigate = useNavigate();
 
@@ -30,6 +32,7 @@ function ItemEdit() {
             body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
           }).then((response) => {
             if (response.status === 204) {
+              invalidateCache("/api/items");
               navigate(`/items/${item.id}`);
             }
           });
