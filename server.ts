@@ -109,10 +109,9 @@ function readIndexHtml() {
 async function configure(app: Express) {
   if (isProduction) {
     const compression = (await import("compression")).default;
-    const sirv = (await import("sirv")).default;
 
     app.use(compression());
-    app.use(sirv("./dist/client", { extensions: [] }));
+    app.use(express.static("./dist/client", { extensions: [] }));
   } else {
     // Create Vite server in middleware mode and configure the app type as
     // 'custom', disabling Vite's own HTML serving logic so parent server

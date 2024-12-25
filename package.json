@@ -3,10 +3,12 @@
   "name": "starter",
   "version": "1.0.0",
   "scripts": {
+    "prepare": "git config core.hooksPath .git-hooks",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
-    "check": "biome check --error-on-warnings --no-errors-on-unmatched --staged . && tsc --noEmit",
+    "check": "biome check --error-on-warnings --no-errors-on-unmatched --staged .",
+    "check-types": "tsc --noEmit",
     "dev": "tsx --env-file=.env server",
     "start": "NODE_ENV=production tsx --env-file=.env server"
   },
@@ -27,7 +29,6 @@
     "mysql2": "^3.11.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router": "^7.1.0",
-    "sirv": "^3.0.0"
+    "react-router": "^7.1.0"
   }
 }
