@@ -18,7 +18,11 @@ export const render = async (template: string, req: Request, res: Response) => {
   );
 
   if (context instanceof Response) {
-    throw new Error("React Router stuff to handle");
+    for (const [key, value] of context.headers.entries()) {
+      res.set(key, value);
+    }
+
+    return res.status(context.status).end(context.body);
   }
 
   const router = createStaticRouter(dataRoutes, context);
@@ -29,9 +33,23 @@ export const render = async (template: string, req: Request, res: Response) => {
     </StrictMode>,
   );
 
+  const leaf = context.matches[context.matches.length - 1];
+  const actionHeaders = context.actionHeaders[leaf.route.id];
+  if (actionHeaders) {
+    for (const [key, value] of actionHeaders.entries()) {
+      res.set(key, value);
+    }
+  }
+  const loaderHeaders = context.loaderHeaders[leaf.route.id];
+  if (loaderHeaders) {
+    for (const [key, value] of loaderHeaders.entries()) {
+      res.set(key, value);
+    }
+  }
+
   res.status(200);
 
-  res.set({ "Content-Type": "text/html" });
+  res.set("Content-Type", "text/html; charset=utf-8");
 
   const transformStream = new Transform({
     transform(chunk, encoding, callback) {
@@ -40,7 +58,6 @@ export const render = async (template: string, req: Request, res: Response) => {
     },
   });
 
-  // 5. Inject the app-rendered HTML into the template.
   const [htmlStart, htmlEnd] = template.split("<!--ssr-outlet-->");
 
   res.write(htmlStart);
