@@ -3,7 +3,7 @@
   "name": "starter",
   "version": "1.0.0",
   "scripts": {
-    "prepare": "git config core.hooksPath .git-hooks",
+    "prepare": "git config core.hooksPath .git-hooks || true",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
