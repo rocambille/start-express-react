@@ -36,23 +36,28 @@ sequenceDiagram
 
 Il est pré-configuré avec un ensemble d'outils pour aider des juniors à produire du code de qualité industrielle, tout en restant un outil pédagogique :
 
-- **Docker** : Plate-forme pour le développement, le partage et l'exécution d'applications.
-- **Vite** : Alternative à _Create-React-App_, offrant une expérience plus fluide avec moins d'outils.
-- **Biome** : Alternative à _ESlint_ et _Prettier_, assurant la qualité du code selon des règles choisies.
+- **Docker** : Plateforme de conteneurisation permettant de standardiser et d'automatiser les environnements de développement et de déploiement, garantissant des configurations reproductibles.  
+- **TypeScript** : Superset de JavaScript ajoutant des types statiques, facilitant la maintenance et réduisant les erreurs.  
+- **React** : Bibliothèque JavaScript pour construire des interfaces utilisateur interactives et modulaires.  
+- **React Router** : Gestionnaire de routage pour les applications React, permettant la création de chemins et de composants dynamiques.  
+- **Vite** : Outil de construction rapide et léger pour les applications front-end, avec un serveur de développement ultra-rapide et une optimisation des bundles pour la production.  
+- **Express** : Framework minimaliste pour créer des serveurs web et des API avec Node.js.  
+- **MySQL** : Système de gestion de bases de données relationnelles performant, utilisé pour stocker et interroger les données.  
+- **Biome** : Outil tout-en-un pour le linting, le formatage et l'analyse statique de code, conçu pour assurer la qualité et la lisibilité du code de manière performante et moderne.  
 
-## Table des Matières
+## Table des matières
 
 - [StartER](#starter)
-  - [Table des Matières](#table-des-matières)
+  - [Table des matières](#table-des-matières)
   - [Utilisateurs Windows](#utilisateurs-windows)
-  - [Installation \& Utilisation](#installation--utilisation)
+  - [Installation et utilisation](#installation-et-utilisation)
   - [Les choses à retenir](#les-choses-à-retenir)
-    - [Commandes de Base](#commandes-de-base)
-    - [Structure des Dossiers](#structure-des-dossiers)
+    - [Commandes de base](#commandes-de-base)
+    - [Structure des fichiers sources](#structure-des-fichiers-sources)
     - [Mettre en place la base de données](#mettre-en-place-la-base-de-données)
     - [Développer la partie back-end](#développer-la-partie-back-end)
     - [REST](#rest)
-    - [Autres Bonnes Pratiques](#autres-bonnes-pratiques)
+    - [Autres bonnes pratiques](#autres-bonnes-pratiques)
   - [FAQ](#faq)
     - [Logs](#logs)
     - [Contribution](#contribution)
@@ -66,35 +71,39 @@ git config --global core.eol lf
 git config --global core.autocrlf false
 ```
 
-## Installation & Utilisation
+## Installation et utilisation
 
 1. Installez Docker et Docker compose.
+1. Installez Node (nécessaire pour exécuter les vérifications de pre-commit).
 2. Installez le plugin **Biome** dans VSCode et configurez-le.
 3. Clonez ce dépôt, puis accédez au répertoire cloné.
 4. Créez un fichier d'environnement (`.env`) à la racine du répertoire cloné : vous pouvez copier le fichier `.env.sample` comme modèle (**ne le supprimez pas**).
+5. Lancez la commande `docker compose up --build`.
 
 ## Les choses à retenir
 
-### Commandes de Base
+### Commandes de base
 
-| Commande                      | Description                   |
-|-------------------------------|-------------------------------|
-| `docker compose up --build`   | Build et démarre les services |
+| Commande                      | Description                                                                                       |
+|-------------------------------|---------------------------------------------------------------------------------------------------|
+| `docker compose up --build`   | Build et démarre les services                                                                     |
+| `npm install`                 | Installe les dépendances localement ((nécessaire pour exécuter les vérifications de pre-commit))  |
+| `npm run check`               | Contrôle la qualité du code et la cohérence des types (exécuté en pre-commit)                     |
 
-### Structure des Dossiers
+### Structure des fichiers sources
 
 ```plaintext
 my-project/
 ├── src/
 |   ├── database/
+│   |   ├── checkConnection.ts
 │   |   ├── client.ts
 │   |   └── schema.sql
 │   ├── express/
 │   │   ├── modules/
-│   │   │   ├── item/
-│   │   │   │   ├── itemActions.ts
-│   │   │   │   └── itemRepository.ts
-│   │   │   └── ...
+│   │   │   └── item/
+│   │   │       ├── itemActions.ts
+│   │   │       └── itemRepository.ts
 │   │   └── router.ts
 |   ├── react/
 │   │   ├── components/
@@ -103,11 +112,12 @@ my-project/
 │   │   │   └── ...
 │   │   ├── App.tsx
 │   │   └── routes.tsx
-|   └── types/
-│       └── index.d.ts
-├── .env
-├── .env.sample
-└── docker-compose.yml
+|   ├── types/
+│   │   └── index.d.ts
+|   ├── entry-client.tsx
+|   └── entry-server.tsx
+├── index.html
+└── server.ts
 ```
 
 ### Mettre en place la base de données
@@ -228,7 +238,7 @@ export default new ItemRepository();
 | Edit      | PUT     | /items/:id   | Données de l'item   | UPDATE | 204 (No Content).              | 400 (Bad Request), si corps invalide. 404 (Not Found), si id invalide. |
 | Destroy   | DELETE  | /items/:id   |                     | DELETE | 204 (No Content).              | 404 (Not Found), si id invalide.                                       |
 
-### Autres Bonnes Pratiques
+### Autres bonnes pratiques
 
 - **Sécurité** :
   - Validez et échappez toujours les entrées des utilisateurs.
