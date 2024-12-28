@@ -1,8 +1,8 @@
-import express from "express";
-import type { Express } from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import express from "express";
+import type { Express } from "express";
 import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
@@ -19,6 +19,8 @@ async function createServer() {
   const app = express();
 
   app.use((await import("./src/express/router")).default);
+
+  app.use(express.static("./public"));
 
   const maybeVite = await configure(app);
 
