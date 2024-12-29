@@ -1,6 +1,9 @@
+import { Suspense } from "react";
+import type { ComponentType, ReactNode } from "react";
+
 const cache = new Map();
 
-export const fetchData = (url: string) => {
+export const get = (url: string) => {
   if (!cache.has(url)) {
     // Promises should be cached for React `use` to work
 
@@ -20,3 +23,11 @@ export const invalidateCache = (basePath: string) => {
     }
   });
 };
+
+export const withSuspense =
+  (Suspendable: ComponentType, fallback: ReactNode = <p>loading...</p>) =>
+  () => (
+    <Suspense fallback={fallback}>
+      <Suspendable />
+    </Suspense>
+  );

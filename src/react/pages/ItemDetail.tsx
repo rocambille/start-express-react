@@ -2,12 +2,12 @@ import { use } from "react";
 import { Link, useParams } from "react-router";
 
 import DeleteForm from "../components/DeleteForm";
-import { fetchData } from "../utils";
+import { get, withSuspense } from "../utils";
 
 function ItemDetail() {
   const { id } = useParams();
 
-  const item = use(fetchData(`/api/items/${id}`)) as Item;
+  const item = use(get(`/api/items/${id}`)) as Item;
 
   return (
     <>
@@ -18,4 +18,4 @@ function ItemDetail() {
   );
 }
 
-export default ItemDetail;
+export default withSuspense(ItemDetail);

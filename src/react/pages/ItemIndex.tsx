@@ -1,9 +1,9 @@
 import { use } from "react";
 import { Link } from "react-router";
-import { fetchData } from "../utils";
+import { get, withSuspense } from "../utils";
 
 function ItemIndex() {
-  const items = use(fetchData("/api/items")) as Item[];
+  const items = use(get("/api/items")) as Item[];
 
   return (
     <>
@@ -20,4 +20,4 @@ function ItemIndex() {
   );
 }
 
-export default ItemIndex;
+export default withSuspense(ItemIndex);

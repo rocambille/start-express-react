@@ -3,14 +3,14 @@ import { useNavigate, useParams } from "react-router";
 
 import ItemForm from "../components/ItemForm";
 
-import { fetchData, invalidateCache } from "../utils";
+import { get, invalidateCache, withSuspense } from "../utils";
 
 function ItemEdit() {
   const navigate = useNavigate();
 
   const { id } = useParams();
 
-  const item = use(fetchData(`/api/items/${id}`)) as Item;
+  const item = use(get(`/api/items/${id}`)) as Item;
 
   return (
     <ItemForm
@@ -35,4 +35,4 @@ function ItemEdit() {
   );
 }
 
-export default ItemEdit;
+export default withSuspense(ItemEdit);

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Outlet } from "react-router";
 
 import "./App.css";
@@ -9,9 +8,7 @@ function App() {
   return (
     <main>
       <NavBar />
-      <Suspense fallback={<p>loading...</p>}>
-        <Outlet />
-      </Suspense>
+      <Outlet />
     </main>
   );
 }
