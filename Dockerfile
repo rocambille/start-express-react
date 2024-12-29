@@ -7,6 +7,7 @@ COPY package-lock.json package-lock.json
 
 RUN npm install
 
+COPY biome.json biome.json
 COPY tsconfig.json tsconfig.json
 COPY tsconfig.app.json tsconfig.app.json
 COPY tsconfig.node.json tsconfig.node.json

@@ -7,7 +7,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
-    "check": "biome check --error-on-warnings --no-errors-on-unmatched --staged .",
+    "check": "biome check --error-on-warnings .",
     "check-types": "tsc --noEmit",
     "dev": "tsx --env-file=.env server",
     "start": "NODE_ENV=production tsx --env-file=.env server"
