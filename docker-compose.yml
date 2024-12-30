@@ -5,13 +5,7 @@ services:
         condition: service_healthy
     build: .
     volumes:
-      - "./index.html:/app/index.html"
-      - "./server.ts:/app/server.ts"
-      - "./src/assets:/app/src/assets"
-      - "./src/database/checkConnection.ts:/app/src/database/checkConnection.ts"
-      - "./src/database/client.ts:/app/src/database/client.ts"
-      - "./src/express:/app/src/express"
-      - "./src/react:/app/src/react"
+      - "./:/app"
     command: dev
     ports:
       - "5173:5173"

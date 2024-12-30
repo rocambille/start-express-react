@@ -5,9 +5,7 @@ WORKDIR /app
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 
-RUN npm install
-
-RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js && cat dist/server/entry-server.js
+RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js
 COPY biome.json biome.json
 COPY tsconfig.json tsconfig.json
 COPY vite.config.ts vite.config.ts

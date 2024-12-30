@@ -9,7 +9,9 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "check": "biome check --error-on-warnings .",
     "check-types": "tsc --noEmit",
+    "predev": "[ -d 'node_modules' ] || npm i",
     "dev": "tsx --env-file=.env server",
+    "prestart": "[ -d 'node_modules' ] || npm i",
     "start": "NODE_ENV=production tsx --env-file=.env server",
     "test": "jest --coverage --verbose"
   },

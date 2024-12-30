@@ -85,12 +85,12 @@ git config --global core.autocrlf false
 
 ### Commandes de base
 
-| Commande                                  | Description                                                                                       |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------|
-| `docker compose up --build`               | Build et démarre les services                                                                     |
-| `docker compose run --build server test`  | Build et exécute les tests                                                                        |
-| `npm install`                             | Installe les dépendances localement ((nécessaire pour exécuter les vérifications de pre-commit))  |
-| `npm run check`                           | Contrôle la qualité du code et la cohérence des types (exécuté en pre-commit)                     |
+| Commande                                        | Description                                                             |
+|-------------------------------------------------|-------------------------------------------------------------------------|
+| `docker compose up --build`                     | Build et démarre les services                                           |
+| `docker compose run --build server test`        | Exécute les tests                                                       |
+| `docker compose run --build server check`       | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
+| `docker compose run --build server check-types` | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
 
 ### Structure des fichiers sources
 
