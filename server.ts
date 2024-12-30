@@ -1,6 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import express from "express";
 import type { Express } from "express";
 import { createServer as createViteServer } from "vite";
@@ -20,8 +18,6 @@ async function createServer() {
 
   app.use((await import("./src/express/router")).default);
 
-  app.use(express.static("./public"));
-
   const maybeVite = await configure(app);
 
   app.use("*", async (req, res, next) => {
@@ -39,26 +35,27 @@ async function createServer() {
       const nodeFetch = globalThis.fetch;
 
       globalThis.fetch = (resource) => {
-        if (resource.includes("://")) {
+        if (resource.toString().includes("://")) {
           return nodeFetch(resource);
         }
 
-        if (resource.startsWith("/")) {
+        if (resource.toString().startsWith("/")) {
           return nodeFetch(`${req.protocol}://${req.get("host")}${resource}`);
         }
 
         return nodeFetch(
-          `${req.protocol}://${req.get("host")}${url}${resource}`,
+          `${req.protocol}://${req.get("host")}${url}${resource.toString()}`,
         );
       };
     }
 
     try {
-      const indexHtml = readIndexHtml();
-
       const getTemplateAndRender = async () => {
+        const indexHtml = readIndexHtml();
+
         if (maybeVite == null) {
-          const render = (await import("./dist/server/entry-server")).render;
+          const { render } = await import("./dist/server/entry-server");
+
           return { template: indexHtml, render };
         }
 
@@ -72,7 +69,7 @@ async function createServer() {
         // 2. Load the server entry. ssrLoadModule automatically transforms
         //    ESM source code to be usable in Node.js! There is no bundling
         //    required, and provides efficient invalidation similar to HMR.
-        const render = (await vite.ssrLoadModule("/src/entry-server")).render;
+        const { render } = await vite.ssrLoadModule("/src/entry-server");
 
         return { template, render };
       };
@@ -97,13 +94,8 @@ async function createServer() {
 const isProduction = process.env.NODE_ENV === "production";
 
 function readIndexHtml() {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
   return fs.readFileSync(
-    path.resolve(
-      __dirname,
-      isProduction ? "dist/client/index.html" : "index.html",
-    ),
+    isProduction ? "dist/client/index.html" : "index.html",
     "utf-8",
   );
 }
