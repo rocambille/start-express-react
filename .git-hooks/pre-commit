@@ -1,4 +1,2 @@
-docker compose up --build --no-deps -d server
-docker compose exec -T server npm run check-types
-docker compose exec -T server npm run check
-docker compose down
+docker compose run -T --build --rm --no-deps server check-types || exit 1
+docker compose run -T --build --rm --no-deps server check || exit 1
