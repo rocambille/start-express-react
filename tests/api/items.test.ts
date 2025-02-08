@@ -108,7 +108,15 @@ describe("POST /api/items", () => {
 
     // Assertions
     expect(response.status).toBe(400);
-    expect(response.body).toEqual({});
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body.validationErrors).toBeInstanceOf(Array);
+    expect(
+      response.body.validationErrors.every(
+        (validationError: ValidationError) =>
+          typeof validationError.field === "string" &&
+          typeof validationError.message === "string",
+      ),
+    ).toEqual(true);
   });
 });
 
@@ -150,7 +158,15 @@ describe("PUT /api/items/:id", () => {
 
     // Assertions
     expect(response.status).toBe(400);
-    expect(response.body).toEqual({});
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body.validationErrors).toBeInstanceOf(Array);
+    expect(
+      response.body.validationErrors.every(
+        (validationError: ValidationError) =>
+          typeof validationError.field === "string" &&
+          typeof validationError.message === "string",
+      ),
+    ).toEqual(true);
   });
 
   it("should fail on invalid id", async () => {

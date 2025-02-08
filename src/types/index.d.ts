@@ -3,3 +3,8 @@ type Item = {
   title: string;
   user_id: number;
 };
+
+type ValidationError = {
+  field: string;
+  message: string;
+};
