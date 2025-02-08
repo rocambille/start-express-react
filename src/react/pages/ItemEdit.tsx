@@ -12,24 +12,23 @@ function ItemEdit() {
 
   const item = use(get(`/api/items/${id}`)) as Item;
 
+  const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
+    fetch(`/api/items/${item.id}`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
+    }).then((response) => {
+      if (response.status === 204) {
+        invalidateCache("/api/items");
+        navigate(`/items/${item.id}`);
+      }
+    });
+  };
+
   return (
-    <ItemForm
-      defaultValue={item}
-      submit={(partialItem) => {
-        fetch(`/api/items/${item.id}`, {
-          method: "put",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
-        }).then((response) => {
-          if (response.status === 204) {
-            invalidateCache("/api/items");
-            navigate(`/items/${item.id}`);
-          }
-        });
-      }}
-    >
+    <ItemForm defaultValue={item} submit={editItem}>
       <button type="submit">Modifier</button>
     </ItemForm>
   );

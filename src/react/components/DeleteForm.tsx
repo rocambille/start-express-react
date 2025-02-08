@@ -9,19 +9,19 @@ type DeleteFormProps = {
 function DeleteForm({ id, basePath }: DeleteFormProps) {
   const navigate = useNavigate();
 
+  const deleteItem = () => {
+    fetch(`/api${basePath}/${id}`, {
+      method: "delete",
+    }).then((response) => {
+      if (response.status === 204) {
+        invalidateCache(`/api${basePath}`);
+        navigate(basePath);
+      }
+    });
+  };
+
   return (
-    <form
-      action={() => {
-        fetch(`/api${basePath}/${id}`, {
-          method: "delete",
-        }).then((response) => {
-          if (response.status === 204) {
-            invalidateCache(`/api${basePath}`);
-            navigate(basePath);
-          }
-        });
-      }}
-    >
+    <form action={deleteItem}>
       <button type="submit">Supprimer</button>
     </form>
   );
