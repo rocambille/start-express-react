@@ -1,33 +1,12 @@
-import { useNavigate } from "react-router";
-
 import ItemForm from "../components/ItemForm";
 
-import { invalidateCache } from "../utils";
+import { useItems } from "../contexts/ItemContext";
 
 function ItemNew() {
-  const navigate = useNavigate();
+  const { addItem } = useItems();
 
   const newItem = {
     title: "",
-  };
-
-  const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    fetch("/api/items", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: 1, ...partialItem }),
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          return response.json();
-        }
-      })
-      .then(({ insertId }) => {
-        invalidateCache("/api/items");
-        navigate(`/items/${insertId}`);
-      });
   };
 
   return (

@@ -1,9 +1,8 @@
-import { use } from "react";
 import { Link } from "react-router";
-import { get, withSuspense } from "../utils";
+import { useItems } from "../contexts/ItemContext";
 
 function ItemIndex() {
-  const items = use(get("/api/items")) as Item[];
+  const { items } = useItems();
 
   return (
     <>
@@ -20,4 +19,4 @@ function ItemIndex() {
   );
 }
 
-export default withSuspense(ItemIndex);
+export default ItemIndex;

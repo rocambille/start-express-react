@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import App from "./App";
+
+import { ItemProvider } from "./contexts/ItemContext";
 
 import Home from "./pages/Home";
 import ItemDetail from "./pages/ItemDetail";
@@ -8,6 +11,7 @@ import ItemNew from "./pages/ItemNew";
 
 export default [
   {
+    path: "/",
     element: <App />,
     children: [
       {
@@ -16,19 +20,29 @@ export default [
       },
       {
         path: "/items",
-        element: <ItemIndex />,
-      },
-      {
-        path: "/items/:id",
-        element: <ItemDetail />,
-      },
-      {
-        path: "/items/:id/edit",
-        element: <ItemEdit />,
-      },
-      {
-        path: "/items/new",
-        element: <ItemNew />,
+        element: (
+          <Suspense fallback={<p>loading...</p>}>
+            <ItemProvider />
+          </Suspense>
+        ),
+        children: [
+          {
+            index: true,
+            element: <ItemIndex />,
+          },
+          {
+            path: "/items/:id",
+            element: <ItemDetail />,
+          },
+          {
+            path: "/items/:id/edit",
+            element: <ItemEdit />,
+          },
+          {
+            path: "/items/new",
+            element: <ItemNew />,
+          },
+        ],
       },
     ],
   },

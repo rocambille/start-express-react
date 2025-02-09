@@ -1,21 +1,18 @@
-import { use } from "react";
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 
-import DeleteForm from "../components/DeleteForm";
-import { get, withSuspense } from "../utils";
+import ItemDeleteForm from "../components/ItemDeleteForm";
+import { useItems } from "../contexts/ItemContext";
 
 function ItemDetail() {
-  const { id } = useParams();
-
-  const item = use(get(`/api/items/${id}`)) as Item;
+  const { item } = useItems();
 
   return (
     <>
       <h1>{item.title}</h1>
       <Link to={`/items/${item.id}/edit`}>Modifier</Link>
-      <DeleteForm basePath="/items" id={item.id} />
+      <ItemDeleteForm />
     </>
   );
 }
 
-export default withSuspense(ItemDetail);
+export default ItemDetail;

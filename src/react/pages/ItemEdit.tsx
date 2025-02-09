@@ -1,31 +1,9 @@
-import { use } from "react";
-import { useNavigate, useParams } from "react-router";
-
 import ItemForm from "../components/ItemForm";
 
-import { get, invalidateCache, withSuspense } from "../utils";
+import { useItems } from "../contexts/ItemContext";
 
 function ItemEdit() {
-  const navigate = useNavigate();
-
-  const { id } = useParams();
-
-  const item = use(get(`/api/items/${id}`)) as Item;
-
-  const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    fetch(`/api/items/${item.id}`, {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: item.user_id, ...partialItem }),
-    }).then((response) => {
-      if (response.status === 204) {
-        invalidateCache("/api/items");
-        navigate(`/items/${item.id}`);
-      }
-    });
-  };
+  const { item, editItem } = useItems();
 
   return (
     <ItemForm defaultValue={item} submit={editItem}>
@@ -34,4 +12,4 @@ function ItemEdit() {
   );
 }
 
-export default withSuspense(ItemEdit);
+export default ItemEdit;
