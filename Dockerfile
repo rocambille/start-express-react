@@ -15,7 +15,6 @@ COPY tests tests
 COPY src/types src/types
 COPY index.html index.html
 COPY server.ts server.ts
-COPY src/assets src/assets
 COPY src/entry-client.tsx src/entry-client.tsx
 COPY src/entry-server.tsx src/entry-server.tsx
 COPY src/database/checkConnection.ts src/database/checkConnection.ts
