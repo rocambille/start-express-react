@@ -1,8 +1,8 @@
 import { type ReactNode, createContext, use, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { get, invalidateCache } from "../utils";
 import { useAuth } from "./AuthContext";
+import { get, invalidateCache } from "./utils";
 
 interface ItemContextType {
   items: Item[];

@@ -1,5 +1,3 @@
-import { type ComponentType, type ReactNode, Suspense } from "react";
-
 const cache = new Map();
 
 export const get = (url: string) => {
@@ -22,11 +20,3 @@ export const invalidateCache = (basePath: string) => {
     }
   });
 };
-
-export const withSuspense =
-  (Suspendable: ComponentType, fallback: ReactNode = <p>loading...</p>) =>
-  () => (
-    <Suspense fallback={fallback}>
-      <Suspendable />
-    </Suspense>
-  );
