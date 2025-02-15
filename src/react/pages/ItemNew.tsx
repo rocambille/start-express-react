@@ -10,7 +10,7 @@ function ItemNew() {
   };
 
   return (
-    <ItemForm defaultValue={newItem} submit={addItem}>
+    <ItemForm defaultValue={newItem} action={addItem}>
       <button type="submit">Ajouter</button>
     </ItemForm>
   );

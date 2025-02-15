@@ -3,10 +3,10 @@ import { type ReactNode, useId } from "react";
 interface ItemFormProps {
   children: ReactNode;
   defaultValue: Omit<Item, "id" | "user_id">;
-  submit: (partialItem: Omit<Item, "id" | "user_id">) => void;
+  action: (partialItem: Omit<Item, "id" | "user_id">) => void;
 }
 
-function ItemForm({ children, defaultValue, submit }: ItemFormProps) {
+function ItemForm({ children, defaultValue, action }: ItemFormProps) {
   const titleId = useId();
 
   return (
@@ -14,7 +14,7 @@ function ItemForm({ children, defaultValue, submit }: ItemFormProps) {
       action={(formData) => {
         const title = formData.get("title") as string;
 
-        submit({ title });
+        action({ title });
       }}
     >
       <p>

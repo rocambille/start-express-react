@@ -10,7 +10,7 @@ function ItemEdit() {
   }
 
   return (
-    <ItemForm defaultValue={item} submit={editItem}>
+    <ItemForm defaultValue={item} action={editItem}>
       <button type="submit">Modifier</button>
     </ItemForm>
   );
