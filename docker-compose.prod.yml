@@ -1,0 +1,14 @@
+services:
+  server:
+    extends:
+      file: docker-compose.yml
+      service: server
+    command: start
+  database:
+    extends:
+      file: docker-compose.yml
+      service: database
+  adminer:
+    extends:
+      file: docker-compose.yml
+      service: adminer

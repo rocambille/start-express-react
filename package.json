@@ -11,7 +11,7 @@
     "check-types": "tsc --noEmit",
     "predev": "[ -d 'node_modules' ] || npm i",
     "dev": "tsx --env-file=.env server",
-    "prestart": "[ -d 'node_modules' ] || npm i",
+    "prestart": "([ -d 'node_modules' ] || npm i) && npm run build",
     "start": "NODE_ENV=production tsx --env-file=.env server",
     "test": "jest --coverage --verbose"
   },
