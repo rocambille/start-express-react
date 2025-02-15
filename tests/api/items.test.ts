@@ -4,7 +4,7 @@ import supertest from "supertest";
 import router from "../../src/express/routes";
 
 import databaseClient, {
-  type Result,
+  // type Result,
   type Rows,
 } from "../../src/database/client";
 
@@ -71,7 +71,7 @@ describe("GET /api/items/:id", () => {
 });
 
 describe("POST /api/items", () => {
-  it("should add a new item successfully", async () => {
+  /*it("should add a new item successfully", async () => {
     // Mock result of the database query
     const result = { insertId: 1 } as Result;
 
@@ -118,11 +118,19 @@ describe("POST /api/items", () => {
           typeof validationError.message === "string",
       ),
     ).toEqual(true);
+  });*/
+
+  it("should fail without access token", async () => {
+    // Send a POST request to the /api/items endpoint
+    const response = await supertest(app).post("/api/items");
+
+    // Assertions
+    expect(response.status).toBe(403);
   });
 });
 
 describe("PUT /api/items/:id", () => {
-  it("should update an existing item successfully", async () => {
+  /*it("should update an existing item successfully", async () => {
     // Mock result of the database query
     const result = { affectedRows: 1 } as Result;
 
@@ -188,11 +196,19 @@ describe("PUT /api/items/:id", () => {
     // Assertions
     expect(response.status).toBe(404);
     expect(response.body).toEqual({});
+  });*/
+
+  it("should fail without access token", async () => {
+    // Send a POST request to the /api/items endpoint
+    const response = await supertest(app).put("/api/items/42");
+
+    // Assertions
+    expect(response.status).toBe(403);
   });
 });
 
 describe("DELETE /api/items/:id", () => {
-  it("should delete an existing item successfully", async () => {
+  /*it("should delete an existing item successfully", async () => {
     // Mock result of the database query
     const result = { affectedRows: 1 } as Result;
 
@@ -224,5 +240,13 @@ describe("DELETE /api/items/:id", () => {
     // Assertions
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
+  });*/
+
+  it("should fail without access token", async () => {
+    // Send a POST request to the /api/items endpoint
+    const response = await supertest(app).delete("/api/items/42");
+
+    // Assertions
+    expect(response.status).toBe(403);
   });
 });

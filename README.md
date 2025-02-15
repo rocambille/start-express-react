@@ -132,7 +132,7 @@ MYSQL_DATABASE=starter
 **Les variables sont utilisés** dans `server/database/client.ts` :
 
 ```typescript
-const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const { MYSQL_ROOT_PASSWORD, MYSQL_DATABASE } = process.env;
 
 import mysql from "mysql2/promise";
 
@@ -177,10 +177,7 @@ docker compose up --build
 // ...
 
 /* ************************************************************************* */
-// Define Your API Routes Here
-/* ************************************************************************* */
 
-// Define item-related routes
 import itemActions from "./modules/item/itemActions";
 
 router.get("/api/items", itemActions.browse);
@@ -231,13 +228,13 @@ export default new ItemRepository();
 
 ### REST
 
-| Opération | Méthode | Chemin d'URL | Corps de la requête | SQL    | Réponse (Succès)               | Réponse (Erreur)                                                       |
-|-----------|---------|--------------|---------------------|--------|--------------------------------|------------------------------------------------------------------------|
-| Browse    | GET     | /items       |                     | SELECT | 200 (OK), liste des items.     |                                                                        |
-| Read      | GET     | /items/:id   |                     | SELECT | 200 (OK), un item.             | 404 (Not Found), si id invalide.                                       |
-| Add       | POST    | /items       | Données de l'item   | INSERT | 201 (Created), id d'insertion. | 400 (Bad Request), si corps invalide.                                  |
-| Edit      | PUT     | /items/:id   | Données de l'item   | UPDATE | 204 (No Content).              | 400 (Bad Request), si corps invalide. 404 (Not Found), si id invalide. |
-| Destroy   | DELETE  | /items/:id   |                     | DELETE | 204 (No Content).              |                                                                        |
+| Opération | Méthode | Chemin d'URL    | Corps de la requête | SQL     | Réponse (Succès)                | Réponse (Erreur)                                                        |
+|-----------|---------|-----------------|---------------------|---------|---------------------------------|-------------------------------------------------------------------------|
+| Browse    | GET     | /api/items      |                     | SELECT  | 200 (OK), liste des items.      |                                                                         |
+| Read      | GET     | /api/items/:id  |                     | SELECT  | 200 (OK), un item.              | 404 (Not Found), si id invalide.                                        |
+| Add       | POST    | /api/items      | Données de l'item   | INSERT  | 201 (Created), id d'insertion.  | 400 (Bad Request), si corps invalide.                                   |
+| Edit      | PUT     | /api/items/:id  | Données de l'item   | UPDATE  | 204 (No Content).               | 400 (Bad Request), si corps invalide. 404 (Not Found), si id invalide.  |
+| Destroy   | DELETE  | /api/items/:id  |                     | DELETE  | 204 (No Content).               |                                                                         |
 
 ### Autres bonnes pratiques
 
