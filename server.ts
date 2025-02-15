@@ -1,6 +1,5 @@
 import fs from "node:fs";
-import express from "express";
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
@@ -9,14 +8,14 @@ createServer().then((server) => {
   const port = 5173;
 
   server.listen(port, () => {
-    console.info(`Listening on port ${port}`);
+    console.info(`Listening on http://localhost:${port}`);
   });
 });
 
 async function createServer() {
   const app = express();
 
-  app.use((await import("./src/express/router")).default);
+  app.use((await import("./src/express/routes")).default);
 
   const maybeVite = await configure(app);
 

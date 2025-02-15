@@ -1,6 +1,7 @@
-import databaseClient from "../../../database/client";
-
-import type { Result, Rows } from "../../../database/client";
+import databaseClient, {
+  type Result,
+  type Rows,
+} from "../../../database/client";
 
 class ItemRepository {
   // The C of CRUD - Create operation

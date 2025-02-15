@@ -1,64 +1,84 @@
-import { createContext, use, useContext } from "react";
-import { Outlet, useNavigate, useParams } from "react-router";
+import { type ReactNode, createContext, use, useContext } from "react";
+import { useNavigate, useParams } from "react-router";
 
 import { get, invalidateCache } from "../utils";
+import { useAuth } from "./AuthContext";
 
 interface ItemContextType {
   items: Item[];
-  item: Item;
+  addItem: (partialItem: Omit<Item, "id" | "user_id">) => void;
+  item?: Item;
   editItem: (partialItem: Omit<Item, "id" | "user_id">) => void;
   deleteItem: () => void;
-  addItem: (partialItem: Omit<Item, "id" | "user_id">) => void;
 }
 
 const ItemContext = createContext(null as ItemContextType | null);
 
-export function ItemProvider() {
-  const items = use(get("/api/items")) as Item[];
+interface ItemProviderProps {
+  children: ReactNode;
+}
 
-  const value = { items } as ItemContextType;
+export function ItemProvider({ children }: ItemProviderProps) {
+  const { user } = useAuth();
+
+  const items = use(get("/api/items")) as Item[];
 
   const navigate = useNavigate();
 
   const { id } = useParams();
 
-  if (id != null) {
-    value.item = items.find((i) => i.id === +id) as Item;
+  const item = items.find((i) => i.id === Number(id));
 
-    value.editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-      fetch(`/api/items/${id}`, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user_id: value.item?.user_id, ...partialItem }),
-      }).then((response) => {
-        if (response.status === 204) {
-          invalidateCache("/api/items");
-          navigate(`/items/${id}`);
-        }
-      });
-    };
+  const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
+    if (user == null) {
+      alert("Please log in");
+      return;
+    }
 
-    value.deleteItem = () => {
-      fetch(`/api/items/${id}`, {
-        method: "delete",
-      }).then((response) => {
-        if (response.status === 204) {
-          invalidateCache("/api/items");
-          navigate("/items");
-        }
-      });
-    };
-  }
+    fetch(`/api/items/${id}`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...partialItem,
+      }),
+    }).then((response) => {
+      if (response.status === 204) {
+        invalidateCache("/api/items");
+        navigate(`/items/${id}`);
+      }
+    });
+  };
 
-  value.addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
+  const deleteItem = () => {
+    if (user == null) {
+      alert("Please log in");
+      return;
+    }
+
+    fetch(`/api/items/${id}`, {
+      method: "delete",
+    }).then((response) => {
+      if (response.status === 204) {
+        invalidateCache("/api/items");
+        navigate("/items");
+      }
+    });
+  };
+
+  const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
+    if (user == null) {
+      alert("Please log in");
+      return;
+    }
+
     fetch("/api/items", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ user_id: 1, ...partialItem }),
+      body: JSON.stringify({ user_id: user.id, ...partialItem }),
     })
       .then((response) => {
         if (response.status === 201) {
@@ -72,8 +92,10 @@ export function ItemProvider() {
   };
 
   return (
-    <ItemContext.Provider value={value}>
-      <Outlet />
+    <ItemContext.Provider
+      value={{ items, addItem, item, editItem, deleteItem }}
+    >
+      {children}
     </ItemContext.Provider>
   );
 }

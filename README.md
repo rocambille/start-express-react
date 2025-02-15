@@ -104,16 +104,13 @@ my-project/
 │   |   └── schema.sql
 │   ├── express/
 │   │   ├── modules/
-│   │   │   └── item/
-│   │   │       ├── itemActions.ts
-│   │   │       └── itemRepository.ts
-│   │   └── router.ts
+│   │   │   └── ...
+│   │   └── routes.ts
 |   ├── react/
 │   │   ├── components/
 │   │   │   └── ...
 │   │   ├── pages/
 │   │   │   └── ...
-│   │   ├── App.tsx
 │   │   └── routes.tsx
 |   ├── types/
 │   │   └── index.d.ts
@@ -216,9 +213,10 @@ export default { browse };
 **Accéder aux données** dans `src/express/modules/item/itemRepository.ts` :
 
 ```typescript
-import databaseClient from "../../../database/client";
-
-import type { Result, Rows } from "../../../database/client";
+import databaseClient, {
+  type Result,
+  type Rows,
+} from "../../../database/client";
 
 class ItemRepository {
   async readAll() {

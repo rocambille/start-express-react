@@ -9,7 +9,31 @@ import { act, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
 
-import * as utils from "../../src/react/utils";
+import * as AuthContext from "../../src/react/contexts/AuthContext";
+import * as ItemContext from "../../src/react/contexts/ItemContext";
+
+const authContextValue = {
+  user: null,
+  login: () => {},
+  logout: () => {},
+  register: () => {},
+};
+
+const itemContextValue = {
+  items: [{ id: 1, user_id: 1, title: "foo" }],
+  item: { id: 1, user_id: 1, title: "foo" },
+  addItem: () => {},
+  editItem: () => {},
+  deleteItem: () => {},
+};
+
+beforeEach(() => {
+  jest.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
+
+  jest
+    .spyOn(ItemContext, "useItems")
+    .mockImplementation(() => itemContextValue);
+});
 
 afterEach(() => {
   jest.restoreAllMocks();
@@ -28,12 +52,6 @@ test("<Home />", async () => {
 import ItemDetail from "../../src/react/pages/ItemDetail";
 
 test("<ItemDetail />", async () => {
-  const item: Item = { id: 1, user_id: 1, title: "foo" };
-  const cachedItem = Promise.resolve(item);
-
-  // Mock the implementation of utils.get
-  jest.spyOn(utils, "get").mockImplementation(() => cachedItem);
-
   await act(async () => {
     render(<ItemDetail />, { wrapper: BrowserRouter });
   });
@@ -44,12 +62,6 @@ test("<ItemDetail />", async () => {
 import ItemEdit from "../../src/react/pages/ItemEdit";
 
 test("<ItemEdit />", async () => {
-  const item: Item = { id: 1, user_id: 1, title: "foo" };
-  const cachedItem = Promise.resolve(item);
-
-  // Mock the implementation of utils.get
-  jest.spyOn(utils, "get").mockImplementation(() => cachedItem);
-
   await act(async () => {
     render(<ItemEdit />, { wrapper: BrowserRouter });
   });
@@ -60,12 +72,6 @@ test("<ItemEdit />", async () => {
 import ItemIndex from "../../src/react/pages/ItemIndex";
 
 test("<ItemIndex />", async () => {
-  const items: Item[] = [{ id: 1, user_id: 1, title: "foo" }];
-  const cachedItems = Promise.resolve(items);
-
-  // Mock the implementation of utils.get
-  jest.spyOn(utils, "get").mockImplementation(() => cachedItems);
-
   await act(async () => {
     render(<ItemIndex />, { wrapper: BrowserRouter });
   });

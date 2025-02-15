@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 
 interface ItemFormProps {
   children: ReactNode;
@@ -7,6 +7,8 @@ interface ItemFormProps {
 }
 
 function ItemForm({ children, defaultValue, submit }: ItemFormProps) {
+  const titleId = useId();
+
   return (
     <form
       action={(formData) => {
@@ -15,7 +17,16 @@ function ItemForm({ children, defaultValue, submit }: ItemFormProps) {
         submit({ title });
       }}
     >
-      <input type="text" name="title" defaultValue={defaultValue.title} />
+      <p>
+        <label htmlFor={titleId}>title</label>
+        <input
+          id={titleId}
+          type="text"
+          name="title"
+          defaultValue={defaultValue.title}
+        />
+      </p>
+
       {children}
     </form>
   );

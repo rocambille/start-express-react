@@ -2,9 +2,7 @@ import "dotenv/config";
 
 import fs from "node:fs";
 
-import databaseClient from "../src/database/client";
-
-import type { Rows } from "../src/database/client";
+import databaseClient, { type Rows } from "../src/database/client";
 
 describe("Installation", () => {
   test("you created .env", async () => {

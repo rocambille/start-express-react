@@ -4,3 +4,4 @@ node_modules
 src/database/data
 .DS_Store
 .env
+*.http

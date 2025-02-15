@@ -1,11 +1,12 @@
 import express from "express";
 import supertest from "supertest";
 
-import router from "../../src/express/router";
+import router from "../../src/express/routes";
 
-import databaseClient from "../../src/database/client";
-
-import type { Result, Rows } from "../../src/database/client";
+import databaseClient, {
+  type Result,
+  type Rows,
+} from "../../src/database/client";
 
 const app = express();
 app.use(router);

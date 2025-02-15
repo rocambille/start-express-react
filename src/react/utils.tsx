@@ -1,5 +1,4 @@
-import { Suspense } from "react";
-import type { ComponentType, ReactNode } from "react";
+import { type ComponentType, type ReactNode, Suspense } from "react";
 
 const cache = new Map();
 
