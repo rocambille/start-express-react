@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Start Express React</title>
     <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-    >
-    <link rel="shortcut icon" href="/src/react/assets/images/favicon.png" type="image/png">
-</head>
-<body>
+      rel="shortcut icon"
+      href="/src/react/assets/images/favicon.png"
+      type="image/png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <style>
+      :root {
+        --pico-border-radius: 2rem;
+        --pico-form-element-spacing-vertical: 0.5rem;
+        --pico-form-element-spacing-horizontal: 1rem;
+      }
+    </style>
+  </head>
+  <body>
     <div class="container" id="root"><!--ssr-outlet--></div>
     <script type="module" src="/src/entry-client"></script>
-</body>
+  </body>
 </html>

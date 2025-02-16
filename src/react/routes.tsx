@@ -1,11 +1,8 @@
 import { Suspense } from "react";
 import { Outlet } from "react-router";
 
-import BurgerMenu from "./components/BurgerMenu";
-import NavBar from "./components/NavBar";
-
-import { AuthProvider } from "./contexts/AuthContext";
-import { ItemProvider } from "./contexts/ItemContext";
+import { ItemProvider } from "./components/ItemContext";
+import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
 import ItemDetail from "./pages/ItemDetail";
@@ -19,15 +16,9 @@ export default [
   {
     path: "/",
     element: (
-      <AuthProvider>
-        <header>
-          <NavBar />
-          <BurgerMenu />
-        </header>
-        <main>
-          <Outlet />
-        </main>
-      </AuthProvider>
+      <Layout>
+        <Outlet />
+      </Layout>
     ),
     children: [
       {
@@ -37,7 +28,7 @@ export default [
       {
         path: "/items",
         element: (
-          <Suspense fallback={<p>loading...</p>}>
+          <Suspense fallback={<p>loading items...</p>}>
             <ItemProvider>
               <Outlet />
             </ItemProvider>

@@ -9,8 +9,14 @@ import { act, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
 
-import * as AuthContext from "../../src/react/contexts/AuthContext";
-import * as ItemContext from "../../src/react/contexts/ItemContext";
+import * as AuthContext from "../../src/react/components/AuthContext";
+import * as ItemContext from "../../src/react/components/ItemContext";
+
+import Home from "../../src/react/pages/Home";
+import ItemDetail from "../../src/react/pages/ItemDetail";
+import ItemEdit from "../../src/react/pages/ItemEdit";
+import ItemIndex from "../../src/react/pages/ItemIndex";
+import ItemNew from "../../src/react/pages/ItemNew";
 
 const authContextValue = {
   user: null,
@@ -39,52 +45,44 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-import Home from "../../src/react/pages/Home";
+describe("React Pages", () => {
+  test("<Home />", async () => {
+    await act(async () => {
+      render(<Home />, { wrapper: BrowserRouter });
+    });
 
-test("<Home />", async () => {
-  await act(async () => {
-    render(<Home />, { wrapper: BrowserRouter });
+    expect(true).toBeTruthy();
   });
 
-  expect(true).toBeTruthy();
-});
+  test("<ItemDetail />", async () => {
+    await act(async () => {
+      render(<ItemDetail />, { wrapper: BrowserRouter });
+    });
 
-import ItemDetail from "../../src/react/pages/ItemDetail";
-
-test("<ItemDetail />", async () => {
-  await act(async () => {
-    render(<ItemDetail />, { wrapper: BrowserRouter });
+    expect(true).toBeTruthy();
   });
 
-  expect(true).toBeTruthy();
-});
+  test("<ItemEdit />", async () => {
+    await act(async () => {
+      render(<ItemEdit />, { wrapper: BrowserRouter });
+    });
 
-import ItemEdit from "../../src/react/pages/ItemEdit";
-
-test("<ItemEdit />", async () => {
-  await act(async () => {
-    render(<ItemEdit />, { wrapper: BrowserRouter });
+    expect(true).toBeTruthy();
   });
 
-  expect(true).toBeTruthy();
-});
+  test("<ItemIndex />", async () => {
+    await act(async () => {
+      render(<ItemIndex />, { wrapper: BrowserRouter });
+    });
 
-import ItemIndex from "../../src/react/pages/ItemIndex";
-
-test("<ItemIndex />", async () => {
-  await act(async () => {
-    render(<ItemIndex />, { wrapper: BrowserRouter });
+    expect(true).toBeTruthy();
   });
 
-  expect(true).toBeTruthy();
-});
+  test("<ItemNew />", async () => {
+    await act(async () => {
+      render(<ItemNew />, { wrapper: BrowserRouter });
+    });
 
-import ItemNew from "../../src/react/pages/ItemNew";
-
-test("<ItemNew />", async () => {
-  await act(async () => {
-    render(<ItemNew />, { wrapper: BrowserRouter });
+    expect(true).toBeTruthy();
   });
-
-  expect(true).toBeTruthy();
 });

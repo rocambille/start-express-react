@@ -1,12 +1,7 @@
-import { useId } from "react";
-
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "./AuthContext";
 
 function LoginRegisterForm() {
   const { login, register } = useAuth();
-
-  const emailId = useId();
-  const passwordId = useId();
 
   return (
     <form
@@ -21,30 +16,47 @@ function LoginRegisterForm() {
           login({ email, password });
         }
       }}
+      style={{ display: "grid", gridTemplateColumns: "1fr auto" }}
     >
-      <p>
-        <label htmlFor={emailId}>email</label>
-        <input id={emailId} type="email" name="email" defaultValue="" />
-      </p>
+      <input
+        aria-label="Email"
+        type="email"
+        name="email"
+        defaultValue=""
+        placeholder="jdoe@mail.com"
+        style={{ borderStartEndRadius: 0, borderEndEndRadius: 0 }}
+      />
 
-      <p>
-        <label htmlFor={passwordId}>password</label>
-        <input
-          id={passwordId}
-          type="password"
-          name="password"
-          defaultValue=""
-        />
-      </p>
+      <input
+        aria-label="Password"
+        type="password"
+        name="password"
+        defaultValue=""
+        placeholder="******"
+        style={{ borderStartEndRadius: 0, borderEndEndRadius: 0 }}
+      />
 
-      <p>
-        <button type="submit" name="register" className="secondary">
-          Créer mon compte
-        </button>
-        <button type="submit" name="login">
-          Me connecter
-        </button>
-      </p>
+      <button
+        type="submit"
+        name="login"
+        style={{ borderStartStartRadius: 0, borderEndStartRadius: 0 }}
+      >
+        Me connecter
+      </button>
+
+      <button
+        type="submit"
+        name="register"
+        className="secondary"
+        style={{
+          borderStartStartRadius: 0,
+          borderEndStartRadius: 0,
+          gridRow: 1,
+          gridColumn: 2,
+        }}
+      >
+        Créer mon compte
+      </button>
     </form>
   );
 }

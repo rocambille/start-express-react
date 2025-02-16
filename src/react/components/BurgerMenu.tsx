@@ -1,12 +1,10 @@
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 
-import { useAuth } from "../contexts/AuthContext";
+interface BurgerMenuProps {
+  children: ReactNode;
+}
 
-import LoginRegisterForm from "./LoginRegisterForm";
-
-function BurgerMenu() {
-  const { user, logout } = useAuth();
-
+function BurgerMenu({ children }: BurgerMenuProps) {
   const burgerMenuId = useId();
 
   return (
@@ -23,13 +21,7 @@ function BurgerMenu() {
         >
           Fermer
         </button>
-        {user ? (
-          <button type="button" onClick={logout}>
-            Me déconnecter
-          </button>
-        ) : (
-          <LoginRegisterForm />
-        )}
+        {children}
       </div>
     </>
   );
