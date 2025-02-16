@@ -38,7 +38,7 @@ function LoginRegisterForm() {
       </p>
 
       <p>
-        <button type="submit" name="register">
+        <button type="submit" name="register" className="secondary">
           Créer mon compte
         </button>
         <button type="submit" name="login">

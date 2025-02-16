@@ -11,16 +11,17 @@ function BurgerMenu() {
 
   return (
     <>
-      <button type="button" popoverTarget={burgerMenuId}>
-        🍔
+      <button type="button" popoverTarget={burgerMenuId} className="contrast">
+        Menu
       </button>
       <div id={burgerMenuId} popover="auto">
         <button
           type="button"
           popoverTarget={burgerMenuId}
           popoverTargetAction="hide"
+          className="contrast"
         >
-          ❎
+          Fermer
         </button>
         {user ? (
           <button type="button" onClick={logout}>

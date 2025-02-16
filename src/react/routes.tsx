@@ -20,9 +20,11 @@ export default [
     path: "/",
     element: (
       <AuthProvider>
-        <main>
+        <header>
           <NavBar />
           <BurgerMenu />
+        </header>
+        <main>
           <Outlet />
         </main>
       </AuthProvider>
