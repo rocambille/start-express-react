@@ -18,35 +18,16 @@ const browse: RequestHandler = async (_req, res, next) => {
 };
 
 // The R of BREAD - Read operation
-const read: RequestHandler = async (req, res, next) => {
-  try {
-    // Fetch a specific user based on the provided ID
-    const user = await userRepository.read(+req.params.id);
-
-    // If the user is not found, respond with HTTP 404 (Not Found)
-    // Otherwise, respond with the user in JSON format
-    if (user == null) {
-      res.sendStatus(404);
-    } else {
-      res.json(user);
-    }
-  } catch (err) {
-    // Pass any errors to the error-handling middleware
-    next(err);
-  }
+const read: RequestHandler = async (req, res, _next) => {
+  res.json(req.user);
 };
 
 // The E of BREAD - Edit (Update) operation
 const edit: RequestHandler = async (req, res, next) => {
   try {
-    if (req.params.id !== req.auth.sub) {
-      res.sendStatus(403);
-      return;
-    }
-
     // Extract the user data from the request body and params
     const newUser = {
-      id: +req.params.id,
+      id: req.user.id,
       email: req.body.email,
       password: req.body.password,
     };
@@ -70,13 +51,8 @@ const edit: RequestHandler = async (req, res, next) => {
 // The D of BREAD - Destroy (Delete) operation
 const destroy: RequestHandler = async (req, res, next) => {
   try {
-    if (req.params.id !== req.auth.sub) {
-      res.sendStatus(403);
-      return;
-    }
-
     // Delete a specific user based on the provided ID
-    await userRepository.delete(+req.params.id);
+    await userRepository.delete(req.user.id);
 
     // Always respond with HTTP 204 (No Content)
     res.sendStatus(204);
@@ -86,41 +62,9 @@ const destroy: RequestHandler = async (req, res, next) => {
   }
 };
 
-// The V - Validate operation
-const validate: RequestHandler = async (req, res, next) => {
-  const errors: ValidationError[] = [];
-
-  const { email, password } = req.body;
-
-  if (email == null) {
-    errors.push({ field: "email", message: "The field is required" });
-  } else if (email.length > 255) {
-    errors.push({
-      field: "email",
-      message: "Should contain less than 255 characters",
-    });
-  }
-
-  if (password == null) {
-    errors.push({ field: "password", message: "The field is required" });
-  } else if (password.length > 255) {
-    errors.push({
-      field: "password",
-      message: "Should contain less than 255 characters",
-    });
-  }
-
-  if (errors.length === 0) {
-    next();
-  } else {
-    res.status(400).json({ validationErrors: errors });
-  }
-};
-
 export default {
   browse,
   read,
   edit,
   destroy,
-  validate,
 };

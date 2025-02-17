@@ -199,6 +199,14 @@ describe("PUT /api/items/:id", () => {
   });*/
 
   it("should fail without access token", async () => {
+    // Mock rows returned from the database
+    const rows = [{}] as Rows;
+
+    // Mock the implementation of the database query method
+    jest
+      .spyOn(databaseClient, "query")
+      .mockImplementation(async () => [rows, []]);
+
     // Send a POST request to the /api/items endpoint
     const response = await supertest(app).put("/api/items/42");
 
@@ -243,6 +251,14 @@ describe("DELETE /api/items/:id", () => {
   });*/
 
   it("should fail without access token", async () => {
+    // Mock rows returned from the database
+    const rows = [{}] as Rows;
+
+    // Mock the implementation of the database query method
+    jest
+      .spyOn(databaseClient, "query")
+      .mockImplementation(async () => [rows, []]);
+
     // Send a POST request to the /api/items endpoint
     const response = await supertest(app).delete("/api/items/42");
 

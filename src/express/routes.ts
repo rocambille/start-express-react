@@ -5,50 +5,21 @@ const router = Router().use(express.json()).use(cookieParser());
 
 /* ************************************************************************ */
 
-import authActions from "./modules/auth/authActions";
-import itemActions from "./modules/item/itemActions";
-import userActions from "./modules/user/userActions";
+import authRoutes from "./modules/auth/authRoutes";
+
+router.use(authRoutes);
 
 /* ************************************************************************ */
 
-router.post("/api/access-token", authActions.createAccessToken);
-router.delete("/api/access-token", authActions.destroyAccessToken);
+import itemRoutes from "./modules/item/itemRoutes";
+
+router.use(itemRoutes);
 
 /* ************************************************************************ */
 
-router.get("/api/items", itemActions.browse);
-router.get("/api/items/:id", itemActions.read);
+import userRoutes from "./modules/user/userRoutes";
 
-/* ************************************************************************ */
-
-router.get("/api/users", userActions.browse);
-router.get("/api/users/:id", userActions.read);
-router.post(
-  "/api/users",
-  userActions.validate,
-  authActions.hashPassword,
-  authActions.createUserAndAccessToken,
-);
-
-/* ************************************************************************ */
-
-router.use("/api", authActions.verifyAccessToken); // Authentication Wall
-
-/* ************************************************************************ */
-
-router.post("/api/items", itemActions.validate, itemActions.add);
-router.put("/api/items/:id", itemActions.validate, itemActions.edit);
-router.delete("/api/items/:id", itemActions.destroy);
-
-/* ************************************************************************ */
-
-router.put(
-  "/api/users/:id",
-  userActions.validate,
-  authActions.hashPassword,
-  userActions.edit,
-);
-router.delete("/api/users/:id", userActions.destroy);
+router.use(userRoutes);
 
 /* ************************************************************************ */
 
