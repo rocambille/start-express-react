@@ -5,7 +5,7 @@ import itemRepository from "./itemRepository";
 
 declare global {
   namespace Express {
-    export interface Request {
+    interface Request {
       item: Item;
     }
   }
