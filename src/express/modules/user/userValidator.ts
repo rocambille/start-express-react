@@ -1,32 +1,19 @@
 import type { RequestHandler } from "express";
+import { type ZodError, z } from "zod";
 
-const validate: RequestHandler = async (req, res, next) => {
-  const errors: ValidationError[] = [];
+const userDTOSchema = z.object({
+  id: z.number().optional(),
+  email: z.string().email().max(255),
+  password: z.string().max(255),
+});
 
-  const { email, password } = req.body;
+const validate: RequestHandler = (req, res, next) => {
+  try {
+    req.body = userDTOSchema.parse(req.body);
 
-  if (email == null) {
-    errors.push({ field: "email", message: "The field is required" });
-  } else if (email.length > 255) {
-    errors.push({
-      field: "email",
-      message: "Should contain less than 255 characters",
-    });
-  }
-
-  if (password == null) {
-    errors.push({ field: "password", message: "The field is required" });
-  } else if (password.length > 255) {
-    errors.push({
-      field: "password",
-      message: "Should contain less than 255 characters",
-    });
-  }
-
-  if (errors.length === 0) {
     next();
-  } else {
-    res.status(400).json({ validationErrors: errors });
+  } catch (err) {
+    res.status(400).json((err as ZodError).issues);
   }
 };
 
