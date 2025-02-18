@@ -19,7 +19,7 @@ async function createServer() {
 
   const maybeVite = await configure(app);
 
-  app.use("*", async (req, res, next) => {
+  app.use(/(.*)/, async (req, res, next) => {
     const url = req.originalUrl;
 
     // The fetch api is ambiguous and depends on the context where it is executed :
