@@ -42,7 +42,7 @@ router.get(USER_PATH, userActions.read);
 
 /* ************************************************************************ */
 
-router.use(authActions.verifyAccessToken); // Authentication Wall
+router.use(BASE_PATH, authActions.verifyAccessToken); // Authentication Wall
 
 /* ************************************************************************ */
 

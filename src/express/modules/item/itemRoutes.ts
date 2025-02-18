@@ -34,7 +34,7 @@ router.get(ITEM_PATH, itemActions.read);
 
 /* ************************************************************************ */
 
-router.use(authActions.verifyAccessToken); // Authentication Wall
+router.use(BASE_PATH, authActions.verifyAccessToken); // Authentication Wall
 
 /* ************************************************************************ */
 
