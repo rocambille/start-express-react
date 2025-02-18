@@ -45,6 +45,7 @@ Il est pré-configuré avec un ensemble d'outils pour aider des juniors à produ
 - **MySQL** : Système de gestion de bases de données relationnelles performant, utilisé pour stocker et interroger les données.  
 - **Biome** : Outil tout-en-un pour le linting, le formatage et l'analyse statique de code, conçu pour assurer la qualité et la lisibilité du code de manière performante et moderne.  
 - **Jest** : Framework de test JavaScript.  
+- **Pico CSS** : Kit CSS minimaliste et léger qui donne la priorité à la syntaxe sémantique.  
 
 ## Table des matières
 

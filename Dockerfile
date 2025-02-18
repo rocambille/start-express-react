@@ -3,7 +3,7 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY package.json package.json
-COPY package-lock.json package-lock.json
+RUN npm install
 
 RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js
 COPY biome.json biome.json

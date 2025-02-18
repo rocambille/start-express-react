@@ -6,6 +6,7 @@ services:
     build: .
     volumes:
       - "./:/app"
+      - "/app/node_modules"
     command: dev
     ports:
       - "5173:5173"
@@ -15,9 +16,7 @@ services:
     restart: always
     env_file: ./.env
     volumes:
-      - type: bind
-        source: ./src/database/schema.sql
-        target: /docker-entrypoint-initdb.d/schema.sql
+      - "./src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
       - "./src/database/data:/var/lib/mysql"
     healthcheck:
         test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
