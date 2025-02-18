@@ -12,6 +12,9 @@ import authActions from "../auth/authActions";
 
 /* ************************************************************************ */
 
+const BASE_PATH = "/api/users";
+const USER_PATH = "/api/users/:userId";
+
 router.param("userId", userParamConverter.convert);
 
 /* ************************************************************************ */
@@ -27,7 +30,7 @@ const checkAccess: RequestHandler = (req, res, next) => {
 /* ************************************************************************ */
 
 router
-  .route("/api/users")
+  .route(BASE_PATH)
   .get(userActions.browse)
   .post(
     userValidator.validate,
@@ -35,12 +38,17 @@ router
     authActions.createUserAndAccessToken,
   );
 
+router.get(USER_PATH, userActions.read);
+
+/* ************************************************************************ */
+
+router.use(authActions.verifyAccessToken); // Authentication Wall
+
 /* ************************************************************************ */
 
 router
-  .route("/api/users/:userId")
-  .get(userActions.read)
-  .all(authActions.verifyAccessToken, checkAccess) /* auth wall */
+  .route(USER_PATH)
+  .all(checkAccess)
   .put(userValidator.validate, authActions.hashPassword, userActions.edit)
   .delete(userActions.destroy);
 

@@ -12,6 +12,9 @@ import authActions from "../auth/authActions";
 
 /* ************************************************************************ */
 
+const BASE_PATH = "/api/items";
+const ITEM_PATH = "/api/items/:itemId";
+
 router.param("itemId", itemParamConverter.convert);
 
 /* ************************************************************************ */
@@ -26,18 +29,20 @@ const checkAccess: RequestHandler = (req, res, next) => {
 
 /* ************************************************************************ */
 
-router
-  .route("/api/items")
-  .get(itemActions.browse)
-  .all(authActions.verifyAccessToken) /* auth wall */
-  .post(itemValidator.validate, itemActions.add);
+router.get(BASE_PATH, itemActions.browse);
+router.get(ITEM_PATH, itemActions.read);
 
 /* ************************************************************************ */
 
+router.use(authActions.verifyAccessToken); // Authentication Wall
+
+/* ************************************************************************ */
+
+router.post(BASE_PATH, itemValidator.validate, itemActions.add);
+
 router
-  .route("/api/items/:itemId")
-  .get(itemActions.read)
-  .all(authActions.verifyAccessToken, checkAccess) /* auth wall */
+  .route(ITEM_PATH)
+  .all(checkAccess)
   .put(itemValidator.validate, itemActions.edit)
   .delete(itemActions.destroy);
 
