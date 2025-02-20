@@ -4,7 +4,7 @@ interface AuthContextType {
   user: User | null;
   login: (credentials: Credentials) => void;
   logout: () => void;
-  register: (credentials: Credentials) => void;
+  register: (credentials: Credentials & { confirmPassword: string }) => void;
 }
 
 const AuthContext = createContext(null as AuthContextType | null);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   };
 
-  const register = (credentials: Credentials) => {
+  const register = (credentials: Credentials & { confirmPassword: string }) => {
     fetch("/api/users", {
       method: "post",
       headers: {

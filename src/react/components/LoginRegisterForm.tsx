@@ -11,7 +11,9 @@ function LoginRegisterForm() {
         const password = formData.get("password") as string;
 
         if (formData.get("register") != null) {
-          register({ email, password });
+          const confirmPassword = formData.get("confirmPassword") as string;
+
+          register({ email, password, confirmPassword });
         } else {
           login({ email, password });
         }
@@ -24,7 +26,7 @@ function LoginRegisterForm() {
         name="email"
         defaultValue=""
         placeholder="jdoe@mail.com"
-        style={{ borderStartEndRadius: 0, borderEndEndRadius: 0 }}
+        style={{ gridColumn: "1 / -1" }}
       />
 
       <input
@@ -32,7 +34,7 @@ function LoginRegisterForm() {
         type="password"
         name="password"
         defaultValue=""
-        placeholder="******"
+        placeholder="password"
         style={{ borderStartEndRadius: 0, borderEndEndRadius: 0 }}
       />
 
@@ -44,16 +46,20 @@ function LoginRegisterForm() {
         Me connecter
       </button>
 
+      <input
+        aria-label="Confirm password"
+        type="password"
+        name="confirmPassword"
+        defaultValue=""
+        placeholder="confirm password"
+        style={{ borderStartEndRadius: 0, borderEndEndRadius: 0 }}
+      />
+
       <button
         type="submit"
         name="register"
         className="secondary"
-        style={{
-          borderStartStartRadius: 0,
-          borderEndStartRadius: 0,
-          gridRow: 1,
-          gridColumn: 2,
-        }}
+        style={{ borderStartStartRadius: 0, borderEndStartRadius: 0 }}
       >
         Créer mon compte
       </button>
