@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import express, { type Express } from "express";
+import express, { type ErrorRequestHandler, type Express } from "express";
 import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
@@ -16,6 +16,15 @@ async function createServer() {
   const app = express();
 
   app.use((await import("./src/express/routes")).default);
+
+  const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
+    console.error(err);
+    console.error("on req:", req.method, req.path);
+
+    next(err);
+  };
+
+  app.use(logErrors);
 
   const maybeVite = await configure(app);
 

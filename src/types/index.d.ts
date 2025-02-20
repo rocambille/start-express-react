@@ -17,8 +17,3 @@ type User = {
 type UserWithPassword = User & {
   password: string;
 };
-
-type ValidationError = {
-  field: string;
-  message: string;
-};

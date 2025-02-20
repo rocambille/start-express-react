@@ -50,11 +50,11 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   const { password, ...userWithoutId } = newUser;
 
-  const user = { ...userWithoutId, id: insertId };
+  const user = { ...userWithoutId, insertId };
 
   const token = await jwt.sign(
     {
-      sub: user.id,
+      sub: insertId,
     },
     process.env.APP_SECRET as string,
     {
