@@ -123,17 +123,16 @@ const destroyAccessToken: RequestHandler = (_req, res) => {
 /* ************************************************************************ */
 
 const verifyAccessToken: RequestHandler = (req, res, next) => {
-  // Vérifier la présence du token
-  const token = req.cookies.auth;
-
-  if (token == null) {
-    res.sendStatus(403);
-    return;
-  }
-
-  // Vérifier la validité du token (son authenticité et sa date d'expériation)
-  // En cas de succès, le payload est extrait et décodé
   try {
+    // Vérifier la présence du token
+    const token = req.cookies.auth;
+
+    if (token == null) {
+      throw new Error("Access token is missing in cookies");
+    }
+
+    // Vérifier la validité du token (son authenticité et sa date d'expériation)
+    // En cas de succès, le payload est extrait et décodé
     req.auth = jwt.verify(
       token,
       process.env.APP_SECRET as string,
@@ -141,7 +140,6 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error(err);
     res.sendStatus(403);
   }
 };

@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import express, { type ErrorRequestHandler } from "express";
+import jwt from "jsonwebtoken";
 import supertest from "supertest";
 
 import routes from "../../src/express/routes";
@@ -130,20 +131,35 @@ describe("POST /api/users", () => {
 });
 
 describe("PUT /api/users/:id", () => {
-  /*it("should update an existing user successfully", async () => {
+  it("should update an existing user successfully", async () => {
+    // Mock rows returned from the database
+    const rows = [{}] as Rows;
+
     // Mock result of the database query
     const result = { affectedRows: 1 } as Result;
 
+    // Mock the implementation of the jwt verify method
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "42" }));
+
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+      return (sql as unknown as string).includes("select")
+        ? [rows, []]
+        : [result, []];
+    });
 
     // Fake user data
-    const fakeUser = { title: "foo", user_id: 0 };
+    const fakeUser = {
+      email: "foo@mail.com",
+      password: "123456",
+      confirmPassword: "123456",
+    };
 
     // Send a PUT request to the /api/users/:id endpoint with a test user
-    const response = await supertest(app).put("/api/users/42").send(fakeUser);
+    const response = await supertest(app)
+      .put("/api/users/42")
+      .send(fakeUser)
+      .set("Cookie", ["auth=foo"]);
 
     // Assertions
     expect(response.status).toBe(204);
@@ -151,43 +167,69 @@ describe("PUT /api/users/:id", () => {
   });
 
   it("should fail on invalid request body", async () => {
+    // Mock rows returned from the database
+    const rows = [{}] as Rows;
+
     // Mock result of the database query
     const result = { affectedRows: 1 } as Result;
 
+    // Mock the implementation of the jwt verify method
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "42" }));
+
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+      return (sql as unknown as string).includes("select")
+        ? [rows, []]
+        : [result, []];
+    });
 
     // Fake empty user
     const fakeUser = {};
 
     // Send a PUT request to the /api/users/:id endpoint with a test user
-    const response = await supertest(app).put("/api/users/42").send(fakeUser);
+    const response = await supertest(app)
+      .put("/api/users/42")
+      .send(fakeUser)
+      .set("Cookie", ["auth=foo"]);
 
     // Assertions
     expect(response.status).toBe(400);
   });
 
   it("should fail on invalid id", async () => {
+    // Mock rows returned from the database
+    const rows = [] as Rows;
+
     // Mock result of the database query
     const result = { affectedRows: 0 } as Result;
 
-    // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    // Mock the implementation of the jwt verify method
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
-    // Fake user data with missing user_id
-    const fakeUser = { title: "foo", user_id: 0 };
+    // Mock the implementation of the database query method
+    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+      return (sql as unknown as string).includes("select")
+        ? [rows, []]
+        : [result, []];
+    });
+
+    // Fake user data
+    const fakeUser = {
+      email: "foo@mail.com",
+      password: "123456",
+      confirmPassword: "123456",
+    };
 
     // Send a PUT request to the /api/users/:id endpoint with a test user
-    const response = await supertest(app).put("/api/users/43").send(fakeUser);
+    const response = await supertest(app)
+      .put("/api/users/43")
+      .send(fakeUser)
+      .set("Cookie", ["auth=foo"]);
 
     // Assertions
     expect(response.status).toBe(404);
     expect(response.body).toEqual({});
-  });*/
+  });
 
   it("should fail without access token", async () => {
     // Mock rows returned from the database
@@ -207,39 +249,59 @@ describe("PUT /api/users/:id", () => {
 });
 
 describe("DELETE /api/users/:id", () => {
-  /*it("should delete an existing user successfully", async () => {
+  it("should delete an existing user successfully", async () => {
+    // Mock rows returned from the database
+    const rows = [{}] as Rows;
+
     // Mock result of the database query
     const result = { affectedRows: 1 } as Result;
 
+    // Mock the implementation of the jwt verify method
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "42" }));
+
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+      return (sql as unknown as string).includes("select")
+        ? [rows, []]
+        : [result, []];
+    });
 
     // Send a DELETE request to the /api/users/:id endpoint
-    const response = await supertest(app).delete("/api/users/42");
+    const response = await supertest(app)
+      .delete("/api/users/42")
+      .set("Cookie", ["auth=foo"]);
 
     // Assertions
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
   });
 
-  it("should success even on invalid id", async () => {
+  it("should fail on invalid id", async () => {
+    // Mock rows returned from the database
+    const rows = [] as Rows;
+
     // Mock result of the database query
-    const result = { affectedRows: 0 } as Result;
+    const result = { affectedRows: 1 } as Result;
+
+    // Mock the implementation of the jwt verify method
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "43" }));
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+      return (sql as unknown as string).includes("select")
+        ? [rows, []]
+        : [result, []];
+    });
 
     // Send a DELETE request to the /api/users/:id endpoint
-    const response = await supertest(app).delete("/api/users/43");
+    const response = await supertest(app)
+      .delete("/api/users/43")
+      .set("Cookie", ["auth=foo"]);
 
-    // Assertions
-    expect(response.status).toBe(204);
+    // Assertions0
+    expect(response.status).toBe(404);
     expect(response.body).toEqual({});
-  });*/
+  });
 
   it("should fail without access token", async () => {
     // Mock rows returned from the database
