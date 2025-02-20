@@ -86,13 +86,12 @@ git config --global core.autocrlf false
 
 ### Commandes de base
 
-| Commande                                                                        | Description                                                             |
-|---------------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| `docker compose up --build`                                                     | Build et démarre les services                                           |
-| `docker compose run --build --rm server test`                                   | Exécute les tests                                                       |
-| `docker compose run --build --rm --no-deps server check`                        | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
-| `docker compose run --build --rm --no-deps server check-types`                  | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
-| `docker compose run --build --rm --no-deps server --entrypoint=npm install ...` | Installe une nouvelle dépendance                                        |
+| Commande                                                        | Description                                                             |
+|-----------------------------------------------------------------|-------------------------------------------------------------------------|
+| `docker compose up --build`                                     | Build et démarre les services                                           |
+| `docker compose run --build --rm server test`                   | Exécute les tests                                                       |
+| `docker compose run --build --rm --no-deps server check`        | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
+| `docker compose run --build --rm --no-deps server check-types`  | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
 
 ### Structure des fichiers sources
 
