@@ -171,7 +171,23 @@ docker compose up --build
 
 ### Développer la partie back-end
 
-**Créer une route** dans `src/express/router.ts` :
+**Utiliser les routes d'un module** dans `src/express/routes.ts` :
+
+```typescript
+// ...
+
+/* ************************************************************************* */
+
+import itemRoutes from "./modules/item/itemRoutes";
+
+router.use(itemRoutes);
+
+/* ************************************************************************* */
+
+// ...
+```
+
+**Créer une route** dans `src/express/modules/itemRoutes.ts` :
 
 ```typescript
 // ...
