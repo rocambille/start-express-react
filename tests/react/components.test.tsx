@@ -11,7 +11,7 @@ import "@testing-library/jest-dom";
 
 import * as AuthContext from "../../src/react/components/AuthContext";
 import { AuthProvider } from "../../src/react/components/AuthContext";
-import { ItemProvider } from "../../src/react/components/ItemContext";
+import { ItemProvider, useItems } from "../../src/react/components/ItemContext";
 import Layout from "../../src/react/components/Layout";
 
 const authContextValue = {
@@ -27,6 +27,8 @@ beforeEach(() => {
       json: () => Promise.resolve([]),
     }),
   );
+
+  jest.spyOn(window, "alert").mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -49,10 +51,25 @@ describe("React Components", () => {
       .spyOn(AuthContext, "useAuth")
       .mockImplementation(() => authContextValue);
 
+    const Consumer = () => {
+      const { addItem, editItem, deleteItem } = useItems();
+
+      addItem({ title: "hello, world!" });
+      editItem({ title: "hello, world!" });
+      deleteItem();
+
+      return <p>hello, world!</p>;
+    };
+
     await act(async () => {
-      render(<ItemProvider>hello, world!</ItemProvider>, {
-        wrapper: BrowserRouter,
-      });
+      render(
+        <ItemProvider>
+          <Consumer />
+        </ItemProvider>,
+        {
+          wrapper: BrowserRouter,
+        },
+      );
     });
 
     expect(true).toBeTruthy();

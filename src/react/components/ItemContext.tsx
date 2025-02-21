@@ -19,11 +19,35 @@ interface ItemProviderProps {
 }
 
 export function ItemProvider({ children }: ItemProviderProps) {
+  const navigate = useNavigate();
+
   const { user } = useAuth();
 
   const items = use(get("/api/items")) as Item[];
 
-  const navigate = useNavigate();
+  const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
+    if (user == null) {
+      alert("Please log in");
+      return;
+    }
+
+    fetch("/api/items", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(partialItem),
+    })
+      .then((response) => {
+        if (response.status === 201) {
+          return response.json();
+        }
+      })
+      .then(({ insertId }) => {
+        invalidateCache("/api/items");
+        navigate(`/items/${insertId}`);
+      });
+  };
 
   const { id } = useParams();
 
@@ -40,9 +64,7 @@ export function ItemProvider({ children }: ItemProviderProps) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...partialItem,
-      }),
+      body: JSON.stringify(partialItem),
     }).then((response) => {
       if (response.status === 204) {
         invalidateCache("/api/items");
@@ -65,30 +87,6 @@ export function ItemProvider({ children }: ItemProviderProps) {
         navigate("/items");
       }
     });
-  };
-
-  const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (user == null) {
-      alert("Please log in");
-      return;
-    }
-
-    fetch("/api/items", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: user.id, ...partialItem }),
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          return response.json();
-        }
-      })
-      .then(({ insertId }) => {
-        invalidateCache("/api/items");
-        navigate(`/items/${insertId}`);
-      });
   };
 
   return (
