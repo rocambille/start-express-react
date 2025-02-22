@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import express, { type ErrorRequestHandler, type Express } from "express";
+import { rateLimit } from "express-rate-limit";
 import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
@@ -14,6 +15,13 @@ createServer().then((server) => {
 
 async function createServer() {
   const app = express();
+
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // max 100 requests per windowMs
+  });
+
+  app.use(limiter);
 
   app.use((await import("./src/express/routes")).default);
 
