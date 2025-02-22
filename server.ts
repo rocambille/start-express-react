@@ -59,9 +59,7 @@ async function createServer() {
           return nodeFetch(`http://localhost:${port}${resource}`);
         }
 
-        return nodeFetch(
-          `http://localhost:${port}${url}${resource.toString()}`,
-        );
+        return nodeFetch(`http://localhost:${port}${url}${resource}`);
       };
     }
 
