@@ -36,16 +36,19 @@ sequenceDiagram
 
 Il est pré-configuré avec un ensemble d'outils pour aider des juniors à produire du code de qualité industrielle, tout en restant un outil pédagogique :
 
-- **Docker** : Plateforme de conteneurisation permettant de standardiser et d'automatiser les environnements de développement et de déploiement, garantissant des configurations reproductibles.  
-- **TypeScript** : Superset de JavaScript ajoutant des types statiques, facilitant la maintenance et réduisant les erreurs.  
-- **React** : Bibliothèque JavaScript pour construire des interfaces utilisateur interactives et modulaires.  
-- **React Router** : Gestionnaire de routage pour les applications React, permettant la création de chemins et de composants dynamiques.  
-- **Vite** : Outil de construction rapide et léger pour les applications front-end, avec un serveur de développement ultra-rapide et une optimisation des bundles pour la production.  
-- **Express** : Framework minimaliste pour créer des serveurs web et des API avec Node.js.  
-- **MySQL** : Système de gestion de bases de données relationnelles performant, utilisé pour stocker et interroger les données.  
-- **Biome** : Outil tout-en-un pour le linting, le formatage et l'analyse statique de code, conçu pour assurer la qualité et la lisibilité du code de manière performante et moderne.  
-- **Jest** : Framework de test JavaScript.  
-- **Pico CSS** : Kit CSS minimaliste et léger qui donne la priorité à la syntaxe sémantique.  
+- [**React**](https://react.dev/learn) : Bibliothèque JavaScript pour construire des interfaces utilisateur interactives et modulaires.  
+- [**Express**](https://expressjs.com/) : Framework minimaliste pour créer des serveurs web et des API avec Node.js.  
+- [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/) : Système de gestion de bases de données relationnelles performant, utilisé pour stocker et interroger les données.  
+
+Sous le capot (liste non exhaustive) :
+
+- [**TypeScript**](https://www.typescriptlang.org/) : Superset de JavaScript ajoutant des types statiques, facilitant la maintenance et réduisant les erreurs.  
+- [**Biome**](https://biomejs.dev/) : Outil tout-en-un pour le linting, le formatage et l'analyse statique de code, conçu pour assurer la qualité et la lisibilité du code de manière performante et moderne.  
+- [**Docker**](https://docs.docker.com/) : Plateforme de conteneurisation permettant de standardiser et d'automatiser les environnements de développement et de déploiement, garantissant des configurations reproductibles.  
+- [**Vite**](https://vite.dev/guide/) : Outil de construction rapide et léger pour les applications front-end, avec un serveur de développement ultra-rapide et une optimisation des bundles pour la production.  
+- [**React Router (Library)**](https://reactrouter.com/home) : Gestionnaire de routage pour les applications React, permettant la création de chemins et de composants dynamiques.  
+- [**Pico CSS**](https://picocss.com/) : Kit CSS minimaliste et léger qui donne la priorité à la syntaxe sémantique.  
+- [**Jest**](https://jestjs.io/) : Framework de test JavaScript.  
 
 ## Table des matières
 
@@ -75,12 +78,13 @@ git config --global core.autocrlf false
 
 ## Installation et utilisation
 
-1. Installez Docker et Docker compose.
-1. Installez Node (nécessaire pour exécuter les vérifications de pre-commit).
-2. Installez le plugin **Biome** dans VSCode et configurez-le.
-3. Clonez ce dépôt, puis accédez au répertoire cloné.
-4. Créez un fichier d'environnement (`.env`) à la racine du répertoire cloné : vous pouvez copier le fichier `.env.sample` comme modèle (**ne le supprimez pas**).
-5. Lancez la commande `docker compose up --build`.
+1. Installez [Git](https://git-scm.com/downloads).
+2. Installez [Node](https://nodejs.org/fr/download).
+3. Installez [Docker et Docker compose](https://docs.docker.com/get-started/).
+4. Installez le plugin **Biome** dans VSCode et configurez-le.
+5. Clonez ce dépôt, puis accédez au répertoire cloné.
+6. Créez un fichier d'environnement (`.env`) à la racine du répertoire cloné : vous pouvez copier le fichier `.env.sample` comme modèle (**ne le supprimez pas**).
+7. Lancez la commande `docker compose up --build`.
 
 ## Les choses à retenir
 
@@ -124,9 +128,9 @@ my-project/
 
 **Créer et remplir le fichier `.env`** à la racine :
 
-```plaintext
-MYSQL_ROOT_PASSWORD=
-MYSQL_DATABASE=starter
+```env
+MYSQL_ROOT_PASSWORD=YOUR_MYSQL_ROOT_PASSWORD
+MYSQL_DATABASE=YOUR_MYSQL_DATABASE_NAME
 ```
 
 **Les variables sont utilisés** dans `server/database/client.ts` :
