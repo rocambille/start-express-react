@@ -50,19 +50,19 @@ async function createServer() {
     {
       const nodeFetch = globalThis.fetch;
 
-      globalThis.fetch = (resource) => {
-        if (resource.toString().includes("://")) {
-          return nodeFetch(resource);
-        }
-
-        if (resource.toString().startsWith("/")) {
-          return nodeFetch(`http://localhost:${port}${resource}`);
-        }
-
-        return nodeFetch(
-          `http://localhost:${port}${url}${resource.toString()}`,
+      globalThis.fetch = (resource) =>
+        nodeFetch(
+          new URL(resource.toString(), `http://localhost:${port}${url}`),
         );
-      };
+
+      // URL constructor manages relative/absolute paths all by itself,
+      // so with base = http://localhost:${port}${url} :
+      // * if resource = "/foo",
+      //   then URL = http://localhost:${port}/foo
+      // * if resource = "./bar",
+      //   then URL = http://localhost:${port}${url}./bar
+      // * if resource = "http://example.com/baz",
+      //   then URL = http://example.com/baz
     }
 
     try {
