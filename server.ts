@@ -56,11 +56,11 @@ async function createServer() {
         }
 
         if (resource.toString().startsWith("/")) {
-          return nodeFetch(`${req.protocol}://${req.get("host")}${resource}`);
+          return nodeFetch(`${req.protocol}://${req.host}${resource}`);
         }
 
         return nodeFetch(
-          `${req.protocol}://${req.get("host")}${url}${resource.toString()}`,
+          `${req.protocol}://${req.host}${url}${resource.toString()}`,
         );
       };
     }
