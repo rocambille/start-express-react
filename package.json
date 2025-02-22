@@ -2,6 +2,7 @@
   "type": "module",
   "name": "starter",
   "version": "1.0.0",
+  "main": "server.ts",
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
     "build": "npm run build:client && npm run build:server",

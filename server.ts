@@ -5,9 +5,9 @@ import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
 
-createServer().then((server) => {
-  const port = 5173;
+const port = 5173;
 
+createServer().then((server) => {
   server.listen(port, () => {
     console.info(`Listening on http://localhost:${port}`);
   });
@@ -56,11 +56,11 @@ async function createServer() {
         }
 
         if (resource.toString().startsWith("/")) {
-          return nodeFetch(`${req.protocol}://${req.host}${resource}`);
+          return nodeFetch(`http://localhost:${port}${resource}`);
         }
 
         return nodeFetch(
-          `${req.protocol}://${req.host}${url}${resource.toString()}`,
+          `http://localhost:${port}${url}${resource.toString()}`,
         );
       };
     }
