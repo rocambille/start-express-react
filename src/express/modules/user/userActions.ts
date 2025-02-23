@@ -19,13 +19,7 @@ const read: RequestHandler = async (req, res) => {
 /* ************************************************************************ */
 
 const edit: RequestHandler = async (req, res) => {
-  const newUser = {
-    id: req.user.id,
-    email: req.body.email,
-    password: req.body.password,
-  };
-
-  const affectedRows = await userRepository.update(newUser);
+  const affectedRows = await userRepository.update(req.user.id, req.body);
 
   if (affectedRows === 0) {
     res.sendStatus(404);

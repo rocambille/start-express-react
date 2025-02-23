@@ -96,7 +96,7 @@ describe("POST /api/items", () => {
       .mockImplementation(async () => [result, []]);
 
     // Fake item data
-    const fakeItem = { title: "foo", user_id: 0 };
+    const fakeItem = { title: "foo" };
 
     // Send a POST request to the /api/items endpoint with a test item
     const response = await await supertest(app)
@@ -165,7 +165,7 @@ describe("PUT /api/items/:id", () => {
       );
 
     // Fake item data
-    const fakeItem = { title: "foo", user_id: 0 };
+    const fakeItem = { title: "foo" };
 
     // Send a PUT request to the /api/items/:id endpoint with a test item
     const response = await supertest(app)
@@ -228,7 +228,7 @@ describe("PUT /api/items/:id", () => {
     });
 
     // Fake item data
-    const fakeItem = { title: "foo", user_id: 0 };
+    const fakeItem = { title: "foo" };
 
     // Send a PUT request to the /api/items/:id endpoint with a test item
     const response = await supertest(app)

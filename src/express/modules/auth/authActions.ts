@@ -36,22 +36,15 @@ const hashPassword: RequestHandler = async (req, _res, next) => {
 /* ************************************************************************ */
 
 const createUserAndAccessToken: RequestHandler = async (req, res) => {
-  // Extraction des données de la requête
-
-  const newUser = {
-    email: req.body.email,
-    password: req.body.password,
-  };
-
   // Création du user
 
-  const insertId = await userRepository.create(newUser);
+  const insertId = await userRepository.create(req.body);
 
   // Everything is ok
 
-  const { password, ...userWithoutId } = newUser;
+  const { password, ...userWithoutInsertId } = req.body;
 
-  const user = { ...userWithoutId, insertId };
+  const user = { ...userWithoutInsertId, insertId };
 
   const token = await jwt.sign(
     {

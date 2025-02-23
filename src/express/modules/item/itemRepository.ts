@@ -40,11 +40,11 @@ class ItemRepository {
 
   // The U of CRUD - Update operation
 
-  async update(item: Item) {
+  async update(id: number, item: Omit<Item, "id">) {
     // Execute the SQL UPDATE query to update an existing item in the "item" table
     const [result] = await databaseClient.query<Result>(
       "update item set title = ?, user_id = ? where id = ?",
-      [item.title, item.user_id, item.id],
+      [item.title, item.user_id, id],
     );
 
     // Return the number of affected rows

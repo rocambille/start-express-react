@@ -19,8 +19,14 @@ router.param("itemId", itemParamConverter.convert);
 
 /* ************************************************************************ */
 
+const parseUserId: RequestHandler = (req, _res, next) => {
+  req.body.user_id = Number(req.auth.sub);
+
+  next();
+};
+
 const checkAccess: RequestHandler = (req, res, next) => {
-  if (req.item.user_id === Number(req.auth.sub)) {
+  if (req.item.user_id === req.body.user_id) {
     next();
   } else {
     res.sendStatus(403);
@@ -34,7 +40,7 @@ router.get(ITEM_PATH, itemActions.read);
 
 /* ************************************************************************ */
 
-router.use(BASE_PATH, authActions.verifyAccessToken); // Authentication Wall
+router.use(BASE_PATH, authActions.verifyAccessToken, parseUserId); // Authentication Wall
 
 /* ************************************************************************ */
 

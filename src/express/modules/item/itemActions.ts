@@ -19,13 +19,7 @@ const read: RequestHandler = (req, res) => {
 /* ************************************************************************ */
 
 const edit: RequestHandler = async (req, res) => {
-  const newItem = {
-    id: req.item.id,
-    title: req.body.title,
-    user_id: Number(req.auth.sub),
-  };
-
-  const affectedRows = await itemRepository.update(newItem);
+  const affectedRows = await itemRepository.update(req.item.id, req.body);
 
   if (affectedRows === 0) {
     res.sendStatus(404);
@@ -37,12 +31,7 @@ const edit: RequestHandler = async (req, res) => {
 /* ************************************************************************ */
 
 const add: RequestHandler = async (req, res) => {
-  const newItem = {
-    title: req.body.title,
-    user_id: Number(req.auth.sub),
-  };
-
-  const insertId = await itemRepository.create(newItem);
+  const insertId = await itemRepository.create(req.body);
 
   res.status(201).json({ insertId });
 };
