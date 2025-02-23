@@ -194,6 +194,8 @@ describe("PUT /api/users/:id", () => {
 
     // Assertions
     expect(response.status).toBe(400);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(3);
   });
 
   it("should fail on invalid id", async () => {
@@ -204,7 +206,7 @@ describe("PUT /api/users/:id", () => {
     const result = { affectedRows: 0 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "43" }));
 
     // Mock the implementation of the database query method
     jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {

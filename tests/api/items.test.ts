@@ -88,7 +88,7 @@ describe("POST /api/items", () => {
     const result = { insertId: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({}));
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
     jest
@@ -115,7 +115,7 @@ describe("POST /api/items", () => {
     const result = { insertId: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({}));
+    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
     jest
@@ -133,6 +133,8 @@ describe("POST /api/items", () => {
 
     // Assertions
     expect(response.status).toBe(400);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(1);
   });
 
   it("should fail without access token", async () => {
@@ -207,7 +209,7 @@ describe("PUT /api/items/:id", () => {
     // Assertions
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Array);
-    expect(response.body.length).toBe(2);
+    expect(response.body.length).toBe(1);
   });
 
   it("should fail on invalid id", async () => {

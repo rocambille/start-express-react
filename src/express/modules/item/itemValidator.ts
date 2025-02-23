@@ -9,7 +9,10 @@ const itemDTOSchema = z.object({
 
 const validate: RequestHandler = (req, res, next) => {
   try {
-    req.body = itemDTOSchema.parse(req.body);
+    req.body = itemDTOSchema.parse({
+      ...req.body,
+      user_id: Number(req.auth.sub),
+    });
 
     next();
   } catch (err) {
