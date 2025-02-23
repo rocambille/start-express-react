@@ -1,7 +1,6 @@
-import cookieParser from "cookie-parser";
 import express, { Router } from "express";
 
-const router = Router().use(express.json()).use(cookieParser());
+const router = Router().use(express.json());
 
 /* ************************************************************************ */
 
