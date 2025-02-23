@@ -10,7 +10,7 @@ import { BrowserRouter } from "react-router";
 import "@testing-library/jest-dom";
 
 import * as AuthContext from "../../src/react/components/AuthContext";
-import { AuthProvider } from "../../src/react/components/AuthContext";
+import { AuthProvider, useAuth } from "../../src/react/components/AuthContext";
 import { ItemProvider, useItems } from "../../src/react/components/ItemContext";
 import Layout from "../../src/react/components/Layout";
 
@@ -37,10 +37,29 @@ afterEach(() => {
 
 describe("React Components", () => {
   test("<AuthProvider />", async () => {
-    await act(async () => {
-      render(<AuthProvider>hello, world!</AuthProvider>, {
-        wrapper: BrowserRouter,
+    const Consumer = () => {
+      const { login, logout, register } = useAuth();
+
+      login({ email: "foo@mail.com", password: "123456" });
+      logout();
+      register({
+        email: "foo@mail.com",
+        password: "123456",
+        confirmPassword: "123456",
       });
+
+      return <p>hello, world!</p>;
+    };
+
+    await act(async () => {
+      render(
+        <AuthProvider>
+          <Consumer />
+        </AuthProvider>,
+        {
+          wrapper: BrowserRouter,
+        },
+      );
     });
 
     expect(true).toBeTruthy();
