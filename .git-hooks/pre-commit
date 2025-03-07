@@ -1,2 +1,2 @@
-npm run check-types
 npm run check
+npm run check-types

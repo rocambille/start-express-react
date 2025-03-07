@@ -85,17 +85,20 @@ git config --global core.autocrlf false
 5. Clonez ce dépôt, puis accédez au répertoire cloné.
 6. Créez un fichier d'environnement (`.env`) à la racine du répertoire cloné : vous pouvez copier le fichier `.env.sample` comme modèle (**ne le supprimez pas**).
 7. Lancez la commande `docker compose up --build`.
+8. Lancez la commande `npm install` pour installer le dossier `node_modules` en local.
 
 ## Les choses à retenir
 
 ### Commandes de base
 
-| Commande                                      | Description                                                             |
-|-----------------------------------------------|-------------------------------------------------------------------------|
-| `docker compose up --build`                   | Build et démarre les services                                           |
-| `docker compose run --build --rm server test` | Exécute les tests                                                       |
-| `npm run check`                               | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
-| `npm run check-types`                         | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
+| Commande                                            | Description                                                                 |
+|-----------------------------------------------------|-----------------------------------------------------------------------------|
+| `docker compose up --build`                         | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
+| `docker compose -f compose.prod.yaml up --build -d` | Build et démarre en production                                              |
+| `docker exec -it your-mysql mysql -u root -p`       | Exécute un client MySQL dans le container `your-mysql`                      |
+| `docker compose run --build --rm server test`       | Exécute les tests                                                           |
+| `npm run check`                                     | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
+| `npm run check-types`                               | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
 
 ### Structure des fichiers sources
 
