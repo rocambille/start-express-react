@@ -1,25 +1,44 @@
-FROM node:22-alpine
+# syntax=docker/dockerfile:1
 
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Dockerfile reference guide at
+# https://docs.docker.com/go/dockerfile-reference/
+
+# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
+
+ARG NODE_VERSION=22.14.0
+
+################################################################################
+# Use node image for base image for all stages.
+FROM node:${NODE_VERSION}-alpine as base
+
+# Set working directory for all build stages.
 WORKDIR /app
 
-COPY package.json package.json
-RUN npm install
+################################################################################
+# Create a stage for installing dependecies.
+FROM base as deps
 
 RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js
-COPY biome.json biome.json
-COPY tsconfig.json tsconfig.json
-COPY vite.config.ts vite.config.ts
-COPY .env .env
-COPY jest.config.js jest.config.js
-COPY tests tests
-COPY src/types src/types
-COPY index.html index.html
-COPY server.ts server.ts
-COPY src/entry-client.tsx src/entry-client.tsx
-COPY src/entry-server.tsx src/entry-server.tsx
-COPY src/database/checkConnection.ts src/database/checkConnection.ts
-COPY src/database/client.ts src/database/client.ts
-COPY src/express src/express
-COPY src/react src/react
 
+# Download dependencies as a separate step to take advantage of Docker's caching.
+# Leverage a cache mount to /root/.npm to speed up subsequent builds.
+# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
+# into this layer.
+RUN --mount=type=bind,source=package.json,target=package.json \
+    --mount=type=bind,source=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
+
+################################################################################
+# Create a new stage to run the application.
+FROM base as final
+
+# Copy the production dependencies from the deps stage into the image.
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy the rest of the source files into the image.
+COPY . .
+
+# Run the application.
 ENTRYPOINT [ "npm", "run" ]

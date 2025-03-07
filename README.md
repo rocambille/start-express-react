@@ -90,12 +90,12 @@ git config --global core.autocrlf false
 
 ### Commandes de base
 
-| Commande                                                        | Description                                                             |
-|-----------------------------------------------------------------|-------------------------------------------------------------------------|
-| `docker compose up --build`                                     | Build et démarre les services                                           |
-| `docker compose run --build --rm server test`                   | Exécute les tests                                                       |
-| `docker compose run --build --rm --no-deps server check`        | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
-| `docker compose run --build --rm --no-deps server check-types`  | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
+| Commande                                      | Description                                                             |
+|-----------------------------------------------|-------------------------------------------------------------------------|
+| `docker compose up --build`                   | Build et démarre les services                                           |
+| `docker compose run --build --rm server test` | Exécute les tests                                                       |
+| `npm run check`                               | Contrôle la qualité du code avec Biome (exécuté en pre-commit)          |
+| `npm run check-types`                         | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit) |
 
 ### Structure des fichiers sources
 
@@ -254,7 +254,7 @@ export default new ItemRepository();
 | Read      | GET     | /api/items/:id  |                     | SELECT  | 200 (OK), un item.              | 404 (Not Found), si id invalide.                                        |
 | Add       | POST    | /api/items      | Données de l'item   | INSERT  | 201 (Created), id d'insertion.  | 400 (Bad Request), si corps invalide.                                   |
 | Edit      | PUT     | /api/items/:id  | Données de l'item   | UPDATE  | 204 (No Content).               | 400 (Bad Request), si corps invalide. 404 (Not Found), si id invalide.  |
-| Destroy   | DELETE  | /api/items/:id  |                     | DELETE  | 204 (No Content).               |                                                                         |
+| Destroy   | DELETE  | /api/items/:id  |                     | DELETE  | 204 (No Content).               | 404 (Not Found), si id invalide.                                        |
 
 ### Autres bonnes pratiques
 

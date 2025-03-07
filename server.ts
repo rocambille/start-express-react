@@ -25,15 +25,6 @@ async function createServer() {
 
   app.use((await import("./src/express/routes")).default);
 
-  const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
-    console.error(err);
-    console.error("on req:", req.method, req.path);
-
-    next(err);
-  };
-
-  app.use(logErrors);
-
   const maybeVite = await configure(app);
 
   app.use(/(.*)/, async (req, res, next) => {
@@ -103,6 +94,15 @@ async function createServer() {
       next(error);
     }
   });
+
+  const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
+    console.error(err);
+    console.error("on req:", req.method, req.path);
+
+    next(err);
+  };
+
+  app.use(logErrors);
 
   return app;
 }

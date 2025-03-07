@@ -1,2 +1,2 @@
-docker compose run -T --build --rm --no-deps server check-types || exit 1
-docker compose run -T --build --rm --no-deps server check || exit 1
+npm run check-types
+npm run check
