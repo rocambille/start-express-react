@@ -311,7 +311,7 @@ describe("DELETE /api/items/:id", () => {
       .set("Cookie", ["auth=foo"]);
 
     // Assertions
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(204);
     expect(response.body).toEqual({});
   });
 

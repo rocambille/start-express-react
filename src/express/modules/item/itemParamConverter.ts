@@ -14,7 +14,7 @@ const convert: RequestHandler = async (req, res, next) => {
   const item = await itemRepository.read(+req.params.itemId);
 
   if (item == null) {
-    res.sendStatus(404);
+    res.sendStatus(req.method === "DELETE" ? 204 : 404);
   } else {
     req.item = item;
 

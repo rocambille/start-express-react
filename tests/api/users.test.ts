@@ -301,7 +301,7 @@ describe("DELETE /api/users/:id", () => {
       .set("Cookie", ["auth=foo"]);
 
     // Assertions0
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(204);
     expect(response.body).toEqual({});
   });
 
