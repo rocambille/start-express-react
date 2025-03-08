@@ -30,6 +30,6 @@ Changes that are cosmetic in nature and do not add anything substantial to the s
 
 #### **Do you want to contribute to the documentation?**
 
-StartER is a volunteer effort. We encourage you to send a mail to rocambille@gmail.com with your pitch !
+StartER is a volunteer effort. We encourage you to [pitch and join the team](https://github.com/rocambille/start-express-react/discussions/1) !
 
 Thanks! :heart: :heart: :heart:
