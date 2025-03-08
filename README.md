@@ -20,7 +20,7 @@ sequenceDiagram
     activate Fetcher
     Fetcher-)Express: requête (HTTP)
     activate Express
-    Express-)Module: appel
+    Express-)Module: route
     activate Module
     Module-)DB: requête SQL
     activate DB
