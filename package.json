@@ -9,6 +9,7 @@
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "check": "biome check --error-on-warnings .",
+    "check:fix": "biome check --write --error-on-warnings .",
     "check-types": "tsc --noEmit",
     "dev": "tsx --env-file=.env server",
     "prestart": "npm run build",
@@ -36,7 +37,7 @@
     "ts-jest": "^29.2.6",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "vite": "^6.2.1"
+    "vite": "^6.2.2"
   },
   "dependencies": {
     "argon2": "^0.41.1",
