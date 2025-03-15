@@ -18,17 +18,17 @@ sequenceDiagram
 
     React-)Fetcher: event
     activate Fetcher
-    Fetcher-)Express: requête (HTTP)
+    Fetcher-)Express: request (HTTP)
     activate Express
     Express-)Module: route
     activate Module
-    Module-)DB: requête SQL
+    Module-)DB: request (SQL)
     activate DB
-    DB--)Module: données
+    DB--)Module: data
     deactivate DB
     Module--)Express: json
     deactivate Module
-    Express--)Fetcher: réponse HTTP
+    Express--)Fetcher: response (HTTP)
     deactivate Express
     Fetcher--)React: render
     deactivate Fetcher
