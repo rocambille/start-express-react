@@ -79,14 +79,7 @@ git config --global core.autocrlf false
 
 ## Installation et utilisation
 
-1. Installez [Git](https://git-scm.com/downloads).
-2. Installez [Node](https://nodejs.org/fr/download).
-3. Installez [Docker et Docker compose](https://docs.docker.com/get-started/).
-4. Installez le plugin **Biome** dans VSCode et configurez-le.
-5. Clonez ce dépôt, puis accédez au répertoire cloné.
-6. Créez un fichier d'environnement (`.env`) à la racine du répertoire cloné : vous pouvez copier le fichier `.env.sample` comme modèle (**ne le supprimez pas**).
-7. Lancez la commande `docker compose up --build`.
-8. Lancez la commande `npm install` pour installer le dossier `node_modules` en local.
+Suivez les [premiers pas](https://github.com/rocambille/start-express-react/wiki/Premiers-pas) dans notre wiki.
 
 ## Les choses à retenir
 
