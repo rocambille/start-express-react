@@ -7,7 +7,7 @@ services:
       - 5173:5173
     environment:
       NODE_ENV: production
-    command: start
+    command: sh -c "npm run build && npm start"
   database:
     extends:
       file: compose.yaml

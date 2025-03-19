@@ -19,7 +19,6 @@ services:
     ports:
       - 5173:5173
       - 24678:24678
-    command: dev
   database:
     image: mysql
     restart: always

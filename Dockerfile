@@ -41,4 +41,4 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Run the application.
-ENTRYPOINT [ "npm", "run" ]
+CMD npm run dev
