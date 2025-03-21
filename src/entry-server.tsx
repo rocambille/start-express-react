@@ -10,13 +10,15 @@ import {
 
 import routes from "./react/routes";
 
-export const render = async (template: string, req: Request, res: Response) => {
-  const { query, dataRoutes } = createStaticHandler(routes);
+const { query, dataRoutes } = createStaticHandler(routes);
 
+export const render = async (template: string, req: Request, res: Response) => {
+  // 1. run actions/loaders to get the routing context with `query`
   const context = await query(
     new Request(`${req.protocol}://${req.get("host")}${req.originalUrl}`),
   );
 
+  // If `query` returns a Response, send it raw
   if (context instanceof Response) {
     for (const [key, value] of context.headers.entries()) {
       res.set(key, value);
@@ -25,14 +27,7 @@ export const render = async (template: string, req: Request, res: Response) => {
     return res.status(context.status).end(context.body);
   }
 
-  const router = createStaticRouter(dataRoutes, context);
-
-  const { pipe } = renderToPipeableStream(
-    <StrictMode>
-      <StaticRouterProvider router={router} context={context} />
-    </StrictMode>,
-  );
-
+  // Setup headers from action and loaders from deepest match
   const leaf = context.matches[context.matches.length - 1];
   const actionHeaders = context.actionHeaders[leaf.route.id];
   if (actionHeaders) {
@@ -47,9 +42,22 @@ export const render = async (template: string, req: Request, res: Response) => {
     }
   }
 
-  res.status(200);
+  // 2. Create a static router for SSR
+  const router = createStaticRouter(dataRoutes, context);
 
-  res.set("Content-Type", "text/html; charset=utf-8");
+  // 3. Render everything with StaticRouterProvider
+  const { pipe } = renderToPipeableStream(
+    <StrictMode>
+      <StaticRouterProvider router={router} context={context} />
+    </StrictMode>,
+  );
+
+  // 4. send a response
+  res.status(200).set("Content-Type", "text/html; charset=utf-8");
+
+  const [htmlStart, htmlEnd] = template.split("<!--ssr-outlet-->");
+
+  res.write(htmlStart);
 
   const transformStream = new Transform({
     transform(chunk, encoding, callback) {
@@ -58,13 +66,9 @@ export const render = async (template: string, req: Request, res: Response) => {
     },
   });
 
-  const [htmlStart, htmlEnd] = template.split("<!--ssr-outlet-->");
-
-  res.write(htmlStart);
+  pipe(transformStream);
 
   transformStream.on("finish", () => {
     res.end(htmlEnd);
   });
-
-  pipe(transformStream);
 };

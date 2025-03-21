@@ -85,14 +85,14 @@ Suivez les [premiers pas](https://github.com/rocambille/start-express-react/wiki
 
 ### Commandes de base
 
-| Commande                                            | Description                                                                 |
-|-----------------------------------------------------|-----------------------------------------------------------------------------|
-| `docker compose up --build`                         | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
-| `docker compose -f compose.prod.yaml up --build -d` | Build et démarre en production                                              |
-| `docker exec -it your-mysql mysql -u root -p`       | Exécute un client MySQL dans le container `your-mysql`                      |
-| `docker compose run --build --rm server test`       | Exécute les tests                                                           |
-| `npm run check`                                     | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
-| `npm run check-types`                               | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
+| Commande                                              | Description                                                                 |
+|-------------------------------------------------------|-----------------------------------------------------------------------------|
+| `docker compose up --build`                           | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
+| `docker compose -f compose.prod.yaml up --build -d`   | Build et démarre en production                                              |
+| `docker exec -it your-mysql mysql -u root -p`         | Exécute un client MySQL dans le container `your-mysql`                      |
+| `docker compose run --build --rm server npm run test` | Exécute les tests                                                           |
+| `npm run check`                                       | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
+| `npm run check-types`                                 | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
 
 ### Structure des fichiers sources
 
