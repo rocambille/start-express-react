@@ -4,7 +4,7 @@ import { useAuth } from "../components/AuthContext";
 import { useItems } from "../components/ItemContext";
 import ItemDeleteForm from "../components/ItemDeleteForm";
 
-function ItemDetail() {
+function ItemShow() {
   const { user } = useAuth();
   const { item } = useItems();
 
@@ -25,4 +25,4 @@ function ItemDetail() {
   );
 }
 
-export default ItemDetail;
+export default ItemShow;

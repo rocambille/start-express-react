@@ -13,10 +13,10 @@ import * as AuthContext from "../../src/react/components/AuthContext";
 import * as ItemContext from "../../src/react/components/ItemContext";
 
 import Home from "../../src/react/pages/Home";
-import ItemDetail from "../../src/react/pages/ItemDetail";
 import ItemEdit from "../../src/react/pages/ItemEdit";
 import ItemIndex from "../../src/react/pages/ItemIndex";
 import ItemNew from "../../src/react/pages/ItemNew";
+import ItemShow from "../../src/react/pages/ItemShow";
 
 const authContextValue = {
   user: null,
@@ -54,14 +54,6 @@ describe("React Pages", () => {
     expect(true).toBeTruthy();
   });
 
-  test("<ItemDetail />", async () => {
-    await act(async () => {
-      render(<ItemDetail />, { wrapper: BrowserRouter });
-    });
-
-    expect(true).toBeTruthy();
-  });
-
   test("<ItemEdit />", async () => {
     await act(async () => {
       render(<ItemEdit />, { wrapper: BrowserRouter });
@@ -81,6 +73,14 @@ describe("React Pages", () => {
   test("<ItemNew />", async () => {
     await act(async () => {
       render(<ItemNew />, { wrapper: BrowserRouter });
+    });
+
+    expect(true).toBeTruthy();
+  });
+
+  test("<ItemShow />", async () => {
+    await act(async () => {
+      render(<ItemShow />, { wrapper: BrowserRouter });
     });
 
     expect(true).toBeTruthy();

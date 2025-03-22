@@ -5,10 +5,10 @@ import { ItemProvider } from "./components/ItemContext";
 import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
-import ItemDetail from "./pages/ItemDetail";
 import ItemEdit from "./pages/ItemEdit";
 import ItemIndex from "./pages/ItemIndex";
 import ItemNew from "./pages/ItemNew";
+import ItemShow from "./pages/ItemShow";
 
 import "./index.css";
 
@@ -41,7 +41,7 @@ export default [
           },
           {
             path: "/items/:id",
-            element: <ItemDetail />,
+            element: <ItemShow />,
           },
           {
             path: "/items/:id/edit",
