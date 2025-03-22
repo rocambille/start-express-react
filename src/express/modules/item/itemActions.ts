@@ -39,7 +39,7 @@ const add: RequestHandler = async (req, res) => {
 /* ************************************************************************ */
 
 const destroy: RequestHandler = async (req, res) => {
-  await itemRepository.delete(req.item.id);
+  await itemRepository.softDelete(req.item.id);
 
   res.sendStatus(204);
 };

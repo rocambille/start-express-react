@@ -22,7 +22,7 @@ class UserRepository {
   async read(id: number) {
     // Execute the SQL SELECT query to retrieve a specific user by its ID
     const [rows] = await databaseClient.query<Rows>(
-      "select id, email from user where id = ?",
+      "select id, email from user where id = ? and deleted_at is null",
       [id],
     );
 
@@ -33,7 +33,7 @@ class UserRepository {
   async readAll() {
     // Execute the SQL SELECT query to retrieve all users from the "user" table
     const [rows] = await databaseClient.query<Rows>(
-      "select id, email from user",
+      "select id, email from user where deleted_at is null",
     );
 
     // Return the array of users
@@ -64,9 +64,31 @@ class UserRepository {
     return result.affectedRows;
   }
 
-  // The D of CRUD - Delete operation
+  // The Ds of CRUD - Delete operations
 
-  async delete(id: number) {
+  async softDelete(id: number) {
+    // Execute the SQL UPDATE query to update an existing user in the "user" table
+    const [result] = await databaseClient.query<Result>(
+      "update user set deleted_at = now() where id = ?",
+      [id],
+    );
+
+    // Return the number of affected rows
+    return result.affectedRows;
+  }
+
+  async softUndelete(id: number) {
+    // Execute the SQL UPDATE query to update an existing user in the "user" table
+    const [result] = await databaseClient.query<Result>(
+      "update user set deleted_at = null where id = ?",
+      [id],
+    );
+
+    // Return the number of affected rows
+    return result.affectedRows;
+  }
+
+  async hardDelete(id: number) {
     // Execute the SQL DELETE query to delete a specific user by its ID
     const [result] = await databaseClient.query<Result>(
       "delete from user where id = ?",

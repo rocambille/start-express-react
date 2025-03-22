@@ -22,7 +22,7 @@ class ItemRepository {
   async read(id: number) {
     // Execute the SQL SELECT query to retrieve a specific item by its ID
     const [rows] = await databaseClient.query<Rows>(
-      "select * from item where id = ?",
+      "select * from item where id = ? and deleted_at is null",
       [id],
     );
 
@@ -32,7 +32,9 @@ class ItemRepository {
 
   async readAll() {
     // Execute the SQL SELECT query to retrieve all items from the "item" table
-    const [rows] = await databaseClient.query<Rows>("select * from item");
+    const [rows] = await databaseClient.query<Rows>(
+      "select * from item where deleted_at is null",
+    );
 
     // Return the array of items
     return rows as Item[];
@@ -51,9 +53,31 @@ class ItemRepository {
     return result.affectedRows;
   }
 
-  // The D of CRUD - Delete operation
+  // The Ds of CRUD - Delete operations
 
-  async delete(id: number) {
+  async softDelete(id: number) {
+    // Execute the SQL UPDATE query to update an existing item in the "item" table
+    const [result] = await databaseClient.query<Result>(
+      "update item set deleted_at = now() where id = ?",
+      [id],
+    );
+
+    // Return the number of affected rows
+    return result.affectedRows;
+  }
+
+  async softUndelete(id: number) {
+    // Execute the SQL UPDATE query to update an existing item in the "item" table
+    const [result] = await databaseClient.query<Result>(
+      "update item set deleted_at = null where id = ?",
+      [id],
+    );
+
+    // Return the number of affected rows
+    return result.affectedRows;
+  }
+
+  async hardDelete(id: number) {
     // Execute the SQL DELETE query to delete a specific item by its ID
     const [result] = await databaseClient.query<Result>(
       "delete from item where id = ?",
