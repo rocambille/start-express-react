@@ -12,6 +12,7 @@ import databaseClient, {
 } from "../../src/database/client";
 
 const app = express();
+
 app.use(routes);
 
 const logErrors: ErrorRequestHandler = (err, req, _res, next) => {

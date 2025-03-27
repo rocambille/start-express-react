@@ -6,8 +6,8 @@ import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
 import ItemEdit from "./pages/ItemEdit";
-import ItemIndex from "./pages/ItemIndex";
-import ItemNew from "./pages/ItemNew";
+import ItemList from "./pages/ItemList";
+import ItemCreate from "./pages/ItemCreate";
 import ItemShow from "./pages/ItemShow";
 
 import "./index.css";
@@ -37,7 +37,7 @@ export default [
         children: [
           {
             index: true,
-            element: <ItemIndex />,
+            element: <ItemList />,
           },
           {
             path: "/items/:id",
@@ -49,7 +49,7 @@ export default [
           },
           {
             path: "/items/new",
-            element: <ItemNew />,
+            element: <ItemCreate />,
           },
         ],
       },

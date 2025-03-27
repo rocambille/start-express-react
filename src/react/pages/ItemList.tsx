@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useAuth } from "../components/AuthContext";
 import { useItems } from "../components/ItemContext";
 
-function ItemIndex() {
+function ItemList() {
   const { user } = useAuth();
   const { items } = useItems();
 
@@ -22,4 +22,4 @@ function ItemIndex() {
   );
 }
 
-export default ItemIndex;
+export default ItemList;

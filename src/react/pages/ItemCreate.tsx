@@ -1,7 +1,7 @@
 import { useItems } from "../components/ItemContext";
 import ItemForm from "../components/ItemForm";
 
-function ItemNew() {
+function ItemCreate() {
   const { addItem } = useItems();
 
   const newItem = {
@@ -15,4 +15,4 @@ function ItemNew() {
   );
 }
 
-export default ItemNew;
+export default ItemCreate;
