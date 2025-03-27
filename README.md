@@ -79,7 +79,7 @@ git config --global core.autocrlf false
 
 ## Installation et utilisation
 
-Suivez les [premiers pas](https://github.com/rocambille/start-express-react/wiki/Premiers-pas) dans notre wiki.
+Référez-vous à la page [Installation](https://github.com/rocambille/start-express-react/wiki/Installation) dans notre wiki.
 
 ## Les choses à retenir
 
