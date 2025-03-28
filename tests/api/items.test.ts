@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import express, { type ErrorRequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import supertest from "supertest";
@@ -25,7 +23,7 @@ const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
 app.use(logErrors);
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("GET /api/items", () => {
@@ -34,9 +32,10 @@ describe("GET /api/items", () => {
     const rows = [] as Rows;
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [rows, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      rows,
+      [],
+    ]);
 
     // Send a GET request to the /api/items endpoint
     const response = await supertest(app).get("/api/items");
@@ -53,9 +52,10 @@ describe("GET /api/items/:id", () => {
     const rows = [{}] as Rows;
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [rows, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      rows,
+      [],
+    ]);
 
     // Send a GET request to the /api/items/:id endpoint
     const response = await supertest(app).get("/api/items/1");
@@ -70,9 +70,10 @@ describe("GET /api/items/:id", () => {
     const rows = [] as Rows;
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [rows, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      rows,
+      [],
+    ]);
 
     // Send a GET request to the /api/items/:id endpoint with an invalid ID
     const response = await supertest(app).get("/api/items/0");
@@ -89,12 +90,13 @@ describe("POST /api/items", () => {
     const result = { insertId: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      result,
+      [],
+    ]);
 
     // Fake item data
     const fakeItem = { title: "foo" };
@@ -116,12 +118,13 @@ describe("POST /api/items", () => {
     const result = { insertId: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [result, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      result,
+      [],
+    ]);
 
     // Fake empty item
     const fakeItem = {};
@@ -156,16 +159,12 @@ describe("PUT /api/items/:id", () => {
     const result = { affectedRows: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async (sql) =>
-        (sql as unknown as string).includes("select")
-          ? [rows, []]
-          : [result, []],
-      );
+    vi.spyOn(databaseClient, "query").mockImplementation(async (sql) =>
+      (sql as unknown as string).includes("select") ? [rows, []] : [result, []],
+    );
 
     // Fake item data
     const fakeItem = { title: "foo" };
@@ -189,10 +188,10 @@ describe("PUT /api/items/:id", () => {
     const result = { affectedRows: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+    vi.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
       return (sql as unknown as string).includes("select")
         ? [rows, []]
         : [result, []];
@@ -221,10 +220,10 @@ describe("PUT /api/items/:id", () => {
     const result = { affectedRows: 0 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+    vi.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
       return (sql as unknown as string).includes("select")
         ? [rows, []]
         : [result, []];
@@ -249,9 +248,10 @@ describe("PUT /api/items/:id", () => {
     const rows = [{}] as Rows;
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [rows, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      rows,
+      [],
+    ]);
 
     // Send a POST request to the /api/items endpoint
     const response = await supertest(app).put("/api/items/42");
@@ -270,10 +270,10 @@ describe("DELETE /api/items/:id", () => {
     const result = { affectedRows: 1 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+    vi.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
       return (sql as unknown as string).includes("select")
         ? [rows, []]
         : [result, []];
@@ -297,10 +297,10 @@ describe("DELETE /api/items/:id", () => {
     const result = { affectedRows: 0 } as Result;
 
     // Mock the implementation of the jwt verify method
-    jest.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
+    vi.spyOn(jwt, "verify").mockImplementation(() => ({ sub: "0" }));
 
     // Mock the implementation of the database query method
-    jest.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
+    vi.spyOn(databaseClient, "query").mockImplementation(async (sql) => {
       return (sql as unknown as string).includes("select")
         ? [rows, []]
         : [result, []];
@@ -321,9 +321,10 @@ describe("DELETE /api/items/:id", () => {
     const rows = [{}] as Rows;
 
     // Mock the implementation of the database query method
-    jest
-      .spyOn(databaseClient, "query")
-      .mockImplementation(async () => [rows, []]);
+    vi.spyOn(databaseClient, "query").mockImplementation(async () => [
+      rows,
+      [],
+    ]);
 
     // Send a POST request to the /api/items endpoint
     const response = await supertest(app).delete("/api/items/42");

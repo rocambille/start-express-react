@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import fs from "node:fs";
 
 import databaseClient, { type Rows } from "../src/database/client";
@@ -27,6 +25,6 @@ describe("Installation", () => {
   });
 });
 
-afterAll((done) => {
-  databaseClient.end().then(done);
+afterAll(async () => {
+  await databaseClient.end();
 });

@@ -1,13 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-import { TextDecoder, TextEncoder } from "node:util";
-
-Object.assign(global, { TextDecoder, TextEncoder });
-
 import { act, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
-import "@testing-library/jest-dom";
 
 import * as AuthContext from "../../src/react/components/AuthContext";
 import * as ItemContext from "../../src/react/components/ItemContext";
@@ -34,15 +26,13 @@ const itemContextValue = {
 };
 
 beforeEach(() => {
-  jest.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
+  vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
 
-  jest
-    .spyOn(ItemContext, "useItems")
-    .mockImplementation(() => itemContextValue);
+  vi.spyOn(ItemContext, "useItems").mockImplementation(() => itemContextValue);
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("React Pages", () => {

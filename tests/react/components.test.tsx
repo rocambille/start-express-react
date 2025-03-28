@@ -1,13 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-import { TextDecoder, TextEncoder } from "node:util";
-
-Object.assign(global, { TextDecoder, TextEncoder });
-
 import { act, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
-import "@testing-library/jest-dom";
 
 import * as AuthContext from "../../src/react/components/AuthContext";
 import { AuthProvider, useAuth } from "../../src/react/components/AuthContext";
@@ -22,17 +14,17 @@ const authContextValue = {
 };
 
 beforeEach(() => {
-  globalThis.fetch = jest.fn().mockImplementation(() =>
+  globalThis.fetch = vi.fn().mockImplementation(() =>
     Promise.resolve({
       json: () => Promise.resolve([]),
     }),
   );
 
-  jest.spyOn(window, "alert").mockImplementation(() => {});
+  vi.spyOn(window, "alert").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe("React Components", () => {
@@ -66,9 +58,7 @@ describe("React Components", () => {
   });
 
   test("<ItemProvider />", async () => {
-    jest
-      .spyOn(AuthContext, "useAuth")
-      .mockImplementation(() => authContextValue);
+    vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
 
     const Consumer = () => {
       const { addItem, editItem, deleteItem } = useItems();

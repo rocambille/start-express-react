@@ -34,7 +34,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 # Create a new stage to run the application.
 FROM base as final
 
-# Copy the production dependencies from the deps stage into the image.
+# Copy the dependencies from the deps stage into the image.
 COPY --from=deps /app/node_modules ./node_modules
 
 # Copy the rest of the source files into the image.
