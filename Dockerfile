@@ -13,11 +13,7 @@ ARG NODE_VERSION=22.14.0
 FROM node:${NODE_VERSION}-alpine as base
 
 # Set working directory for all build stages.
-WORKDIR /app
-
-################################################################################
-# Create a stage for installing dependecies.
-FROM base as deps
+WORKDIR /home/app
 
 RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js
 
@@ -29,13 +25,6 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
     npm ci
-
-################################################################################
-# Create a new stage to run the application.
-FROM base as final
-
-# Copy the dependencies from the deps stage into the image.
-COPY --from=deps /app/node_modules ./node_modules
 
 # Copy the rest of the source files into the image.
 COPY . .
