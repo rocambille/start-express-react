@@ -36,26 +36,25 @@ sequenceDiagram
 
 Il est pré-configuré avec un ensemble d'outils pour aider des juniors à produire du code de qualité industrielle, tout en restant un outil pédagogique :
 
-- [**React**](https://react.dev/learn) : Bibliothèque JavaScript pour construire des interfaces utilisateur interactives et modulaires.  
 - [**Express**](https://expressjs.com/) : Framework minimaliste pour créer des serveurs web et des API avec Node.js.  
-- [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/) : Système de gestion de bases de données relationnelles performant, utilisé pour stocker et interroger les données.  
+- [**React**](https://react.dev/learn) : Bibliothèque JavaScript pour construire des interfaces utilisateur interactives et modulaires.  
 
-Sous le capot (liste non exhaustive) :
+Sous le capot (dans l'ordre alphabétique, liste non exhaustive) :
 
-- [**TypeScript**](https://www.typescriptlang.org/) : Superset de JavaScript ajoutant des types statiques, facilitant la maintenance et réduisant les erreurs.  
 - [**Biome**](https://biomejs.dev/) : Outil tout-en-un pour le linting, le formatage et l'analyse statique de code, conçu pour assurer la qualité et la lisibilité du code de manière performante et moderne.  
 - [**Docker**](https://docs.docker.com/) : Plateforme de conteneurisation permettant de standardiser et d'automatiser les environnements de développement et de déploiement, garantissant des configurations reproductibles.  
+- [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/) : Système de gestion de bases de données relationnelles, utilisé pour stocker et interroger les données.  
+- [**Pico CSS**](https://picocss.com/) : Kit CSS minimaliste et léger qui donne la priorité à la syntaxe sémantique.  
+- [**React Router (Library)**](https://reactrouter.com/home) : Gestionnaire de routage pour les applications React, permettant la création de chemins et de composants dynamiques.  
+- [**TypeScript**](https://www.typescriptlang.org/) : Superset de JavaScript ajoutant des types statiques, facilitant la maintenance et réduisant les erreurs.  
 - [**Vite**](https://vite.dev/guide/) : Outil de construction rapide et léger pour les applications front-end, avec un serveur de développement ultra-rapide et une optimisation des bundles pour la production.  
 - [**Vitest**](https://vitest.dev/guide/) : Framework de test JavaScript.  
-- [**React Router (Library)**](https://reactrouter.com/home) : Gestionnaire de routage pour les applications React, permettant la création de chemins et de composants dynamiques.  
-- [**Pico CSS**](https://picocss.com/) : Kit CSS minimaliste et léger qui donne la priorité à la syntaxe sémantique.  
 - [**Zod**](https://zod.dev/) : Bibliothèque de déclaration et de validation de schéma axée sur TypeScript.  
 
 ## Table des matières
 
 - [StartER](#starter)
   - [Table des matières](#table-des-matières)
-  - [Utilisateurs Windows](#utilisateurs-windows)
   - [Installation et utilisation](#installation-et-utilisation)
   - [Les choses à retenir](#les-choses-à-retenir)
     - [Commandes de base](#commandes-de-base)
@@ -64,18 +63,8 @@ Sous le capot (liste non exhaustive) :
     - [Développer la partie back-end](#développer-la-partie-back-end)
     - [REST](#rest)
     - [Autres bonnes pratiques](#autres-bonnes-pratiques)
-  - [FAQ](#faq)
     - [Logs](#logs)
-    - [Contribution](#contribution)
-
-## Utilisateurs Windows
-
-Assurez-vous de lancer ces commandes dans un terminal Git pour éviter [les problèmes de formats de nouvelles lignes](https://en.wikipedia.org/wiki/Newline#Issues_with_different_newline_formats) :
-
-```sh
-git config --global core.eol lf
-git config --global core.autocrlf false
-```
+  - [Contribution](#contribution)
 
 ## Installation et utilisation
 
@@ -267,13 +256,11 @@ export default new ItemRepository();
   - Adoptez un style de codage cohérent avec Biome.
   - Écrivez des tests pour toutes les fonctionnalités critiques.
 
-## FAQ
-
 ### Logs
 
 Pour accéder aux logs de votre projet en ligne (pour suivre le déploiement ou surveiller les erreurs), connectez-vous à votre VPS (`ssh user@host`). Ensuite, allez dans votre projet spécifique et exécutez `docker compose logs -t -f`.
 
-### Contribution
+## Contribution
 
 Nous accueillons avec plaisir les contributions ! Veuillez suivre ces étapes pour contribuer :
 
