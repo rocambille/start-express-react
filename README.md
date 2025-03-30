@@ -80,6 +80,11 @@ Pour démarrer, référez-vous aux pages :
 
 ```
 .
+├── .env
+├── .env.sample
+├── compose.yaml
+├── compose.prod.yaml
+├── Dockerfile
 ├── index.html
 ├── server.ts
 └── src
