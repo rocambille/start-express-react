@@ -2,11 +2,15 @@
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
 [![issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
 
+<div align="center">
+    
 # StartER
 
 [![Use this template](https://img.shields.io/badge/Démarrer-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 
-[![view - Documentation](https://img.shields.io/badge/Apprendre-Documentation-blue?style=for-the-badge)](https://github.com/rocambille/start-express-react/wiki)
+[![Read the manual](https://img.shields.io/badge/Apprendre-Read_the_manual-blue?style=for-the-badge)](https://github.com/rocambille/start-express-react/wiki)
+
+</div>
 
 Ce projet est un framework pédagogique, suivant une architecture Express-React connectée à une base de données :
 
