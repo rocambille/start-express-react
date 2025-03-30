@@ -1,5 +1,5 @@
-[![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=blue)](https://github.com/rocambille/start-express-react/releases/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
+[![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/releases/)
+[![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
 [![issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
 
 <div align="center">
