@@ -20,7 +20,7 @@ services:
       - 5173:5173
       - 24678:24678
   database:
-    image: mysql
+    image: mysql:lts
     restart: always
     env_file: ./.env
     volumes:
@@ -32,7 +32,7 @@ services:
         timeout: 20s
         retries: 10
   adminer:
-    image: adminer
+    image: adminer:5
     restart: always
     ports:
       - 8080:8080
