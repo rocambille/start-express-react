@@ -1,15 +1,11 @@
-import type { ReactNode } from "react";
+import type { PropsWithChildren } from "react";
 
 import { AuthProvider } from "./AuthContext";
 import AuthForm from "./AuthForm";
 import BurgerMenu from "./BurgerMenu";
 import NavBar from "./NavBar";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-function Layout({ children }: LayoutProps) {
+function Layout({ children }: PropsWithChildren) {
   return (
     <AuthProvider>
       <header>

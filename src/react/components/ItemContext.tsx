@@ -1,24 +1,20 @@
-import { type ReactNode, createContext, use, useContext } from "react";
+import { type PropsWithChildren, createContext, use, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { useAuth } from "./AuthContext";
 import { get, invalidateCache } from "./utils";
 
-interface ItemContextType {
+type ItemContextType = {
   items: Item[];
   addItem: (partialItem: Omit<Item, "id" | "user_id">) => void;
   item?: Item;
   editItem: (partialItem: Omit<Item, "id" | "user_id">) => void;
   deleteItem: () => void;
-}
+};
 
 const ItemContext = createContext(null as ItemContextType | null);
 
-interface ItemProviderProps {
-  children: ReactNode;
-}
-
-export function ItemProvider({ children }: ItemProviderProps) {
+export function ItemProvider({ children }: PropsWithChildren) {
   const navigate = useNavigate();
 
   const { user } = useAuth();

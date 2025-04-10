@@ -1,10 +1,9 @@
-import { type ReactNode, useId } from "react";
+import { type PropsWithChildren, useId } from "react";
 
-interface ItemFormProps {
-  children: ReactNode;
+type ItemFormProps = PropsWithChildren<{
   defaultValue: Omit<Item, "id" | "user_id">;
   action: (partialItem: Omit<Item, "id" | "user_id">) => void;
-}
+}>;
 
 function ItemForm({ children, defaultValue, action }: ItemFormProps) {
   const titleId = useId();

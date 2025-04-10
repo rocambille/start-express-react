@@ -1,10 +1,6 @@
-import { type ReactNode, useId } from "react";
+import { type PropsWithChildren, useId } from "react";
 
-interface BurgerMenuProps {
-  children: ReactNode;
-}
-
-function BurgerMenu({ children }: BurgerMenuProps) {
+function BurgerMenu({ children }: PropsWithChildren) {
   const burgerMenuId = useId();
 
   return (
