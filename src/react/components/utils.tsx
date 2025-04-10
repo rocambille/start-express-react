@@ -1,22 +1,22 @@
-const cache = new Map();
+const cacheData = new Map();
 
-export const get = (url: string) => {
-  if (!cache.has(url)) {
+export const cache = (url: string) => {
+  if (!cacheData.has(url)) {
     // Promises should be cached for React `use` to work
 
-    cache.set(
+    cacheData.set(
       url,
       fetch(url).then((response) => response.json()),
     );
   }
 
-  return cache.get(url);
+  return cacheData.get(url);
 };
 
 export const invalidateCache = (basePath: string) => {
-  cache.forEach((_value, key: string) => {
+  cacheData.forEach((_value, key: string) => {
     if (key.startsWith(basePath)) {
-      cache.delete(key);
+      cacheData.delete(key);
     }
   });
 };

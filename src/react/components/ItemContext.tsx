@@ -2,7 +2,7 @@ import { type PropsWithChildren, createContext, use, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import { useAuth } from "./AuthContext";
-import { get, invalidateCache } from "./utils";
+import { cache, invalidateCache } from "./utils";
 
 type ItemContextType = {
   items: Item[];
@@ -19,7 +19,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
 
   const { user } = useAuth();
 
-  const items = use(get("/api/items")) as Item[];
+  const items = use(cache("/api/items")) as Item[];
 
   const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
     if (user == null) {
