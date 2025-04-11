@@ -5,7 +5,7 @@ function ItemEdit() {
   const { item, editItem } = useItems();
 
   if (item == null) {
-    throw new Error();
+    throw 404;
   }
 
   return (
