@@ -9,7 +9,7 @@ function ItemShow() {
   const { item } = useItems();
 
   if (item == null) {
-    throw new Error();
+    throw 404;
   }
 
   return (

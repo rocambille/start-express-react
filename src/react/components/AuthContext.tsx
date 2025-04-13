@@ -1,19 +1,20 @@
-import { type ReactNode, createContext, useContext, useState } from "react";
+import {
+  type PropsWithChildren,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 
-interface AuthContextType {
+type AuthContextType = {
   user: User | null;
   login: (credentials: Credentials) => void;
   logout: () => void;
   register: (credentials: Credentials & { confirmPassword: string }) => void;
-}
+};
 
 const AuthContext = createContext(null as AuthContextType | null);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState(null as User | null);
 
   const login = (credentials: Credentials) => {

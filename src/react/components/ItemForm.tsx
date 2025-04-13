@@ -1,7 +1,6 @@
-import { type ReactNode, useId } from "react";
+import { type PropsWithChildren, useId } from "react";
 
-interface ItemFormProps {
-  children: ReactNode;
+interface ItemFormProps extends PropsWithChildren {
   defaultValue: Omit<Item, "id" | "user_id">;
   action: (partialItem: Omit<Item, "id" | "user_id">) => void;
 }

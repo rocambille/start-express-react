@@ -6,6 +6,14 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import userRepository from "../user/userRepository";
 
+declare global {
+  namespace Express {
+    export interface Request {
+      auth: JwtPayload;
+    }
+  }
+}
+
 /* ************************************************************************ */
 
 // Options de hachage (voir documentation : https://github.com/ranisalt/node-argon2/wiki/Options)
