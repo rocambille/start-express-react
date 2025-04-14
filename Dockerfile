@@ -10,12 +10,10 @@ ARG NODE_VERSION=22.14.0
 
 ################################################################################
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as base
+FROM node:${NODE_VERSION}-alpine
 
 # Set working directory for all build stages.
 WORKDIR /home/app
-
-RUN mkdir -p dist/server && echo "export const render = null" > dist/server/entry-server.js
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
@@ -30,4 +28,6 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 
 # Run the application.
-CMD npm run dev
+# Shell form vs Exec form?
+# See https://docs.docker.com/reference/build-checks/json-args-recommended/
+CMD ["npm", "run", "dev"]

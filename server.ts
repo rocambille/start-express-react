@@ -61,6 +61,8 @@ async function createServer() {
         const indexHtml = readIndexHtml();
 
         if (maybeVite == null) {
+          // Note: ./dist/server/entry-server doesn't exist *before* build
+          // @ts-expect-error
           const { render } = await import("./dist/server/entry-server");
 
           return { template: indexHtml, render };
