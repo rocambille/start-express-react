@@ -1,7 +1,8 @@
-import mysql from "mysql2/promise";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import mysql from "mysql2/promise";
 
 // Build the path to the schema SQL file
 const __filename = fileURLToPath(import.meta.url);
