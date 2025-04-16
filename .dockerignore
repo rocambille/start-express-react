@@ -30,6 +30,5 @@
 **/build
 **/dist
 **/src/database/data
-**/src/database/schema.sql
 LICENSE
 README.md

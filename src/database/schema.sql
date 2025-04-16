@@ -1,7 +1,3 @@
-drop database if exists starter;
-create database starter;
-use starter;
-
 create table user (
   id int unsigned primary key auto_increment not null,
   email varchar(255) not null unique,

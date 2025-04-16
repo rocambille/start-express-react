@@ -106,14 +106,15 @@ Pour démarrer, référez-vous aux pages :
 
 ### Commandes de base
 
-| Commande                                              | Description                                                                 |
-|-------------------------------------------------------|-----------------------------------------------------------------------------|
-| `docker compose up --build`                           | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
-| `docker compose -f compose.prod.yaml up --build -d`   | Build et démarre en production                                              |
-| `docker compose logs -t`                              | Affiche les logs avec les timestamps                                        |
-| `docker compose run --build --rm server npm run test` | Exécute les tests                                                           |
-| `npm run check`                                       | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
-| `npm run check-types`                                 | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
+| Commande                                                          | Description                                                                 |
+|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `docker compose up --build`                                       | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
+| `docker compose -f compose.prod.yaml up --build -d`               | Build et démarre en production                                              |
+| `docker compose logs -t`                                          | Affiche les logs avec les timestamps                                        |
+| `docker compose run --build --rm server npm run database:sync`    | Synchronise le contenu de la base de données avec `src/database/schema.sql` |
+| `docker compose run --build --rm server npm run test`             | Exécute les tests                                                           |
+| `npm run check`                                                   | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
+| `npm run check-types`                                             | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
 
 ### REST cheatsheet
 
