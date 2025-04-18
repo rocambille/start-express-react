@@ -21,10 +21,7 @@ try {
 
   // Create a connection to the database
   databaseClient = await mysql.createConnection({
-    host: "database",
-    port: 3306,
-    user: "root",
-    password: MYSQL_ROOT_PASSWORD,
+    uri: `mysql://root:${MYSQL_ROOT_PASSWORD}@database:3306/${MYSQL_DATABASE}`,
     multipleStatements: true, // Allow multiple SQL statements
   });
 
