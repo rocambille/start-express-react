@@ -1,4 +1,4 @@
-[![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/releases/)
+[![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/tags/)
 [![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
 [![issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
 
@@ -91,15 +91,15 @@ Pour démarrer, référez-vous aux pages :
     ├── database
     │   └── schema.sql
     ├── express
-    │   ├── modules
-    │   │   └── ...
-    │   └── routes.ts
+    │   ├── routes.ts
+    │   └── modules
+    │       └── ...
     ├── react
+    │   ├── routes.tsx
     │   ├── components
     │   │   └── ...
-    │   ├── pages
-    │   │   └── ...
-    │   └── routes.tsx
+    │   └── pages
+    │       └── ...
     └── types
         └── index.d.ts
 ```
