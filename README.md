@@ -2,6 +2,13 @@
 [![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
 [![issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
 
+<div align="right">
+
+[![en-US](https://img.shields.io/badge/lang-en--US-white.svg)](https://github.com/rocambille/start-express-react/blob/main/README.en-US.md)
+[![fr-FR](https://img.shields.io/badge/lang-fr--FR-green.svg)](https://github.com/rocambille/start-express-react/blob/main/README.md)
+
+</div>
+
 <div align="center">
     
 # StartER
