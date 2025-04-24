@@ -86,11 +86,9 @@ export function ItemProvider({ children }: PropsWithChildren) {
   };
 
   return (
-    <ItemContext.Provider
-      value={{ items, addItem, item, editItem, deleteItem }}
-    >
+    <ItemContext value={{ items, addItem, item, editItem, deleteItem }}>
       {children}
-    </ItemContext.Provider>
+    </ItemContext>
   );
 }
 

@@ -64,9 +64,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext value={{ user, login, logout, register }}>
       {children}
-    </AuthContext.Provider>
+    </AuthContext>
   );
 }
 
