@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+import type { RequestParamHandler } from "express";
 
 import userRepository from "./userRepository";
 
@@ -10,8 +10,8 @@ declare global {
   }
 }
 
-const convert: RequestHandler = async (req, res, next) => {
-  const user = await userRepository.read(+req.params.userId);
+const convert: RequestParamHandler = async (req, res, next, id) => {
+  const user = await userRepository.read(+id);
 
   if (user == null) {
     res.sendStatus(req.method === "DELETE" ? 204 : 404);
