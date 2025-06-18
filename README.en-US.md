@@ -10,8 +10,12 @@
 </div>
 
 <div align="center">
-    
-# StartER
+
+# StartER – A modern full-stack Express + React starter
+
+🔧 **Educational framework** for building web applications in Express + React with integrated production tools.
+
+⭐️ If you find this project useful, **add a star** to support the project! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
 
 [![Use this template](https://img.shields.io/badge/Start-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 
@@ -19,7 +23,7 @@
 
 </div>
 
-This project is an educational framework, following an Express-React architecture connected to a database:
+## Overview
 
 ```mermaid
 sequenceDiagram
