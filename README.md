@@ -10,8 +10,12 @@
 </div>
 
 <div align="center">
-    
-# StartER
+
+# StartER – Un starter Express + React full-stack moderne
+
+🔧 **Framework pédagogique** pour créer des applications web en Express + React avec des outils de production intégrés.
+
+⭐️ Si vous trouvez ce projet utile, **laissez une étoile** pour soutenir le projet ! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
 
 [![Use this template](https://img.shields.io/badge/Démarrer-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 
@@ -19,7 +23,7 @@
 
 </div>
 
-Ce projet est un framework pédagogique, suivant une architecture Express-React connectée à une base de données :
+## Vue d'ensemble
 
 ```mermaid
 sequenceDiagram
