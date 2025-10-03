@@ -1,7 +1,6 @@
-import type { CookieOptions, RequestHandler } from "express";
-
 import argon2 from "argon2";
 import cookieParser from "cookie-parser";
+import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import userRepository from "../user/userRepository";
@@ -50,7 +49,7 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   // Everything is ok
 
-  const { password, ...userWithoutInsertId } = req.body;
+  const { password: _password, ...userWithoutInsertId } = req.body;
 
   const user = { ...userWithoutInsertId, insertId };
 
@@ -97,7 +96,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
 
   // Everything is ok
 
-  const { password, ...user } = userWithPassword;
+  const { password: _password, ...user } = userWithPassword;
 
   const token = await jwt.sign(
     {
@@ -143,7 +142,7 @@ const verifyAccessToken: RequestHandler[] = [
       ) as JwtPayload;
 
       next();
-    } catch (err) {
+    } catch (_err) {
       res.sendStatus(403);
     }
   },

@@ -4,11 +4,10 @@ const router = Router();
 
 /* ************************************************************************ */
 
+import authActions from "../auth/authActions";
 import userActions from "./userActions";
 import userParamConverter from "./userParamConverter";
 import userValidator from "./userValidator";
-
-import authActions from "../auth/authActions";
 
 /* ************************************************************************ */
 

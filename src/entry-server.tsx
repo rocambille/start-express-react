@@ -3,9 +3,9 @@ import type { Request, Response } from "express";
 import { StrictMode } from "react";
 import { renderToPipeableStream } from "react-dom/server";
 import {
-  StaticRouterProvider,
   createStaticHandler,
   createStaticRouter,
+  StaticRouterProvider,
 } from "react-router";
 
 import routes from "./react/routes";
