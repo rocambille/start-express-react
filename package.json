@@ -14,7 +14,8 @@
     "dev": "tsx --env-file=.env server",
     "start": "tsx --env-file=.env server",
     "test": "vitest run --coverage",
-    "types:check": "tsc --noEmit"
+    "types:check": "tsc --noEmit",
+    "make:clone": "node --loader ts-node/esm src/scripts/make-clone.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
@@ -22,14 +23,17 @@
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
+    "@types/fs-extra": "^11.0.4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/supertest": "^6.0.3",
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "fs-extra": "^11.3.2",
     "jsdom": "^27.0.0",
     "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
