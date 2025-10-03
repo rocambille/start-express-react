@@ -126,6 +126,25 @@ To get started, refer to the following pages:
 | `docker compose run --build --rm server npm run test` | Runs tests |
 | `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
 | `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
+| `npm run make:clone <path to existing module> <path for new module>  <OldName> <NewName>` | Clone a module or file, renaming identifiers automatically |
+
+### Example: Clone Command 
+#### Cloning a Single File
+
+To clone a single file `itemActions.ts` into a new file `itemActionsCloned.ts`:
+
+```bash
+npm run make:clone src/express/modules/item/itemActions.ts src/express/modules/item/itemActionsCloned.ts itemActions clonedItemActions
+```
+
+#### Cloning a Whole Module
+
+To clone the entire `item` module folder into a new folder `itemCloned`:
+
+```bash
+npm run make:clone src/express/modules/item src/express/modules/itemCloned Item ItemCloned
+```
+
 
 ### REST cheatsheet
 

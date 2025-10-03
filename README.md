@@ -117,15 +117,34 @@ Pour démarrer, référez-vous aux pages :
 
 ### Commandes de base
 
-| Commande                                                          | Description                                                                 |
-|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `docker compose up --build`                                       | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)  |
-| `docker compose -f compose.prod.yaml up --build -d`               | Build et démarre en production                                              |
-| `docker compose logs -t`                                          | Affiche les logs avec les timestamps                                        |
-| `docker compose run --build --rm server npm run database:sync`    | Synchronise le contenu de la base de données avec `src/database/schema.sql` |
-| `docker compose run --build --rm server npm run test`             | Exécute les tests                                                           |
-| `npm run biome:check`                                             | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
-| `npm run types:check`                                             | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
+| Commande                                                                                            | Description                                                                  |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| `docker compose up --build`                                                                         | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)   |
+| `docker compose -f compose.prod.yaml up --build -d`                                                 | Build et démarre en production                                               |
+| `docker compose logs -t`                                                                            | Affiche les logs avec les timestamps                                         |
+| `docker compose run --build --rm server npm run database:sync`                                      | Synchronise le contenu de la base de données avec `src/database/schema.sql`  |
+| `docker compose run --build --rm server npm run test`                                               | Exécute les tests                                                            |
+| `npm run biome:check`                                                                               | Contrôle la qualité du code avec Biome (exécuté en pre-commit)               |
+| `npm run types:check`                                                                               | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)      |
+| `npm run make:clone <chemin vers module existant> <chemin pour nouveau module> <OldName> <NewName>` | Clone un module ou un fichier, en renommant automatiquement les identifiants |
+
+### Exemple : Commande Clone
+
+#### Clonage d’un seul fichier
+
+Pour cloner un fichier **`itemActions.ts`** en un nouveau fichier **`itemActionsCloned.ts`** :
+
+```bash
+npm run make:clone src/express/modules/item/itemActions.ts src/express/modules/item/itemActionsCloned.ts itemActions clonedItemActions
+```
+
+#### Clonage d’un module entier
+Pour cloner tout le dossier du module item en un nouveau dossier itemCloned :
+
+```bash
+npm run make:clone src/express/modules/item src/express/modules/itemCloned Item ItemCloned
+```
+
 
 ### REST cheatsheet
 
