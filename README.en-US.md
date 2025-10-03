@@ -120,8 +120,8 @@ To get started, refer to the following pages:
 | `docker compose logs -t` | Displays logs with timestamps |
 | `docker compose run --build --rm server npm run database:sync` | Synchronizes database contents with `src/database/schema.sql` |
 | `docker compose run --build --rm server npm run test` | Runs tests |
-| `npm run check` | Checks code quality with Biome (executed on pre-commit) |
-| `npm run check-types` | Checks type consistency with TypeScript (executed on pre-commit) |
+| `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
+| `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
 
 ### REST cheatsheet
 
