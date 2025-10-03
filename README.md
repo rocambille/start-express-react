@@ -120,8 +120,8 @@ Pour démarrer, référez-vous aux pages :
 | `docker compose logs -t`                                          | Affiche les logs avec les timestamps                                        |
 | `docker compose run --build --rm server npm run database:sync`    | Synchronise le contenu de la base de données avec `src/database/schema.sql` |
 | `docker compose run --build --rm server npm run test`             | Exécute les tests                                                           |
-| `npm run check`                                                   | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
-| `npm run check-types`                                             | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
+| `npm run biome:check`                                             | Contrôle la qualité du code avec Biome (exécuté en pre-commit)              |
+| `npm run types:check`                                             | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)     |
 
 ### REST cheatsheet
 

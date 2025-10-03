@@ -1,4 +1,4 @@
 #!/bin/sh
 
-npm run check
-npm run check-types
+npm run biome:check
+npm run types:check
