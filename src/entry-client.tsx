@@ -7,9 +7,9 @@ if (root == null) {
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import {
+  createBrowserRouter,
   RouterProvider,
   type RouterState,
-  createBrowserRouter,
 } from "react-router";
 
 import routes from "./react/routes";

@@ -1,13 +1,11 @@
 import express, { type ErrorRequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import supertest from "supertest";
-
-import routes from "../../src/express/routes";
-
 import databaseClient, {
   type Result,
   type Rows,
 } from "../../src/database/client";
+import routes from "../../src/express/routes";
 
 const app = express();
 
