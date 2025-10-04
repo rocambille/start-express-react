@@ -14,6 +14,7 @@ function NavBar() {
         {link("/", "Home")}
         {link("/items", "Items")}
         {link("/use-action-state-showcase", "Showcase")}
+        {link("/use-form-status-showcase", "useFormStatus")}
       </ul>
     </nav>
   );

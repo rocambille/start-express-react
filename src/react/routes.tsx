@@ -10,6 +10,7 @@ import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
 import UseActionStateShowcase from './pages/UseActionStateShowcase';
+import UseFormStatusShowcase from './pages/UseFormStatusShowcase';
 
 import "./index.css";
 
@@ -30,6 +31,10 @@ export default [
         path: "/use-action-state-showcase",
         element: <UseActionStateShowcase />,
       },
+      {
+        path: "/use-form-status-showcase",
+        element: <UseFormStatusShowcase />,
+    },
       {
         path: "/items",
         element: (
