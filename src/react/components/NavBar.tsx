@@ -13,6 +13,7 @@ function NavBar() {
       <ul>
         {link("/", "Home")}
         {link("/items", "Items")}
+        {link("/useformstatus", "useFormStatus")}
       </ul>
     </nav>
   );

@@ -9,6 +9,7 @@ import ItemCreate from "./pages/ItemCreate";
 import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
+import UseFormStatusPage from "./pages/UseFormStatusPage";
 
 import "./index.css";
 
@@ -24,6 +25,10 @@ export default [
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/useformstatus",
+        element: <UseFormStatusPage />,
       },
       {
         path: "/items",
