@@ -9,7 +9,8 @@ import ItemCreate from "./pages/ItemCreate";
 import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
-import UseActionStateShowcase from './pages/UseActionStateShowcase';
+
+import ShowcasePage from './pages/Showcase';
 
 import "./index.css";
 
@@ -27,9 +28,10 @@ export default [
         element: <Home />,
       },
       {
-        path: "/use-action-state-showcase",
-        element: <UseActionStateShowcase />,
+       path: "/showcase",
+       element: <ShowcasePage />,
       },
+      
       {
         path: "/items",
         element: (
