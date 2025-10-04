@@ -11,10 +11,10 @@ function NavBar() {
   return (
     <nav>
       <ul>
-        {link("/", "Home")}
-        {link("/items", "Items")}
-        {link("/use-action-state-showcase", "Showcase")}
-      </ul>
+  {link("/", "Home")}
+  {link("/items", "Items")}
+  {link("/showcase", "Showcase")}
+</ul>
     </nav>
   );
 }
