@@ -9,6 +9,8 @@ import ItemCreate from "./pages/ItemCreate";
 import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
+import UseActionStateShowcase from './pages/UseActionStateShowcase';
+import UseFormStatusShowcase from './pages/UseFormStatusShowcase';
 
 import "./index.css";
 
@@ -25,6 +27,14 @@ export default [
         index: true,
         element: <Home />,
       },
+      {
+        path: "/use-action-state-showcase",
+        element: <UseActionStateShowcase />,
+      },
+      {
+        path: "/use-form-status-showcase",
+        element: <UseFormStatusShowcase />,
+    },
       {
         path: "/items",
         element: (
