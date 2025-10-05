@@ -12,20 +12,35 @@ async function formAction(formData: FormData) {
 }
 
 function SubmitButton() {
-  const { pending, data, method, action } = useFormStatus();
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" aria-disabled={pending}>
+      {pending ? "Envoi en cours..." : "Envoyer"}
+    </button>
+  );
+}
+
+function FormStatusIndicator() {
+  const { data, method, action } = useFormStatus();
 
   return (
     <>
-      <button type="submit" aria-disabled={pending}>
-        {pending ? "Envoi en cours..." : "Envoyer"}
-      </button>
-
-      {/* Here is more if pending status is not enough */}
-      {data && method && action && (
+      {data && (
+        <p>
+          <strong>Data :</strong>{" "}
+          {[...data.entries()].map((entry) => entry.join("=")).join("&")}
+        </p>
+      )}
+      {method && (
+        <p>
+          <strong>Méthode :</strong> {method}
+        </p>
+      )}
+      {action && (
         <>
           <p>
-            Submitted using {method},{" "}
-            {[...data.entries()].map((entry) => entry.join("=")).join("&")} and:
+            <strong>Action :</strong>
           </p>
           <pre>
             <code>{action.toString()}</code>
@@ -63,6 +78,7 @@ export default function FormStatusExample() {
       </p>
 
       <SubmitButton />
+      <FormStatusIndicator />
     </form>
   );
 }
