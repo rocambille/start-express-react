@@ -12,6 +12,7 @@ function NavBar() {
     <nav>
       <ul>
         {link("/", "Home")}
+        {link("/showcase", "ShowCase")}
         {link("/items", "Items")}
       </ul>
     </nav>
