@@ -1,6 +1,5 @@
-#!/usr/bin/env ts-node
+import path from "node:path";
 import fs from "fs-extra";
-import path from "path";
 
 /**
  * Recursively walks through a directory,
@@ -9,40 +8,55 @@ import path from "path";
 async function walkAndReplace(
   dir: string,
   oldName: string,
-  newName: string
+  newName: string,
 ): Promise<void> {
   const files = await fs.readdir(dir);
 
   for (const file of files) {
-    let fullPath = path.join(dir, file);
+    const fullPath = path.join(dir, file);
     const stat = await fs.stat(fullPath);
 
     if (stat.isDirectory()) {
       await walkAndReplace(fullPath, oldName, newName);
     } else {
       // ✅ Rename file if filename contains oldName
-      let newFilePath = fullPath.replace(oldName, newName);
+      const newFilePath = fullPath.replace(oldName, newName);
+
       if (newFilePath !== fullPath) {
         await fs.move(fullPath, newFilePath, { overwrite: true });
-        fullPath = newFilePath;
       }
 
       // ✅ Replace inside file
-      let content = await fs.readFile(fullPath, "utf8");
-      const regex = new RegExp(`\\b${oldName}\\b`, "g");
-      content = content.replace(regex, newName);
-      await fs.writeFile(fullPath, content, "utf8");
+      await replaceInsideFile(newFilePath, oldName, newName);
     }
   }
+}
+
+async function replaceInsideFile(
+  filePath: string,
+  oldName: string,
+  newName: string,
+): Promise<void> {
+  const content = await fs.readFile(filePath, "utf8");
+
+  const regex = new RegExp(oldName, "ig");
+
+  const newContent = content.replace(regex, (match: string) => {
+    if (match[0] !== oldName[0]) {
+      return newName[0].toUpperCase() + newName.substring(1);
+    }
+
+    return newName;
+  });
+
+  await fs.writeFile(filePath, newContent, "utf8");
 }
 
 async function main() {
   const [, , src, dest, oldName, newName] = process.argv;
 
   if (!src || !dest || !oldName || !newName) {
-    console.error(
-      "Usage: npm run make:clone <src> <dest> <OldName> <NewName>"
-    );
+    console.error("Usage: npm run make:clone <src> <dest> <OldName> <NewName>");
     process.exit(1);
   }
 
@@ -59,13 +73,9 @@ async function main() {
   if (stat.isFile()) {
     // ✅ Handle single file cloning
     await fs.copy(srcPath, destPath);
-    let content = await fs.readFile(destPath, "utf8");
 
-    // Replace identifiers
-    const regex = new RegExp(`\\b${oldName}\\b`, "g");
-    content = content.replace(regex, newName);
+    await replaceInsideFile(destPath, oldName, newName);
 
-    await fs.writeFile(destPath, content, "utf8");
     console.log(`✅ Cloned file ${srcPath} → ${destPath}`);
   } else if (stat.isDirectory()) {
     // ✅ Handle folder cloning
