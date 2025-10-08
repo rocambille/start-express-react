@@ -124,6 +124,7 @@ To get started, refer to the following pages:
 | `docker compose logs -t` | Displays logs with timestamps |
 | `docker compose run --build --rm server npm run database:sync` | Synchronizes database contents with `src/database/schema.sql` |
 | `docker compose run --build --rm server npm run test` | Runs tests |
+| `docker compose run --build --rm server npm run make:purge` | Removes default modules. Add `-- --keep-auth` to preserve user and auth modules. |
 | `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
 | `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
 

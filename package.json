@@ -14,7 +14,8 @@
     "dev": "tsx --env-file=.env server",
     "start": "tsx --env-file=.env server",
     "test": "vitest run --coverage",
-    "types:check": "tsc --noEmit"
+    "types:check": "tsc --noEmit",
+    "make:purge": "tsx --env-file=.env bin/purge"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
