@@ -2,7 +2,7 @@ import { useId, useMemo, useState, useTransition } from "react";
 
 // Mock data to demonstrate the useTransition hook
 const generateLargeDataset = () => {
-  return Array.from({ length: 20000 }, (_, i) => ({
+  return Array.from({ length: 20_000 }, (_, i) => ({
     id: i,
     name: `Item ${i}`,
     category: ["Electronics", "Books", "Clothing", "Home", "Sports"][i % 5],
@@ -10,14 +10,14 @@ const generateLargeDataset = () => {
   }));
 };
 
-const UseTransitionExample = () => {
+// Generate data once
+const data = generateLargeDataset();
+
+const TransitionExample = () => {
   const [query, setQuery] = useState("");
   const [isPending, startTransition] = useTransition();
   const inputId = useId();
   const descriptionId = useId();
-
-  // Generate data once
-  const data = useMemo(() => generateLargeDataset(), []);
 
   // Filter data based on search query
   const filteredData = useMemo(() => {
@@ -28,7 +28,7 @@ const UseTransitionExample = () => {
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         item.category.toLowerCase().includes(query.toLowerCase()),
     );
-  }, [data, query]);
+  }, [query]);
 
   const handleSearch = (value: string) => {
     // Use startTransition to mark this state update as non-urgent
@@ -187,4 +187,4 @@ const UseTransitionExample = () => {
   );
 };
 
-export default UseTransitionExample;
+export default TransitionExample;

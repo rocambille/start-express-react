@@ -12,7 +12,6 @@ function NavBar() {
     <nav>
       <ul>
         {link("/", "Home")}
-        {link("/showcase", "ShowCase")}
         {link("/items", "Items")}
         {link("/showcase", "Showcase")}
       </ul>

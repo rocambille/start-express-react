@@ -9,9 +9,7 @@ import ItemCreate from "./pages/ItemCreate";
 import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
-import ShowCase from "./pages/ShowCase";
-
-import ShowcasePage from "./pages/Showcase";
+import Showcase from "./pages/Showcase";
 
 import "./index.css";
 
@@ -27,10 +25,6 @@ export default [
       {
         index: true,
         element: <Home />,
-      },
-      {
-        path: "/showcase",
-        element: <ShowCase />,
       },
       {
         path: "/items",
@@ -62,7 +56,7 @@ export default [
       },
       {
         path: "/showcase",
-        element: <ShowcasePage />,
+        element: <Showcase />,
       },
     ],
   },
