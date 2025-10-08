@@ -127,6 +127,7 @@ Pour démarrer, référez-vous aux pages :
 | `npm run biome:check`                                                                               | Contrôle la qualité du code avec Biome (exécuté en pre-commit)               |
 | `npm run types:check`                                                                               | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)      |
 | `npm run make:clone <chemin vers module existant> <chemin pour nouveau module> <OldName> <NewName>` | Clone un module ou un fichier, en renommant automatiquement les identifiants |
+| `npm run make:purge`                                                                                | Supprime les modules par défaut. Ajoutez `-- --keep-auth` pour conserver les modules user et auth. |
 
 ### Exemple : Commande Clone
 
@@ -144,7 +145,6 @@ Pour cloner tout le dossier du module item en un nouveau dossier itemCloned :
 ```bash
 npm run make:clone src/express/modules/item src/express/modules/itemCloned Item ItemCloned
 ```
-
 
 ### REST cheatsheet
 

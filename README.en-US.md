@@ -127,6 +127,7 @@ To get started, refer to the following pages:
 | `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
 | `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
 | `npm run make:clone <path to existing module> <path for new module>  <OldName> <NewName>` | Clone a module or file, renaming identifiers automatically |
+| `npm run make:purge` | Removes default modules. Add `-- --keep-auth` to preserve user and auth modules. |
 
 ### Example: Clone Command 
 #### Cloning a Single File

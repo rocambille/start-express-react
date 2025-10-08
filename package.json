@@ -12,10 +12,11 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "database:sync": "tsx --env-file=.env bin/database-sync",
     "dev": "tsx --env-file=.env server",
+    "make:clone": "tsx  --env-file=.env bin/make-clone",
+    "make:purge": "tsx --env-file=.env bin/purge",
     "start": "tsx --env-file=.env server",
     "test": "vitest run --coverage",
-    "types:check": "tsc --noEmit",
-    "make:clone": "tsx  --env-file=.env bin/make-clone"
+    "types:check": "tsc --noEmit"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
