@@ -2,8 +2,9 @@
 import { useState } from "react";
 import ActionStateExample from "../components/showcase/ActionStateExample";
 import FormStatusExample from "../components/showcase/FormStatusExample";
+import TransitionExample from "../components/showcase/TransitionExample";
 
-type ShowcaseType = "actionState" | "formStatus";
+type ShowcaseType = "actionState" | "formStatus" | "transition";
 
 export default function ShowcasePage() {
   const [activeShowcase, setActiveShowcase] =
@@ -34,12 +35,20 @@ export default function ShowcasePage() {
         >
           useFormStatus
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveShowcase("transition")}
+          aria-disabled={activeShowcase === "transition"}
+        >
+          useTransition
+        </button>
       </nav>
 
       <hr />
 
       {activeShowcase === "actionState" && <ActionStateExample />}
       {activeShowcase === "formStatus" && <FormStatusExample />}
+      {activeShowcase === "transition" && <TransitionExample />}
     </article>
   );
 }

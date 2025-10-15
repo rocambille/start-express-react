@@ -9,8 +9,7 @@ import ItemCreate from "./pages/ItemCreate";
 import ItemEdit from "./pages/ItemEdit";
 import ItemList from "./pages/ItemList";
 import ItemShow from "./pages/ItemShow";
-
-import ShowcasePage from "./pages/Showcase";
+import Showcase from "./pages/Showcase";
 
 import "./index.css";
 
@@ -57,7 +56,7 @@ export default [
       },
       {
         path: "/showcase",
-        element: <ShowcasePage />,
+        element: <Showcase />,
       },
     ],
   },
