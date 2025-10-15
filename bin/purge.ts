@@ -1,7 +1,8 @@
-import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import readline from "node:readline/promises";
+import { fileURLToPath } from "node:url";
+
+import fs from "fs-extra";
 
 // Locate the project root directory (one level up from /bin).
 const __filename = fileURLToPath(import.meta.url);
@@ -20,25 +21,17 @@ async function confirm(question: string): Promise<boolean> {
   return answer.toLowerCase() === "y";
 }
 
-// Removes a file if it exists.
-async function removeFile(filePath: string) {
+// Removes a path (file or directory).
+async function remove(fileOrDirectoryPath: string) {
   try {
-    await fs.rm(path.join(rootDir, filePath));
-    console.log(`- Removed file: ${filePath}`);
-  } catch (error: any) {
-    if (error.code !== "ENOENT") {
-      console.error(`Error removing file ${filePath}:`, error);
-    }
-  }
-}
-
-// Removes a directory recursively if it exists.
-async function removeDir(dirPath: string) {
-  try {
-    await fs.rm(path.join(rootDir, dirPath), { recursive: true, force: true });
-    console.log(`- Removed directory: ${dirPath}`);
+    await fs.remove(path.join(rootDir, fileOrDirectoryPath));
+    console.log(`- Removed: ${fileOrDirectoryPath}`);
   } catch (error) {
-    console.error(`Error removing directory ${dirPath}:`, error);
+    const { code } = error as { code: string };
+
+    if (code !== "ENOENT") {
+      console.error(`Error removing ${fileOrDirectoryPath}:`, error);
+    }
   }
 }
 
@@ -55,8 +48,10 @@ async function updateFile(
       await fs.writeFile(fullPath, newContent, "utf-8");
       console.log(`- Updated file: ${filePath}`);
     }
-  } catch (error: any) {
-    if (error.code !== "ENOENT") {
+  } catch (error) {
+    const { code } = error as { code: string };
+
+    if (code !== "ENOENT") {
       console.error(`Error updating file ${filePath}:`, error);
     }
   }
@@ -68,15 +63,15 @@ async function updateFile(
 async function purgeItems() {
   console.log("\nPurging 'item' module...");
   // Remove item module files and related React components/pages.
-  await removeDir("src/express/modules/item");
-  await removeFile("tests/api/items.test.ts");
-  await removeFile("src/react/pages/ItemCreate.tsx");
-  await removeFile("src/react/pages/ItemEdit.tsx");
-  await removeFile("src/react/pages/ItemList.tsx");
-  await removeFile("src/react/pages/ItemShow.tsx");
-  await removeFile("src/react/components/ItemContext.tsx");
-  await removeFile("src/react/components/ItemDeleteForm.tsx");
-  await removeFile("src/react/components/ItemForm.tsx");
+  await remove("src/express/modules/item");
+  await remove("tests/api/items.test.ts");
+  await remove("src/react/pages/ItemCreate.tsx");
+  await remove("src/react/pages/ItemEdit.tsx");
+  await remove("src/react/pages/ItemList.tsx");
+  await remove("src/react/pages/ItemShow.tsx");
+  await remove("src/react/components/ItemContext.tsx");
+  await remove("src/react/components/ItemDeleteForm.tsx");
+  await remove("src/react/components/ItemForm.tsx");
 
   // Remove item routes and imports from Express and React.
   await updateFile("src/express/routes.ts", (content) =>
@@ -141,10 +136,22 @@ async function purgeItems() {
         /import \* as ItemContext from ".\.\/.\.\/src\/react\/components\/ItemContext";\n\n/,
         "",
       )
-      .replace(/import ItemCreate from ".\.\/.\.\/src\/react\/pages\/ItemCreate";\n/, "")
-      .replace(/import ItemEdit from ".\.\/.\.\/src\/react\/pages\/ItemEdit";\n/, "")
-      .replace(/import ItemList from ".\.\/.\.\/src\/react\/pages\/ItemList";\n/, "")
-      .replace(/import ItemShow from ".\.\/.\.\/src\/react\/pages\/ItemShow";\n\n/, "")
+      .replace(
+        /import ItemCreate from ".\.\/.\.\/src\/react\/pages\/ItemCreate";\n/,
+        "",
+      )
+      .replace(
+        /import ItemEdit from ".\.\/.\.\/src\/react\/pages\/ItemEdit";\n/,
+        "",
+      )
+      .replace(
+        /import ItemList from ".\.\/.\.\/src\/react\/pages\/ItemList";\n/,
+        "",
+      )
+      .replace(
+        /import ItemShow from ".\.\/.\.\/src\/react\/pages\/ItemShow";\n\n/,
+        "",
+      )
       .replace(/const itemContextValue = {[\s\S]*?};\n\n/m, "")
       .replace(
         /vi\.spyOn\(ItemContext, "useItems"\)\.mockImplementation\(\(\) => itemContextValue\);\n/,
@@ -162,7 +169,10 @@ async function purgeItems() {
         /import { ItemProvider, useItems } from ".\.\/.\.\/src\/react\/components\/ItemContext";\n/,
         "",
       )
-      .replace(/test\("<ItemProvider \/>", async \(\) => {[\s\S]*?}\);\n\n/m, ""),
+      .replace(
+        /test\("<ItemProvider \/>", async \(\) => {[\s\S]*?}\);\n\n/m,
+        "",
+      ),
   );
 
   // Remove item link from NavBar.
@@ -171,17 +181,61 @@ async function purgeItems() {
   );
 }
 
+// Removes all files and code related to the React 'showcase' page.
+async function purgeShowcase() {
+  console.log("\nPurging 'showcase'...");
+  // Remove showcase related React components/pages.
+  await remove("src/react/pages/Showcase.tsx");
+  await remove("src/react/components/showcase");
+
+  await updateFile("src/react/routes.tsx", (content) => {
+    const lines = content.split("\n");
+    const startIndex = lines.findIndex((line) =>
+      line.trim().startsWith('path: "/showcase"'),
+    );
+    if (startIndex === -1) return content;
+
+    let openBraces = 0;
+    let endIndex = -1;
+
+    // Find the block by counting braces.
+    for (let i = startIndex - 1; i < lines.length; i += 1) {
+      openBraces += (lines[i].match(/{/g) || []).length;
+      openBraces -= (lines[i].match(/}/g) || []).length;
+      if (openBraces === 0 && i >= startIndex) {
+        endIndex = i;
+        break;
+      }
+    }
+
+    if (endIndex !== -1) {
+      // Remove the block.
+      lines.splice(startIndex - 1, endIndex - (startIndex - 1) + 1);
+    }
+
+    // Clean up imports.
+    return lines
+      .join("\n")
+      .replace(/import Showcase from ".\/pages\/Showcase";\n/, "");
+  });
+
+  // Remove showcase link from NavBar.
+  await updateFile("src/react/components/NavBar.tsx", (content) =>
+    content.replace(`        {link("/showcase", "Showcase")}\n`, ""),
+  );
+}
+
 // Remove all files and code related to the 'auth' and 'user' modules.
 async function purgeAuth() {
   console.log("\nPurging 'auth' and 'user' modules...");
   // Remove auth and user module files and related React components.
-  await removeDir("src/express/modules/user");
-  await removeDir("src/express/modules/auth");
-  await removeFile("tests/api/users.test.ts");
-  await removeFile("src/react/components/AuthContext.tsx");
-  await removeFile("src/react/components/AuthForm.tsx");
-  await removeFile("src/react/components/LoginRegisterForm.tsx");
-  await removeFile("src/react/components/LogoutForm.tsx");
+  await remove("src/express/modules/user");
+  await remove("src/express/modules/auth");
+  await remove("tests/api/users.test.ts");
+  await remove("src/react/components/AuthContext.tsx");
+  await remove("src/react/components/AuthForm.tsx");
+  await remove("src/react/components/LoginRegisterForm.tsx");
+  await remove("src/react/components/LogoutForm.tsx");
 
   // Remove auth/user routes and imports from Express.
   await updateFile("src/express/routes.ts", (content) =>
@@ -241,7 +295,10 @@ async function purgeAuth() {
         "",
       )
       .replace(/const authContextValue = {[\s\S]*?};\n\n/m, "")
-      .replace(/test\("<AuthProvider \/>", async \(\) => {[\s\S]*?}\);\n\n/m, "")
+      .replace(
+        /test\("<AuthProvider \/>", async \(\) => {[\s\S]*?}\);\n\n/m,
+        "",
+      )
       .replace(
         /vi\.spyOn\(AuthContext, "useAuth"\)\.mockImplementation\(\(\) => authContextValue\);\n\n/,
         "",
@@ -254,17 +311,14 @@ async function main() {
   const args = process.argv.slice(2);
   const keepAuth = args.includes("--keep-auth");
 
-  console.log(
-    "This script will remove boilerplate modules from your project.",
-  );
+  console.log("This script will remove boilerplate modules from your project.");
+
   if (keepAuth) {
     console.log(
       "The --keep-auth flag is present. Authentication and user modules will be preserved.",
     );
   } else {
-    console.log(
-      "All boilerplate modules (item, user, auth) will be removed.",
-    );
+    console.log("All boilerplate modules (item, user, auth) will be removed.");
   }
 
   const proceed = await confirm(
@@ -278,6 +332,7 @@ async function main() {
   }
 
   await purgeItems();
+  await purgeShowcase();
 
   if (!keepAuth) {
     await purgeAuth();
@@ -287,11 +342,12 @@ async function main() {
   console.log(
     "Please review the changes and manually resolve any remaining issues.",
   );
-
-  rl.close();
 }
 
-main().catch((error) => {
-  console.error("An unexpected error occurred:", error);
-  rl.close();
-});
+main()
+  .catch((error) => {
+    console.error("An unexpected error occurred:", error);
+  })
+  .finally(() => {
+    rl.close();
+  });
