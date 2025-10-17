@@ -5,7 +5,7 @@ import { useItems } from "../components/ItemContext";
 import ItemDeleteForm from "../components/ItemDeleteForm";
 
 function ItemShow() {
-  const { user } = useAuth();
+  const auth = useAuth();
   const { item } = useItems();
 
   if (item == null) {
@@ -15,7 +15,7 @@ function ItemShow() {
   return (
     <>
       <h1>{item.title}</h1>
-      {user?.id === item.user_id && (
+      {auth.user?.id === item.user_id && (
         <>
           <Link to={`/items/${item.id}/edit`}>Modifier</Link>
           <ItemDeleteForm />

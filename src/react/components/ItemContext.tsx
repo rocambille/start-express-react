@@ -17,12 +17,12 @@ const ItemContext = createContext(null as ItemContextType | null);
 export function ItemProvider({ children }: PropsWithChildren) {
   const navigate = useNavigate();
 
-  const { user } = useAuth();
+  const auth = useAuth();
 
   const items = use(cache("/api/items")) as Item[];
 
   const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (user == null) {
+    if (auth.user == null) {
       alert("Please log in");
       return;
     }
@@ -50,7 +50,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
   const item = items.find((i) => i.id === Number(id));
 
   const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (user == null) {
+    if (auth.user == null) {
       alert("Please log in");
       return;
     }
@@ -70,7 +70,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
   };
 
   const deleteItem = () => {
-    if (user == null) {
+    if (auth.user == null) {
       alert("Please log in");
       return;
     }

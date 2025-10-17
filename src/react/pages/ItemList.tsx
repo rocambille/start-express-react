@@ -4,13 +4,13 @@ import { useAuth } from "../components/AuthContext";
 import { useItems } from "../components/ItemContext";
 
 function ItemList() {
-  const { user } = useAuth();
+  const auth = useAuth();
   const { items } = useItems();
 
   return (
     <>
       <h1>Items</h1>
-      {user && <Link to="/items/new">Ajouter</Link>}
+      {auth.user && <Link to="/items/new">Ajouter</Link>}
       <ul>
         {items.map((item) => (
           <li key={item.id}>
