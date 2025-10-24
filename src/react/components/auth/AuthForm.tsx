@@ -6,7 +6,7 @@ import LogoutForm from "./LogoutForm";
 function AuthForm() {
   const auth = useAuth();
 
-  return auth.user == null ? <LoginRegisterForm /> : <LogoutForm />;
+  return auth.check() ? <LogoutForm /> : <LoginRegisterForm />;
 }
 
 export default AuthForm;

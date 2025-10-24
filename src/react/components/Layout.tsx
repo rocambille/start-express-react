@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
-import { AuthProvider } from "./AuthContext";
-import AuthForm from "./AuthForm";
+import { AuthProvider } from "./auth/AuthContext";
+import AuthForm from "./auth/AuthForm";
 import BurgerMenu from "./BurgerMenu";
 import NavBar from "./NavBar";
 

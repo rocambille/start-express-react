@@ -7,6 +7,7 @@ import {
 
 type AuthContextType = {
   user: User | null;
+  check: () => boolean;
   login: (credentials: Credentials) => void;
   logout: () => void;
   register: (credentials: Credentials & { confirmPassword: string }) => void;
@@ -64,7 +65,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   return (
-    <AuthContext value={{ user, login, logout, register }}>
+    <AuthContext
+      value={{
+        user,
+        check: () => user != null,
+        login,
+        logout,
+        register,
+      }}
+    >
       {children}
     </AuthContext>
   );

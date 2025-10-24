@@ -13,7 +13,6 @@ function NavBar() {
       <ul>
         {link("/", "Home")}
         {link("/items", "Items")}
-        {link("/showcase", "Showcase")}
       </ul>
     </nav>
   );

@@ -1,8 +1,7 @@
 import { createContext, type PropsWithChildren, use, useContext } from "react";
 import { useNavigate, useParams } from "react-router";
-
-import { useAuth } from "./AuthContext";
-import { cache, invalidateCache } from "./utils";
+import { useAuth } from "../auth/AuthContext";
+import { cache, invalidateCache } from "../utils";
 
 type ItemContextType = {
   items: Item[];
@@ -22,7 +21,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
   const items = use(cache("/api/items")) as Item[];
 
   const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (auth.user == null) {
+    if (!auth.check()) {
       alert("Please log in");
       return;
     }
@@ -50,7 +49,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
   const item = items.find((i) => i.id === Number(id));
 
   const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (auth.user == null) {
+    if (!auth.check()) {
       alert("Please log in");
       return;
     }
@@ -70,7 +69,7 @@ export function ItemProvider({ children }: PropsWithChildren) {
   };
 
   const deleteItem = () => {
-    if (auth.user == null) {
+    if (!auth.check()) {
       alert("Please log in");
       return;
     }

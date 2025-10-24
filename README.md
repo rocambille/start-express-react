@@ -107,9 +107,7 @@ Pour démarrer, référez-vous aux pages :
     │       └── ...
     ├── react
     │   ├── routes.tsx
-    │   ├── components
-    │   │   └── ...
-    │   └── pages
+    │   └── components
     │       └── ...
     └── types
         └── index.d.ts

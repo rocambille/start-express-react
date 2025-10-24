@@ -1,17 +1,17 @@
 import { act, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 
-import * as AuthContext from "../../src/react/components/AuthContext";
-import * as ItemContext from "../../src/react/components/ItemContext";
+import * as AuthContext from "../../src/react/components/auth/AuthContext";
 
-import Home from "../../src/react/pages/Home";
-import ItemCreate from "../../src/react/pages/ItemCreate";
-import ItemEdit from "../../src/react/pages/ItemEdit";
-import ItemList from "../../src/react/pages/ItemList";
-import ItemShow from "../../src/react/pages/ItemShow";
+import * as ItemContext from "../../src/react/components/item/ItemContext";
+import ItemCreate from "../../src/react/components/item/ItemCreate";
+import ItemEdit from "../../src/react/components/item/ItemEdit";
+import ItemList from "../../src/react/components/item/ItemList";
+import ItemShow from "../../src/react/components/item/ItemShow";
 
 const authContextValue = {
   user: null,
+  check: () => false,
   login: () => {},
   logout: () => {},
   register: () => {},
@@ -26,6 +26,14 @@ const itemContextValue = {
 };
 
 beforeEach(() => {
+  globalThis.fetch = vi.fn().mockImplementation(() =>
+    Promise.resolve({
+      json: () => Promise.resolve([]),
+    }),
+  );
+
+  vi.spyOn(window, "alert").mockImplementation(() => {});
+
   vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
 
   vi.spyOn(ItemContext, "useItems").mockImplementation(() => itemContextValue);
@@ -35,10 +43,27 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("React Pages", () => {
-  test("<Home />", async () => {
+describe("React item components", () => {
+  test("<ItemProvider />", async () => {
+    const Consumer = () => {
+      const { addItem, editItem, deleteItem } = ItemContext.useItems();
+
+      addItem({ title: "hello, world!" });
+      editItem({ title: "hello, world!" });
+      deleteItem();
+
+      return <p>hello, world!</p>;
+    };
+
     await act(async () => {
-      render(<Home />, { wrapper: BrowserRouter });
+      render(
+        <ItemContext.ItemProvider>
+          <Consumer />
+        </ItemContext.ItemProvider>,
+        {
+          wrapper: BrowserRouter,
+        },
+      );
     });
 
     expect(true).toBeTruthy();

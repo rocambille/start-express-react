@@ -1,15 +1,7 @@
-import { Suspense } from "react";
 import { Outlet } from "react-router";
-
-import { ItemProvider } from "./components/ItemContext";
+import Home from "./components/Home";
+import { itemRoutes } from "./components/item";
 import Layout from "./components/Layout";
-
-import Home from "./pages/Home";
-import ItemCreate from "./pages/ItemCreate";
-import ItemEdit from "./pages/ItemEdit";
-import ItemList from "./pages/ItemList";
-import ItemShow from "./pages/ItemShow";
-import Showcase from "./pages/Showcase";
 
 import "./index.css";
 
@@ -26,38 +18,7 @@ export default [
         index: true,
         element: <Home />,
       },
-      {
-        path: "/items",
-        element: (
-          <Suspense fallback={<p>loading items...</p>}>
-            <ItemProvider>
-              <Outlet />
-            </ItemProvider>
-          </Suspense>
-        ),
-        children: [
-          {
-            path: "/items/new",
-            element: <ItemCreate />,
-          },
-          {
-            path: "/items/:id/edit",
-            element: <ItemEdit />,
-          },
-          {
-            index: true,
-            element: <ItemList />,
-          },
-          {
-            path: "/items/:id",
-            element: <ItemShow />,
-          },
-        ],
-      },
-      {
-        path: "/showcase",
-        element: <Showcase />,
-      },
+      itemRoutes,
     ],
   },
 ];

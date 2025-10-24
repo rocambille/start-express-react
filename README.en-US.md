@@ -107,9 +107,7 @@ To get started, refer to the following pages:
     │       └── ...
     ├── react
     │   ├── routes.tsx
-    │   ├── components
-    │   │   └── ...
-    │   └── pages
+    │   └── components
     │       └── ...
     └── types
         └── index.d.ts

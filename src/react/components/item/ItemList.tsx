@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
-import { useAuth } from "../components/AuthContext";
-import { useItems } from "../components/ItemContext";
+import { useAuth } from "../auth/AuthContext";
+import { useItems } from "./ItemContext";
 
 function ItemList() {
   const auth = useAuth();

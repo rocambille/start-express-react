@@ -1,8 +1,8 @@
 import { Link } from "react-router";
 
-import { useAuth } from "../components/AuthContext";
-import { useItems } from "../components/ItemContext";
-import ItemDeleteForm from "../components/ItemDeleteForm";
+import { useAuth } from "../auth/AuthContext";
+import { useItems } from "./ItemContext";
+import ItemDeleteForm from "./ItemDeleteForm";
 
 function ItemShow() {
   const auth = useAuth();
