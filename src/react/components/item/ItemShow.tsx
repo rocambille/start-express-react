@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
-import { useItems } from "./ItemContext";
+import { useItems } from "./hooks";
 import ItemDeleteForm from "./ItemDeleteForm";
 
 function ItemShow() {

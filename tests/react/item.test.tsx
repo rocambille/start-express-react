@@ -1,9 +1,8 @@
 import { act, render } from "@testing-library/react";
-import { BrowserRouter } from "react-router";
+import * as ReactRouter from "react-router";
 
 import * as AuthContext from "../../src/react/components/auth/AuthContext";
 
-import * as ItemContext from "../../src/react/components/item/ItemContext";
 import ItemCreate from "../../src/react/components/item/ItemCreate";
 import ItemEdit from "../../src/react/components/item/ItemEdit";
 import ItemList from "../../src/react/components/item/ItemList";
@@ -17,26 +16,18 @@ const authContextValue = {
   register: () => {},
 };
 
-const itemContextValue = {
-  items: [{ id: 1, user_id: 1, title: "foo" }],
-  item: { id: 1, user_id: 1, title: "foo" },
-  addItem: () => {},
-  editItem: () => {},
-  deleteItem: () => {},
-};
-
 beforeEach(() => {
   globalThis.fetch = vi.fn().mockImplementation(() =>
     Promise.resolve({
-      json: () => Promise.resolve([]),
+      json: () => Promise.resolve([{ id: 1 }]),
     }),
   );
 
   vi.spyOn(window, "alert").mockImplementation(() => {});
 
-  vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
+  vi.spyOn(ReactRouter, "useParams").mockImplementation(() => ({ id: "1" }));
 
-  vi.spyOn(ItemContext, "useItems").mockImplementation(() => itemContextValue);
+  vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
 });
 
 afterEach(() => {
@@ -44,34 +35,9 @@ afterEach(() => {
 });
 
 describe("React item components", () => {
-  test("<ItemProvider />", async () => {
-    const Consumer = () => {
-      const { addItem, editItem, deleteItem } = ItemContext.useItems();
-
-      addItem({ title: "hello, world!" });
-      editItem({ title: "hello, world!" });
-      deleteItem();
-
-      return <p>hello, world!</p>;
-    };
-
-    await act(async () => {
-      render(
-        <ItemContext.ItemProvider>
-          <Consumer />
-        </ItemContext.ItemProvider>,
-        {
-          wrapper: BrowserRouter,
-        },
-      );
-    });
-
-    expect(true).toBeTruthy();
-  });
-
   test("<ItemCreate />", async () => {
     await act(async () => {
-      render(<ItemCreate />, { wrapper: BrowserRouter });
+      render(<ItemCreate />, { wrapper: ReactRouter.BrowserRouter });
     });
 
     expect(true).toBeTruthy();
@@ -79,7 +45,7 @@ describe("React item components", () => {
 
   test("<ItemEdit />", async () => {
     await act(async () => {
-      render(<ItemEdit />, { wrapper: BrowserRouter });
+      render(<ItemEdit />, { wrapper: ReactRouter.BrowserRouter });
     });
 
     expect(true).toBeTruthy();
@@ -87,7 +53,7 @@ describe("React item components", () => {
 
   test("<ItemList />", async () => {
     await act(async () => {
-      render(<ItemList />, { wrapper: BrowserRouter });
+      render(<ItemList />, { wrapper: ReactRouter.BrowserRouter });
     });
 
     expect(true).toBeTruthy();
@@ -95,7 +61,7 @@ describe("React item components", () => {
 
   test("<ItemShow />", async () => {
     await act(async () => {
-      render(<ItemShow />, { wrapper: BrowserRouter });
+      render(<ItemShow />, { wrapper: ReactRouter.BrowserRouter });
     });
 
     expect(true).toBeTruthy();

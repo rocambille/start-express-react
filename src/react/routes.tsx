@@ -18,7 +18,7 @@ export default [
         index: true,
         element: <Home />,
       },
-      itemRoutes,
+      ...itemRoutes,
     ],
   },
 ];
