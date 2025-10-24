@@ -1,11 +1,11 @@
-import { Outlet } from "react-router";
+import { Outlet, type RouteObject } from "react-router";
 import Home from "./components/Home";
 import { itemRoutes } from "./components/item";
 import Layout from "./components/Layout";
 
 import "./index.css";
 
-export default [
+const routes: RouteObject[] = [
   {
     path: "/",
     element: (
@@ -22,3 +22,5 @@ export default [
     ],
   },
 ];
+
+export default routes;

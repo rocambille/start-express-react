@@ -1,9 +1,11 @@
+import type { RouteObject } from "react-router";
+
 import ItemCreate from "./ItemCreate";
 import ItemEdit from "./ItemEdit";
 import ItemList from "./ItemList";
 import ItemShow from "./ItemShow";
 
-export const itemRoutes = [
+export const itemRoutes: RouteObject[] = [
   {
     path: "/items/new",
     element: <ItemCreate />,
@@ -13,7 +15,7 @@ export const itemRoutes = [
     element: <ItemEdit />,
   },
   {
-    index: true,
+    path: "/items",
     element: <ItemList />,
   },
   {
