@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { cache, invalidateCache } from "../utils";
 
-export const useItems = () => {
+const useItems = () => {
   const navigate = useNavigate();
 
   const auth = useAuth();
@@ -88,3 +88,5 @@ export const useItems = () => {
 
   return { items, item, editItem, addItem, deleteItem };
 };
+
+export default useItems;
