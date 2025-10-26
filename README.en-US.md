@@ -124,10 +124,11 @@ To get started, refer to the following pages:
 | `docker compose run --build --rm server npm run test` | Runs tests |
 | `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
 | `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
-| `npm run make:clone <path to existing module> <path for new module>  <OldName> <NewName>` | Clone a module or file, renaming identifiers automatically |
+| `npm run make:clone <source> <destination>  <OldName> <NewName>` | Clone a module or file, renaming identifiers automatically |
 | `npm run make:purge` | Removes default modules. Add `-- --keep-auth` to preserve user and auth modules. |
 
 ### Example: Clone Command 
+
 #### Cloning a Single File
 
 To clone a single file `itemActions.ts` into a new file `itemActionsCloned.ts`:

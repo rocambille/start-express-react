@@ -117,15 +117,15 @@ Pour démarrer, référez-vous aux pages :
 
 | Commande                                                                                            | Description                                                                  |
 |-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| `docker compose up --build`                                                                         | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)   |
-| `docker compose -f compose.prod.yaml up --build -d`                                                 | Build et démarre en production                                               |
-| `docker compose logs -t`                                                                            | Affiche les logs avec les timestamps                                         |
-| `docker compose run --build --rm server npm run database:sync`                                      | Synchronise le contenu de la base de données avec `src/database/schema.sql`  |
-| `docker compose run --build --rm server npm run test`                                               | Exécute les tests                                                            |
-| `npm run biome:check`                                                                               | Contrôle la qualité du code avec Biome (exécuté en pre-commit)               |
-| `npm run types:check`                                                                               | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)      |
-| `npm run make:clone <chemin vers module existant> <chemin pour nouveau module> <OldName> <NewName>` | Clone un module ou un fichier, en renommant automatiquement les identifiants |
-| `npm run make:purge`                                                                                | Supprime les modules par défaut. Ajoutez `-- --keep-auth` pour conserver les modules user et auth. |
+| `docker compose up --build`                                       | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché)   |
+| `docker compose -f compose.prod.yaml up --build -d`               | Build et démarre en production                                               |
+| `docker compose logs -t`                                          | Affiche les logs avec les timestamps                                         |
+| `docker compose run --build --rm server npm run database:sync`    | Synchronise le contenu de la base de données avec `src/database/schema.sql`  |
+| `docker compose run --build --rm server npm run test`             | Exécute les tests                                                            |
+| `npm run biome:check`                                             | Contrôle la qualité du code avec Biome (exécuté en pre-commit)               |
+| `npm run types:check`                                             | Contrôle la cohérence des types avec TypeScript (exécuté en pre-commit)      |
+| `npm run make:clone <source> <destination> <OldName> <NewName>`   | Clone un module ou un fichier, en renommant automatiquement les identifiants |
+| `npm run make:purge`                                              | Supprime les modules par défaut. Ajoutez `-- --keep-auth` pour conserver les modules user et auth. |
 
 ### Exemple : Commande Clone
 
@@ -138,6 +138,7 @@ npm run make:clone src/express/modules/item/itemActions.ts src/express/modules/i
 ```
 
 #### Clonage d’un module entier
+
 Pour cloner tout le dossier du module item en un nouveau dossier itemCloned :
 
 ```bash
