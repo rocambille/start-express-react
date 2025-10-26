@@ -2,6 +2,7 @@ import {
   createContext,
   type PropsWithChildren,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -17,6 +18,18 @@ const AuthContext = createContext(null as AuthContextType | null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState(null as User | null);
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+      })
+      .then((user: User) => {
+        setUser(user);
+      });
+  }, []);
 
   const login = (credentials: Credentials) => {
     fetch("/api/access-token", {

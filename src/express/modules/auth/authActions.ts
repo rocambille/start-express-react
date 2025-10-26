@@ -150,10 +150,19 @@ const verifyAccessToken: RequestHandler[] = [
 
 /* ************************************************************************ */
 
+const readMe: RequestHandler = async (req, res) => {
+  const me = await userRepository.read(Number(req.auth.sub));
+
+  res.json(me);
+};
+
+/* ************************************************************************ */
+
 export default {
   hashPassword,
   createUserAndAccessToken,
   createAccessToken,
   destroyAccessToken,
   verifyAccessToken,
+  readMe,
 };
