@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 
-import { useAuth } from "../components/AuthContext";
-import { useItems } from "../components/ItemContext";
-import ItemDeleteForm from "../components/ItemDeleteForm";
+import { useAuth } from "../auth/AuthContext";
+import ItemDeleteForm from "./ItemDeleteForm";
+import useItems from "./useItems";
 
 function ItemShow() {
-  const { user } = useAuth();
+  const auth = useAuth();
   const { item } = useItems();
 
   if (item == null) {
@@ -15,7 +15,7 @@ function ItemShow() {
   return (
     <>
       <h1>{item.title}</h1>
-      {user?.id === item.user_id && (
+      {auth.user?.id === item.user_id && (
         <>
           <Link to={`/items/${item.id}/edit`}>Modifier</Link>
           <ItemDeleteForm />

@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     env: loadEnv(mode, process.cwd(), ""),
-    workspace: [
+    projects: [
       {
         extends: true,
         test: {

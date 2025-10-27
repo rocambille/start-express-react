@@ -1,4 +1,4 @@
-import { useItems } from "./ItemContext";
+import useItems from "./useItems";
 
 function ItemDeleteForm() {
   const { deleteItem } = useItems();

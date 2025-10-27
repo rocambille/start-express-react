@@ -4,9 +4,9 @@ import LoginRegisterForm from "./LoginRegisterForm";
 import LogoutForm from "./LogoutForm";
 
 function AuthForm() {
-  const { user } = useAuth();
+  const auth = useAuth();
 
-  return user == null ? <LoginRegisterForm /> : <LogoutForm />;
+  return auth.check() ? <LogoutForm /> : <LoginRegisterForm />;
 }
 
 export default AuthForm;

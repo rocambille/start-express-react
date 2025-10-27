@@ -17,8 +17,8 @@ describe("Installation", () => {
     }
   });
   test("schema.sql was executed", async () => {
-    // Query the 'item' table to check if any data has been inserted
-    const [rows] = await databaseClient.query<Rows>("select * from item");
+    // Query the 'user' table to check if any data has been inserted
+    const [rows] = await databaseClient.query<Rows>("select * from user");
 
     // Expecting rows to be returned, indicating successful migration
     expect(rows.length).toBeGreaterThanOrEqual(0);

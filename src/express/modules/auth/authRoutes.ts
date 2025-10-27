@@ -13,6 +13,8 @@ router
   .post(authActions.createAccessToken)
   .delete(authActions.destroyAccessToken);
 
+router.get("/api/me", authActions.verifyAccessToken, authActions.readMe);
+
 /* ************************************************************************ */
 
 export default router;
