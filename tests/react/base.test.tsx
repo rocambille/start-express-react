@@ -15,6 +15,12 @@ const authContextValue = {
 };
 
 beforeEach(() => {
+  globalThis.fetch = vi.fn().mockImplementation(() =>
+    Promise.resolve({
+      json: () => Promise.resolve([]),
+    }),
+  );
+
   vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
 });
 
