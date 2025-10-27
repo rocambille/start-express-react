@@ -55,8 +55,22 @@ async function replaceInsideFile(
 async function main() {
   const [, , src, dest, oldName, newName] = process.argv;
 
-  if (!src || !dest || !oldName || !newName) {
+  // thx https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
+  const isValidJsIdentifier = (name: string) =>
+    /^[$_\p{ID_Start}][$\p{ID_Continue}]*$/u.test(name);
+
+  if (
+    !src ||
+    !dest ||
+    !oldName ||
+    !newName ||
+    !isValidJsIdentifier(oldName) ||
+    !isValidJsIdentifier(newName)
+  ) {
     console.error("Usage: npm run make:clone <src> <dest> <OldName> <NewName>");
+    console.error(
+      "Arguments <OldName> and <NewName> must be valid identifiers in JavaScript",
+    );
     process.exit(1);
   }
 
