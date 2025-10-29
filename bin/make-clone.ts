@@ -65,11 +65,11 @@ async function main() {
     /^[$_\p{ID_Start}][$\p{ID_Continue}]*$/u.test(name);
 
   if (!isValidJsIdentifier(oldName)) {
-    console.error(`❌ ${oldName}is not a valid identifier in JavaScript`);
+    console.error(`❌ ${oldName} is not a valid identifier in JavaScript`);
     process.exit(1);
   }
   if (!isValidJsIdentifier(newName)) {
-    console.error(`❌ ${newName}is not a valid identifier in JavaScript`);
+    console.error(`❌ ${newName} is not a valid identifier in JavaScript`);
     process.exit(1);
   }
 
