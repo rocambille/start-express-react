@@ -89,11 +89,11 @@ async function createServer() {
       //     `render` function calls appropriate framework SSR APIs,
       //    e.g. ReactDOMServer.renderToString()
       await render(template, req, res);
-    } catch (error) {
+    } catch (err) {
       // If an error is caught, let Vite fix the stack trace so it maps back
       // to your actual source code.
-      maybeVite?.ssrFixStacktrace(error as Error);
-      next(error);
+      maybeVite?.ssrFixStacktrace(err as Error);
+      next(err);
     }
   });
 

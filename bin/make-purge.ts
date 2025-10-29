@@ -26,11 +26,11 @@ async function remove(fileOrDirectoryPath: string) {
   try {
     await fs.remove(path.join(rootDir, fileOrDirectoryPath));
     console.log(`- Removed: ${fileOrDirectoryPath}`);
-  } catch (error) {
-    const { code } = error as { code: string };
+  } catch (err) {
+    const { code } = err as { code: string };
 
     if (code !== "ENOENT") {
-      console.error(`Error removing ${fileOrDirectoryPath}:`, error);
+      console.error(`Error removing ${fileOrDirectoryPath}:`, err);
     }
   }
 }
@@ -48,11 +48,11 @@ async function updateFile(
       await fs.writeFile(fullPath, newContent, "utf-8");
       console.log(`- Updated file: ${filePath}`);
     }
-  } catch (error) {
-    const { code } = error as { code: string };
+  } catch (err) {
+    const { code } = err as { code: string };
 
     if (code !== "ENOENT") {
-      console.error(`Error updating file ${filePath}:`, error);
+      console.error(`Error updating file ${filePath}:`, err);
     }
   }
 }
@@ -180,8 +180,8 @@ async function main() {
 }
 
 main()
-  .catch((error) => {
-    console.error("An unexpected error occurred:", error);
+  .catch((err) => {
+    console.error("An unexpected error occurred:", err);
   })
   .finally(() => {
     rl.close();

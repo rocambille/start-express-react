@@ -12,8 +12,8 @@ describe("Installation", () => {
     try {
       // Check if the connection is successful
       await databaseClient.getConnection();
-    } catch (error) {
-      expect(error).toBeDefined();
+    } catch (err) {
+      expect(err).toBeDefined();
     }
   });
   test("schema.sql was executed", async () => {
