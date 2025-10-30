@@ -5,7 +5,7 @@ import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
 
-const port = 5173;
+const port = +(process.env.APP_PORT ?? 5173);
 
 createServer().then((server) => {
   server.listen(port, () => {
@@ -89,11 +89,11 @@ async function createServer() {
       //     `render` function calls appropriate framework SSR APIs,
       //    e.g. ReactDOMServer.renderToString()
       await render(template, req, res);
-    } catch (error) {
+    } catch (err) {
       // If an error is caught, let Vite fix the stack trace so it maps back
       // to your actual source code.
-      maybeVite?.ssrFixStacktrace(error as Error);
-      next(error);
+      maybeVite?.ssrFixStacktrace(err as Error);
+      next(err);
     }
   });
 

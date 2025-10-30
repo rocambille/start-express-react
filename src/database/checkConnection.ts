@@ -8,11 +8,11 @@ client
 
     connection.release();
   })
-  .catch((error: Error) => {
+  .catch((err: Error) => {
     console.warn(
       "Warning:",
       "Failed to establish a database connection.",
       "Please check your database credentials in the .env file if you need a database access.",
     );
-    console.warn(error.message);
+    console.warn(err.message);
   });

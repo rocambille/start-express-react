@@ -17,7 +17,7 @@ services:
     volumes:
       - ".:/app"
     ports:
-      - 5173:5173
+      - ${APP_PORT-5173}:${APP_PORT-5173}
       - 24678:24678
   database:
     image: mysql:lts
@@ -27,10 +27,10 @@ services:
       - "./src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
       - "./src/database/data:/var/lib/mysql"
     healthcheck:
-        test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
-        interval: 2s
-        timeout: 40s
-        retries: 20
+      test: '/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute "SHOW DATABASES;"'
+      interval: 2s
+      timeout: 40s
+      retries: 20
   adminer:
     image: adminer:5
     restart: always
