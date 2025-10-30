@@ -1,6 +1,6 @@
 [![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/tags/)
 [![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
-[![issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
+[![Issues - start-express-react](https://img.shields.io/github/issues/rocambille/start-express-react)](https://github.com/rocambille/start-express-react/issues)
 
 <div align="right">
 
@@ -11,11 +11,11 @@
 
 <div align="center">
 
-# StartER – A modern full-stack Express + React starter
+# StartER – A modern, full-stack Express + React starter pack
 
 🔧 **Educational framework** for building web applications in Express + React with integrated production tools.
 
-⭐️ If you find this project useful, **add a star** to support the project! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
+⭐️ If you find this project useful, **leave a star** to support it! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
 
 [![Use this template](https://img.shields.io/badge/Start-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 
@@ -57,37 +57,43 @@ sequenceDiagram
     deactivate Fetcher
 ```
 
-The framework comes pre-configured with a set of tools to help junior developers produce industrial-quality code, while remaining an educational tool:
+StartER is a **full-stack starter** combining Express (backend) and React (frontend) into a single, cohesive project.
 
-- [**Express**](https://expressjs.com/): Minimalist framework for building web servers and APIs with Node.js.
-- [**React**](https://react.dev/learn): JavaScript library for building interactive and modular user interfaces.
+It is designed both as a **learning tool** and as a solid production foundation for **rapidly prototyping** modern web applications.
 
-Under the hood (in alphabetical order, non-exhaustive list):
+## Included technologies
 
-- [**Biome**](https://biomejs.dev/): All-in-one tool for linting, formatting, and static code analysis, designed to ensure code quality and readability in a powerful and modern way.
-- [**Docker**](https://docs.docker.com/): Containerization platform for standardizing and automating development and deployment environments, ensuring reproducible configurations.
-- [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/): Relational database management system used to store and query data.
-- [**Pico CSS**](https://picocss.com/): Minimalist and lightweight CSS kit that prioritizes semantic syntax.
-- [**React Router (Data Mode)**](https://reactrouter.com/home): Routing manager for React applications, allowing the creation of dynamic paths and components.
-- [**TypeScript**](https://www.typescriptlang.org/): JavaScript superset that adds static types, eases maintenance, and reduces errors.
-- [**Vite**](https://vite.dev/guide/): Fast and lightweight build tool for front-end applications, with a blazing-fast development server and optimized bundles for production.
-- [**Vitest**](https://vitest.dev/guide/): JavaScript testing framework.
-- [**Zod**](https://zod.dev/): TypeScript-based schema declaration and validation library.
+### Server-side and client-side
 
-## Installation and Usage
+* [**Express**](https://expressjs.com/): a minimalist framework for creating web servers and APIs with Node.js.
+* [**React**](https://react.dev/learn): a JavaScript library for building interactive and modular user interfaces.
 
-Complete documentation is available in our [wiki](https://github.com/rocambille/start-express-react/wiki/Home-en-US).
+### Tools and ecosystem
 
-To get started, refer to the following pages:
+In alphabetical order (non-exhaustive list):
+
+* [**Biome**](https://biomejs.dev/): a powerful linter, formatter, and static analyzer to ensure clean code.
+* [**Docker**](https://docs.docker.com/): containerization for reproducible development and deployment environments.
+* [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/): relational database management system.
+* [**Pico CSS**](https://picocss.com/): minimalist and semantic CSS kit.
+* [**React Router (Mode Data)**](https://reactrouter.com/home): route manager for React.
+* TypeScript (https://www.typescriptlang.org/): JavaScript superset that adds static types.
+* [**Vite**](https://vite.dev/guide/): a rapid build tool for development and production.
+* [**Vitest**](https://vitest.dev/guide/): testing framework integrated into Vite.
+* [**Zod**](https://zod.dev/) : validation and typing of TypeScript schemas.
+
+## Installation and usage
+
+Full documentation is available in the [project wiki](https://github.com/rocambille/start-express-react/wiki).
+
+To get started, see the main pages:
 
 * [Installation](https://github.com/rocambille/start-express-react/wiki/Installation-en-US)
 * [Database](https://github.com/rocambille/start-express-react/wiki/Database-en-US)
 * [Express](https://github.com/rocambille/start-express-react/wiki/Express-en-US)
 * [React](https://github.com/rocambille/start-express-react/wiki/React-en-US)
 
-## Things to remember
-
-### Directory structure
+## Directory structure
 
 ```
 .
@@ -113,40 +119,43 @@ To get started, refer to the following pages:
         └── index.d.ts
 ```
 
-### Basic Commands
+## Basic commands
 
 | Command | Description |
-|------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `docker compose up --build` | Build and start services (add `-d` to start in detached mode) |
-| `docker compose -f compose.prod.yaml up --build -d` | Build and start in production mode |
-| `docker compose logs -t` | Displays logs with timestamps |
-| `docker compose run --build --rm server npm run database:sync` | Synchronizes database contents with `src/database/schema.sql` |
-| `docker compose run --build --rm server npm run test` | Runs tests |
-| `npm run biome:check` | Checks code quality with Biome (executed on pre-commit) |
-| `npm run types:check` | Checks type consistency with TypeScript (executed on pre-commit) |
-| `npm run make:clone <source> <destination>  <OldName> <NewName>` | Clone a module or file, renaming identifiers automatically |
-| `npm run make:purge` | Removes default modules. Add `-- --keep-auth` to preserve user and auth modules. |
 
-### Example: Clone Command 
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
-#### Cloning a Single File
+| `docker compose up --build` | Builds and starts the services (add `-d` to start in detached mode). |
 
-To clone a single file `itemActions.ts` into a new file `itemActionsCloned.ts`:
+| `docker compose -f compose.prod.yaml up --build -d` | Builds and starts the application in production mode. |
 
-```bash
-npm run make:clone src/express/modules/item/itemActions.ts src/express/modules/item/itemActionsCloned.ts itemActions clonedItemActions
-```
+| `docker compose logs -t` | Displays logs with timestamps. |
 
-#### Cloning a Whole Module
+| `docker compose run --build --rm server npm run database:sync` | Synchronizes the database with `src/database/schema.sql`. |
 
-To clone the entire `item` module folder into a new folder `itemCloned`:
+| `docker compose run --build --rm server npm run test` | Runs the tests. |
 
-```bash
-npm run make:clone src/express/modules/item src/express/modules/itemCloned Item ItemCloned
-```
+| `npm run biome:check` | Checks code quality with Biome (executed in pre-commit). |
 
+| `npm run types:check` | Checks the consistency of TypeScript types (executed in pre-commit). |
 
-### REST cheatsheet
+| `npm run make:clone <source> <destination> <OldName> <NewName>` | Clones a module or file, automatically renaming the identifiers. |
+
+| `npm run make:purge` | Removes default modules (`--keep-auth` to keep `user` and `auth`). |
+
+## REST cheatsheet
+
+StartER is based on a RESTful architecture, where each resource (for example `items` or `users`) exposes a set of endpoints structured around classic CRUD/BREAD operations:
+
+* **Browse**: browse all resources
+* **Read**: read a specific resource
+* **Add**: create a new resource
+* **Edit**: modify an existing resource
+* **Destroy**: delete a resource
+
+This table summarizes the conventions used in the project's Express modules (such as `itemRoutes`), their associated HTTP methods, and the expected responses.
+
+It serves as a quick reference when developing your own modules or testing your APIs.
 
 | Operation | Method | URL Path | Request Body | SQL | Response (Success) | Response (Error) |
 |-----------|---------|-----------------|---------------------|---------|---------------------------------|-------------------------------------------------------------------------|
@@ -155,3 +164,9 @@ npm run make:clone src/express/modules/item src/express/modules/itemCloned Item 
 | Add | POST | /api/items | Item Data | INSERT | 201 (Created), insert id. | 400 (Bad Request), if invalid body. |
 | Edit | PUT | /api/items/:id | Item Data | UPDATE | 204 (No Content). | 400 (Bad Request), if invalid body. 404 (Not Found), if invalid id. |
 | Destroy | DELETE | /api/items/:id | | DELETE | 204 (No Content). | |
+
+## License
+
+This project is distributed under the [MIT](./LICENSE.md) license.
+
+You are free to use, modify, and redistribute it for educational or professional purposes.
