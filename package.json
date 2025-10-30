@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "starter",
-  "version": "2025.10.27",
+  "version": "2025.10.30",
   "main": "server.ts",
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
