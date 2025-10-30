@@ -5,7 +5,7 @@ import { createServer as createViteServer } from "vite";
 
 import "./src/database/checkConnection";
 
-const port = 5173;
+const port = +(process.env.APP_PORT ?? 5173);
 
 createServer().then((server) => {
   server.listen(port, () => {
