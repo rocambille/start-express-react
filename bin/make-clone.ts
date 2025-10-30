@@ -53,9 +53,9 @@ async function replaceInsideFile(
 }
 
 async function main() {
-  const [, , src, dest, oldName, newName] = process.argv;
+  const [, , src, dest, oldName, newName, ...unexpected] = process.argv;
 
-  if (!src || !dest || !oldName || !newName) {
+  if (!src || !dest || !oldName || !newName || unexpected.length > 0) {
     console.error("Usage: npm run make:clone <src> <dest> <OldName> <NewName>");
     process.exit(1);
   }
@@ -102,6 +102,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
+  console.error("An unexpected error occurred:", err);
   process.exit(1);
 });

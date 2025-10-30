@@ -7,6 +7,7 @@ import fs from "fs-extra";
 // Locate the project root directory (one level up from /bin).
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const rootDir = path.join(__dirname, "..");
 
 // Setup readline for interactive confirmation.
@@ -25,7 +26,7 @@ async function confirm(question: string): Promise<boolean> {
 async function remove(fileOrDirectoryPath: string) {
   try {
     await fs.remove(path.join(rootDir, fileOrDirectoryPath));
-    console.log(`- Removed: ${fileOrDirectoryPath}`);
+    console.info(`- Removed: ${fileOrDirectoryPath}`);
   } catch (err) {
     const { code } = err as { code: string };
 
@@ -46,7 +47,7 @@ async function updateFile(
     const newContent = replacer(content);
     if (content !== newContent) {
       await fs.writeFile(fullPath, newContent, "utf-8");
-      console.log(`- Updated file: ${filePath}`);
+      console.info(`- Updated file: ${filePath}`);
     }
   } catch (err) {
     const { code } = err as { code: string };
@@ -61,7 +62,7 @@ async function updateFile(
 
 // Removes all files and code related to the 'item' module.
 async function purgeItems() {
-  console.log("\nPurging 'item' module...");
+  console.info("\nPurging 'item' module...");
   // Remove item module files and related React components.
   await remove("src/express/modules/item");
   await remove("src/react/components/item");
@@ -100,7 +101,7 @@ async function purgeItems() {
 
 // Remove all files and code related to the 'auth' and 'user' modules.
 async function purgeAuth() {
-  console.log("\nPurging 'auth' and 'user' modules...");
+  console.info("\nPurging 'auth' and 'user' modules...");
   // Remove auth and user module files and related React components.
   await remove("src/express/modules/user");
   await remove("src/express/modules/auth");
@@ -144,17 +145,23 @@ async function purgeAuth() {
 
 // Entry point: parse arguments, confirm, and run purge.
 async function main() {
-  const args = process.argv.slice(2);
-  const keepAuth = args.includes("--keep-auth");
+  const [, , keepAuth, ...unexpected] = process.argv;
 
-  console.log("This script will remove boilerplate modules from your project.");
+  if ((keepAuth && keepAuth !== "--keep-auth") || unexpected.length > 0) {
+    console.error("Usage: npm run make:purge [--keep-auth]");
+    process.exit(1);
+  }
+
+  console.info(
+    "This script will remove boilerplate modules from your project.",
+  );
 
   if (keepAuth) {
-    console.log(
+    console.info(
       "The --keep-auth flag is present. Authentication and user modules will be preserved.",
     );
   } else {
-    console.log("All boilerplate modules (item, user, auth) will be removed.");
+    console.info("All boilerplate modules (item, user, auth) will be removed.");
   }
 
   const proceed = await confirm(
@@ -162,8 +169,7 @@ async function main() {
   );
 
   if (!proceed) {
-    console.log("Purge operation cancelled.");
-    rl.close();
+    console.info("\nPurge operation cancelled.");
     return;
   }
 
@@ -173,8 +179,8 @@ async function main() {
     await purgeAuth();
   }
 
-  console.log("\nPurge complete! ✨");
-  console.log(
+  console.info("\nPurge complete! ✨");
+  console.info(
     "Please review the changes and manually resolve any remaining issues.",
   );
 }
@@ -182,6 +188,7 @@ async function main() {
 main()
   .catch((err) => {
     console.error("An unexpected error occurred:", err);
+    process.exit(1);
   })
   .finally(() => {
     rl.close();
