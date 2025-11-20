@@ -1,27 +1,12 @@
-import { act, render } from "@testing-library/react";
-import { BrowserRouter } from "react-router";
-
-import * as AuthContext from "../../src/react/components/auth/AuthContext";
+import { render, screen, waitFor } from "@testing-library/react";
+import { createRoutesStub } from "react-router";
 
 import Home from "../../src/react/components/Home";
 import Layout from "../../src/react/components/Layout";
-
-const authContextValue = {
-  user: null,
-  check: () => false,
-  login: () => {},
-  logout: () => {},
-  register: () => {},
-};
+import mockFetch from "./mockFetch";
 
 beforeEach(() => {
-  globalThis.fetch = vi.fn().mockImplementation(() =>
-    Promise.resolve({
-      json: () => Promise.resolve([]),
-    }),
-  );
-
-  vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
+  mockFetch();
 });
 
 afterEach(() => {
@@ -29,21 +14,57 @@ afterEach(() => {
 });
 
 describe("React base components", () => {
-  test("<Home />", async () => {
-    await act(async () => {
-      render(<Home />, { wrapper: BrowserRouter });
-    });
+  describe("<Home />", () => {
+    test("should mount successfully", async () => {
+      const Stub = createRoutesStub([
+        {
+          path: "/",
+          Component: Home,
+          ErrorBoundary: ({ error }) => {
+            throw error;
+          },
+        },
+      ]);
 
-    expect(true).toBeTruthy();
+      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+
+      await waitFor(() => screen.getByText(/starter/i));
+    });
+    test("should count the clicks", async () => {
+      const Stub = createRoutesStub([
+        {
+          path: "/",
+          Component: Home,
+          ErrorBoundary: ({ error }) => {
+            throw error;
+          },
+        },
+      ]);
+
+      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+
+      await waitFor(() => screen.getByText("0"));
+
+      screen.getByRole("button", { name: /count/i }).click();
+
+      await waitFor(() => screen.getByText("1"));
+    });
   });
+  describe("<Layout />", () => {
+    test("should render its children", async () => {
+      const Stub = createRoutesStub([
+        {
+          path: "/",
+          Component: () => <Layout>hello, world!</Layout>,
+          ErrorBoundary: ({ error }) => {
+            throw error;
+          },
+        },
+      ]);
 
-  test("<Layout />", async () => {
-    await act(async () => {
-      render(<Layout>hello, world!</Layout>, {
-        wrapper: BrowserRouter,
-      });
+      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+
+      await waitFor(() => screen.getByText("hello, world!"));
     });
-
-    expect(true).toBeTruthy();
   });
 });

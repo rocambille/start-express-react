@@ -10,7 +10,7 @@ function ItemList() {
   return (
     <>
       <h1>Items</h1>
-      {auth.user && <Link to="/items/new">Ajouter</Link>}
+      {auth.check() && <Link to="/items/new">Ajouter</Link>}
       <ul>
         {items.map((item) => (
           <li key={item.id}>

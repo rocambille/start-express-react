@@ -16,7 +16,7 @@ const useItems = () => {
 
   const { id } = useParams();
 
-  const item = items.find((i) => i.id === Number(id));
+  const item = id ? items.find((item) => item.id === +id) : null;
 
   // edit
 
