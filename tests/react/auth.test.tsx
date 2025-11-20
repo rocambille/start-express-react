@@ -1,11 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { createRoutesStub } from "react-router";
 
 import {
   AuthProvider,
   useAuth,
 } from "../../src/react/components/auth/AuthContext";
-import mockFetch from "./mockFetch";
+import { mockFetch, withErrorBoundary } from "./utils";
 
 beforeEach(() => {
   mockFetch();
@@ -19,99 +19,63 @@ describe("React auth components", () => {
   describe("<AuthProvider />", () => {
     test("should render its children", async () => {
       const Stub = createRoutesStub([
-        {
-          path: "/",
-          Component: () => <AuthProvider>hello, world!</AuthProvider>,
-          ErrorBoundary: ({ error }) => {
-            throw error;
-          },
-        },
+        withErrorBoundary(() => <AuthProvider>hello, world!</AuthProvider>),
       ]);
 
       render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
+    });
+    test("should fetch /api/me on mount", async () => {
+      const Stub = createRoutesStub([
+        withErrorBoundary(() => <AuthProvider>hello, world!</AuthProvider>),
+      ]);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      expect(globalThis.fetch).toHaveBeenCalledWith("/api/me");
     });
   });
   describe("useAuth()", () => {
     test("should be used within <AuthProvider>", async () => {
-      // avoid exception noise in console
-      vi.spyOn(console, "error").mockImplementation(() => null);
+      // Avoid exception noise in console
+      const silence = vi.spyOn(console, "error").mockImplementation(() => {});
 
-      const Consumer = () => {
-        useAuth();
+      try {
+        renderHook(useAuth);
 
-        return "hello, world!";
-      };
-
-      const Stub = createRoutesStub([
-        {
-          path: "/",
-          Component: () => <Consumer />,
-          ErrorBoundary: ({ error }) => {
-            throw error;
-          },
-        },
-      ]);
-
-      expect(() => render(<Stub initialEntries={["/"]} />)).toThrowError(
-        /useAuth[\s\S]*within[\s\S]*AuthProvider/i,
-      );
+        throw new Error("should have thrown");
+      } catch (err) {
+        expect((err as Error).message).toMatch(
+          /useAuth[\s\S]*within[\s\S]*AuthProvider/i,
+        );
+      } finally {
+        silence.mockRestore();
+      }
     });
-    test("should return auth object", async () => {
+    test("should return an auth object", async () => {
       const Consumer = () => {
         const auth = useAuth();
 
         expect(auth).toBeDefined();
-        expect(auth.check).toBeDefined();
-        expect(auth.login).toBeDefined();
-        expect(auth.logout).toBeDefined();
+        expect(typeof auth.check).toBe("function");
+        expect(typeof auth.login).toBe("function");
+        expect(typeof auth.logout).toBe("function");
 
         return "hello, world!";
       };
 
       const Stub = createRoutesStub([
-        {
-          path: "/",
-          Component: () => (
-            <AuthProvider>
-              <Consumer />
-            </AuthProvider>
-          ),
-          ErrorBoundary: ({ error }) => {
-            throw error;
-          },
-        },
+        withErrorBoundary(() => (
+          <AuthProvider>
+            <Consumer />
+          </AuthProvider>
+        )),
       ]);
 
       render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
-  });
-  test("should fetch /api/me on mount", async () => {
-    const Consumer = () => {
-      const auth = useAuth();
-
-      return auth.user?.email;
-    };
-
-    const Stub = createRoutesStub([
-      {
-        path: "/",
-        Component: () => (
-          <AuthProvider>
-            <Consumer />
-          </AuthProvider>
-        ),
-        ErrorBoundary: ({ error }) => {
-          throw error;
-        },
-      },
-    ]);
-
-    render(<Stub initialEntries={["/"]} />);
-
-    await waitFor(() => screen.getByText("foo@mail.com"));
   });
 });

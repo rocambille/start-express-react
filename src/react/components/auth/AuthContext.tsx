@@ -16,7 +16,7 @@ type AuthContextType = {
 
 const AuthContext = createContext(null as AuthContextType | null);
 
-export function AuthProvider({ children }: PropsWithChildren) {
+export function AuthProvider({ children }: Required<PropsWithChildren>) {
   const [user, setUser] = useState(null as User | null);
 
   useEffect(() => {

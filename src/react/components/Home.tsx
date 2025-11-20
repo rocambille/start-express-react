@@ -18,7 +18,7 @@ function Home() {
         </p>
       </hgroup>
       <div>
-        <p>{count}</p>
+        <p data-testid="count-value">{count}</p>
         <button type="button" onClick={() => setCount(count + 1)}>
           Count
         </button>
