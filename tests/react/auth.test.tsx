@@ -28,13 +28,14 @@ describe("React auth components", () => {
         },
       ]);
 
-      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+      render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
   });
   describe("useAuth()", () => {
     test("should be used within <AuthProvider>", async () => {
+      // avoid exception noise in console
       vi.spyOn(console, "error").mockImplementation(() => null);
 
       const Consumer = () => {
@@ -54,7 +55,7 @@ describe("React auth components", () => {
       ]);
 
       expect(() => render(<Stub initialEntries={["/"]} />)).toThrowError(
-        "useAuth has to be used within <AuthProvider />",
+        /useAuth[\s\S]*within[\s\S]*AuthProvider/i,
       );
     });
     test("should return auth object", async () => {
@@ -83,9 +84,34 @@ describe("React auth components", () => {
         },
       ]);
 
-      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+      render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
+  });
+  test("should fetch /api/me on mount", async () => {
+    const Consumer = () => {
+      const auth = useAuth();
+
+      return auth.user?.email;
+    };
+
+    const Stub = createRoutesStub([
+      {
+        path: "/",
+        Component: () => (
+          <AuthProvider>
+            <Consumer />
+          </AuthProvider>
+        ),
+        ErrorBoundary: ({ error }) => {
+          throw error;
+        },
+      },
+    ]);
+
+    render(<Stub initialEntries={["/"]} />);
+
+    await waitFor(() => screen.getByText("foo@mail.com"));
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { createRoutesStub } from "react-router";
 
 import Home from "../../src/react/components/Home";
@@ -26,7 +26,7 @@ describe("React base components", () => {
         },
       ]);
 
-      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+      render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText(/starter/i));
     });
@@ -41,11 +41,13 @@ describe("React base components", () => {
         },
       ]);
 
-      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+      render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("0"));
 
-      screen.getByRole("button", { name: /count/i }).click();
+      act(() => {
+        screen.getByRole("button", { name: /count/i }).click();
+      });
 
       await waitFor(() => screen.getByText("1"));
     });
@@ -62,7 +64,7 @@ describe("React base components", () => {
         },
       ]);
 
-      expect(() => render(<Stub initialEntries={["/"]} />)).not.toThrow();
+      render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
