@@ -72,8 +72,8 @@ export function AuthProvider({ children }: Required<PropsWithChildren>) {
           return response.json();
         }
       })
-      .then((user: User) => {
-        setUser(user);
+      .then(({ insertId }) => {
+        setUser({ id: insertId, email: credentials.email });
       });
   };
 
