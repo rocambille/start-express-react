@@ -21,6 +21,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.1",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.4",

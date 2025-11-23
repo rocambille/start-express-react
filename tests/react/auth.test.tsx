@@ -1,11 +1,11 @@
 import { render, renderHook, screen, waitFor } from "@testing-library/react";
-import { createRoutesStub } from "react-router";
 
 import {
   AuthProvider,
   useAuth,
 } from "../../src/react/components/auth/AuthContext";
-import { mockFetch, withErrorBoundary } from "./utils";
+
+import { mockFetch, stubRoute } from "./utils";
 
 beforeEach(() => {
   mockFetch();
@@ -18,18 +18,18 @@ afterEach(() => {
 describe("React auth components", () => {
   describe("<AuthProvider />", () => {
     test("should render its children", async () => {
-      const Stub = createRoutesStub([
-        withErrorBoundary(() => <AuthProvider>hello, world!</AuthProvider>),
-      ]);
+      const Stub = stubRoute("/", () => (
+        <AuthProvider>hello, world!</AuthProvider>
+      ));
 
       render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
     test("should fetch /api/me on mount", async () => {
-      const Stub = createRoutesStub([
-        withErrorBoundary(() => <AuthProvider>hello, world!</AuthProvider>),
-      ]);
+      const Stub = stubRoute("/", () => (
+        <AuthProvider>hello, world!</AuthProvider>
+      ));
 
       render(<Stub initialEntries={["/"]} />);
 
@@ -39,43 +39,24 @@ describe("React auth components", () => {
   describe("useAuth()", () => {
     test("should be used within <AuthProvider>", async () => {
       // Avoid exception noise in console
-      const silence = vi.spyOn(console, "error").mockImplementation(() => {});
+      const spy = vi.spyOn(console, "error");
+      spy.mockImplementation(() => {});
 
-      try {
-        renderHook(useAuth);
+      expect(() => {
+        renderHook(() => useAuth());
+      }).toThrow(/\buseAuth\b.*\bwithin\b.*\bAuthProvider\b/i);
 
-        throw new Error("should have thrown");
-      } catch (err) {
-        expect((err as Error).message).toMatch(
-          /useAuth[\s\S]*within[\s\S]*AuthProvider/i,
-        );
-      } finally {
-        silence.mockRestore();
-      }
+      spy.mockRestore();
     });
     test("should return an auth object", async () => {
-      const Consumer = () => {
-        const auth = useAuth();
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
-        expect(auth).toBeDefined();
-        expect(typeof auth.check).toBe("function");
-        expect(typeof auth.login).toBe("function");
-        expect(typeof auth.logout).toBe("function");
+      const auth = result.current;
 
-        return "hello, world!";
-      };
-
-      const Stub = createRoutesStub([
-        withErrorBoundary(() => (
-          <AuthProvider>
-            <Consumer />
-          </AuthProvider>
-        )),
-      ]);
-
-      render(<Stub initialEntries={["/"]} />);
-
-      await waitFor(() => screen.getByText("hello, world!"));
+      expect(auth).toBeDefined();
+      expect(typeof auth.check).toBe("function");
+      expect(typeof auth.login).toBe("function");
+      expect(typeof auth.logout).toBe("function");
     });
   });
 });

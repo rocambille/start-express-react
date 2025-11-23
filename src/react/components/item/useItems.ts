@@ -1,4 +1,4 @@
-import { use } from "react";
+import { use, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { cache, invalidateCache } from "../utils";
@@ -16,7 +16,11 @@ const useItems = () => {
 
   const { id } = useParams();
 
-  const item = id ? items.find((item) => item.id === +id) : null;
+  const item: Item | undefined = useMemo(() => {
+    if (id != null) {
+      return items.find((item) => item.id === +id);
+    }
+  }, [id, items]);
 
   // edit
 
