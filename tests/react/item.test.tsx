@@ -28,7 +28,7 @@ afterEach(() => {
 
 describe("React item components", () => {
   describe("useItems", () => {
-    test("should return items", async () => {
+    it("should return items", async () => {
       mockAuth(null);
 
       expect.assertions(1);
@@ -45,7 +45,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
-    test("should return non null item when params contain valid id", async () => {
+    it("should return non null item when params contain valid id", async () => {
       mockAuth(null);
 
       expect.assertions(1);
@@ -64,7 +64,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
-    test("should return undefined item when params contain invalid id", async () => {
+    it("should return undefined item when params contain invalid id", async () => {
       mockAuth(null);
 
       expect.assertions(1);
@@ -81,7 +81,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
-    test("should return undefined item when params don't contain id", async () => {
+    it("should return undefined item when params don't contain id", async () => {
       mockAuth(null);
 
       expect.assertions(1);
@@ -100,7 +100,7 @@ describe("React item components", () => {
     });
   });
   describe("<ItemCreate />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/new", ItemCreate);
@@ -109,7 +109,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByRole("button"));
     });
-    test("should submit form creating an item", async () => {
+    it("should submit form creating an item", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
@@ -142,7 +142,7 @@ describe("React item components", () => {
     });
   });
   describe("<ItemDeleteForm />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id", ItemDeleteForm);
@@ -153,7 +153,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByRole("button"));
     });
-    test("should submit form editing an item", async () => {
+    it("should submit form editing an item", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
@@ -183,7 +183,7 @@ describe("React item components", () => {
     });
   });
   describe("<ItemEdit />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id/edit", ItemEdit);
@@ -194,7 +194,7 @@ describe("React item components", () => {
 
       await waitFor(() => screen.getByRole("button"));
     });
-    test("should throw 404 when params contain invalid id", async () => {
+    it("should throw 404 when params contain invalid id", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id/edit", ItemEdit);
@@ -203,7 +203,7 @@ describe("React item components", () => {
         /\b404\b/,
       );
     });
-    test("should submit form editing an item", async () => {
+    it("should submit form editing an item", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
@@ -241,7 +241,7 @@ describe("React item components", () => {
     });
   });
   describe("<ItemList />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items", ItemList);
@@ -252,7 +252,7 @@ describe("React item components", () => {
         screen.getByRole("heading", { level: 1, name: /items/i }),
       );
     });
-    test("should not display link to create item when anonymous", async () => {
+    it("should not display link to create item when anonymous", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items", ItemList);
@@ -261,7 +261,7 @@ describe("React item components", () => {
 
       await waitFor(() => expect(screen.queryByTestId("items-new")).toBeNull());
     });
-    test("should display link to create item when authentified", async () => {
+    it("should display link to create item when authentified", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/items", ItemList);
@@ -272,7 +272,7 @@ describe("React item components", () => {
     });
   });
   describe("<ItemShow />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id", ItemShow);
@@ -285,7 +285,7 @@ describe("React item components", () => {
         screen.getByRole("heading", { level: 1, name: mockedItems[0].title }),
       );
     });
-    test("should throw 404 when params contain invalid id", async () => {
+    it("should throw 404 when params contain invalid id", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id", ItemShow);
@@ -294,7 +294,7 @@ describe("React item components", () => {
         /\b404\b/,
       );
     });
-    test("should not display link to edit item when anonymous", async () => {
+    it("should not display link to edit item when anonymous", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/items/:id", ItemShow);
@@ -309,7 +309,7 @@ describe("React item components", () => {
         ).toBeNull(),
       );
     });
-    test("should display link to edit item when authentified", async () => {
+    it("should display link to edit item when authentified", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/items/:id", ItemShow);

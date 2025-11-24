@@ -20,7 +20,7 @@ afterEach(() => {
 
 describe("React auth components", () => {
   describe("<AuthProvider />", () => {
-    test("should render its children", async () => {
+    it("should render its children", async () => {
       const Stub = stubRoute("/", () => (
         <AuthProvider>hello, world!</AuthProvider>
       ));
@@ -29,7 +29,7 @@ describe("React auth components", () => {
 
       await waitFor(() => screen.getByText("hello, world!"));
     });
-    test("should fetch /api/me on mount", async () => {
+    it("should fetch /api/me on mount", async () => {
       const Stub = stubRoute("/", () => (
         <AuthProvider>hello, world!</AuthProvider>
       ));
@@ -40,7 +40,7 @@ describe("React auth components", () => {
     });
   });
   describe("useAuth()", () => {
-    test("should be used within <AuthProvider>", async () => {
+    it("should be used within <AuthProvider>", async () => {
       // Avoid exception noise in console
       vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -48,14 +48,14 @@ describe("React auth components", () => {
         renderHook(() => useAuth());
       }).toThrow(/\buseAuth\b.*\bwithin\b.*\bAuthProvider\b/i);
     });
-    test("should return an auth object", async () => {
+    it("should return an auth object", async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
       const auth = result.current;
 
       expect(auth).toBeDefined();
     });
-    test("should return a check function", async () => {
+    it("should return a check function", async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
       const auth = result.current;
@@ -64,7 +64,7 @@ describe("React auth components", () => {
 
       expect(auth.check()).toBe(auth.user != null);
     });
-    test("should return a login function", async () => {
+    it("should return a login function", async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
       const auth = result.current;
@@ -84,7 +84,7 @@ describe("React auth components", () => {
         }),
       );
     });
-    test("should return a logout function", async () => {
+    it("should return a logout function", async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
       const auth = result.current;
@@ -100,7 +100,7 @@ describe("React auth components", () => {
         }),
       );
     });
-    test("should return a register function", async () => {
+    it("should return a register function", async () => {
       const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
       const auth = result.current;
@@ -130,7 +130,7 @@ describe("React auth components", () => {
     });
   });
   describe("<LoginRegisterForm />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
@@ -140,7 +140,7 @@ describe("React auth components", () => {
       await waitFor(() => screen.getByTestId("login"));
       await waitFor(() => screen.getByTestId("register"));
     });
-    test("should submit form login", async () => {
+    it("should submit form login", async () => {
       const [auth] = mockAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
@@ -160,7 +160,7 @@ describe("React auth components", () => {
         password: "secret",
       });
     });
-    test("should submit form register", async () => {
+    it("should submit form register", async () => {
       const [auth] = mockAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
@@ -184,7 +184,7 @@ describe("React auth components", () => {
     });
   });
   describe("<LogoutForm />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/", LogoutForm);
@@ -193,7 +193,7 @@ describe("React auth components", () => {
 
       await waitFor(() => screen.getByRole("button"));
     });
-    test("should submit form logout", async () => {
+    it("should submit form logout", async () => {
       const [auth] = mockAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/", LogoutForm);

@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe("React base components", () => {
   describe("<Home />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       const Stub = stubRoute("/", Home);
 
       render(<Stub initialEntries={["/"]} />);
@@ -25,7 +25,7 @@ describe("React base components", () => {
         screen.getByRole("heading", { level: 1, name: /starter/i }),
       );
     });
-    test("should count the clicks", async () => {
+    it("should count the clicks", async () => {
       const Stub = stubRoute("/", Home);
 
       render(<Stub initialEntries={["/"]} />);
@@ -44,14 +44,14 @@ describe("React base components", () => {
     });
   });
   describe("<Layout />", () => {
-    test("should mount successfully", async () => {
+    it("should mount successfully", async () => {
       const Stub = stubRoute("/", () => <Layout />);
 
       render(<Stub initialEntries={["/"]} />);
 
       await waitFor(() => screen.getByRole("navigation"));
     });
-    test("should render its children", async () => {
+    it("should render its children", async () => {
       const Stub = stubRoute("/", () => <Layout>hello, world!</Layout>);
 
       render(<Stub initialEntries={["/"]} />);
