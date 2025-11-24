@@ -15,6 +15,7 @@ import {
   mockedItems,
   mockFetch,
   renderAsync,
+  renderHookAsync,
   stubRoute,
 } from "./utils";
 
@@ -31,72 +32,45 @@ describe("React item components", () => {
     it("should return items", async () => {
       mockAuth(null);
 
-      expect.assertions(1);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
 
-      const Stub = stubRoute("/items", () => {
-        const { items } = useItems();
+      const { result } = await renderHookAsync(() => useItems());
 
-        expect(items).toEqual(mockedItems);
-
-        return "hello, world!";
-      });
-
-      await renderAsync(<Stub initialEntries={["/items"]} />);
-
-      await waitFor(() => screen.getByText("hello, world!"));
+      expect(result.current.items).toEqual(mockedItems);
     });
-    it("should return non null item when params contain valid id", async () => {
+    it("should return valid item when params contain valid id", async () => {
       mockAuth(null);
 
-      expect.assertions(1);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
+      vi.spyOn(ReactRouter, "useParams").mockImplementation(() => ({
+        id: mockedItems[0].id.toString(),
+      }));
 
-      const Stub = stubRoute("/items/:id", () => {
-        const { item } = useItems();
+      const { result } = await renderHookAsync(() => useItems());
 
-        expect(item).toEqual(mockedItems[0]);
-
-        return "hello, world!";
-      });
-
-      await renderAsync(
-        <Stub initialEntries={[`/items/${mockedItems[0].id}`]} />,
-      );
-
-      await waitFor(() => screen.getByText("hello, world!"));
+      expect(result.current.item).toEqual(mockedItems[0]);
     });
     it("should return undefined item when params contain invalid id", async () => {
       mockAuth(null);
 
-      expect.assertions(1);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
+      vi.spyOn(ReactRouter, "useParams").mockImplementation(() => ({
+        id: mockedInsertId.toString(),
+      }));
 
-      const Stub = stubRoute("/items/:id", () => {
-        const { item } = useItems();
+      const { result } = await renderHookAsync(() => useItems());
 
-        expect(item).toBeUndefined();
-
-        return "hello, world!";
-      });
-
-      await renderAsync(<Stub initialEntries={["/items/0"]} />);
-
-      await waitFor(() => screen.getByText("hello, world!"));
+      expect(result.current.item).toBeUndefined();
     });
     it("should return undefined item when params don't contain id", async () => {
       mockAuth(null);
 
-      expect.assertions(1);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
+      vi.spyOn(ReactRouter, "useParams").mockImplementation(() => ({}));
 
-      const Stub = stubRoute("/items", () => {
-        const { item } = useItems();
+      const { result } = await renderHookAsync(() => useItems());
 
-        expect(item).toBeUndefined();
-
-        return "hello, world!";
-      });
-
-      await renderAsync(<Stub initialEntries={["/items"]} />);
-
-      await waitFor(() => screen.getByText("hello, world!"));
+      expect(result.current.item).toBeUndefined();
     });
   });
   describe("<ItemCreate />", () => {

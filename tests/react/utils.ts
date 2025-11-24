@@ -1,4 +1,4 @@
-import { act, render } from "@testing-library/react";
+import { act, render, renderHook } from "@testing-library/react";
 import { createRoutesStub } from "react-router";
 
 import * as AuthContext from "../../src/react/components/auth/AuthContext";
@@ -140,13 +140,21 @@ export const stubRoute = (
 
 type RenderParameters = Parameters<typeof render>;
 
+// Wrapping render in act is required here because useItems is suspending
+// see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
 export const renderAsync = async (
   ui: RenderParameters[0],
   options?: RenderParameters[1],
-) => {
-  // Wrapping render in act is required here because useItems is suspending
-  // see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
-  await act(async () => {
-    render(ui, options);
-  });
-};
+) => await act(async () => render(ui, options));
+
+type RenderHookParameters = Parameters<typeof renderHook>;
+
+// Wrapping render in act is required here because useItems is suspending
+// see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
+export const renderHookAsync = async <T extends RenderHookParameters[0]>(
+  render: T,
+  options?: RenderHookParameters[1],
+) =>
+  (await act(async () => renderHook(render, options))) as {
+    result: { current: ReturnType<T> };
+  };
