@@ -10,8 +10,6 @@ import ItemShow from "../../src/react/components/item/ItemShow";
 import useItems from "../../src/react/components/item/useItems";
 
 import {
-  getByHref,
-  getSubmit,
   mockAuth,
   mockedInsertId,
   mockedItems,
@@ -109,16 +107,16 @@ describe("React item components", () => {
 
       await renderAsync(<Stub initialEntries={["/items/new"]} />);
 
-      await waitFor(() => getSubmit());
+      await waitFor(() => screen.getByRole("button"));
     });
     test("should submit form creating an item", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
 
-      const spy = vi
-        .spyOn(ReactRouter, "useNavigate")
-        .mockImplementation(() => mockedNavigate);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
+        () => mockedNavigate,
+      );
 
       const Stub = stubRoute("/items/new", ItemCreate);
 
@@ -127,7 +125,7 @@ describe("React item components", () => {
       const user = userEvent.setup();
 
       await user.type(screen.getByLabelText(/title/i), "New item");
-      await user.click(getSubmit());
+      await user.click(screen.getByRole("button"));
 
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "/api/items",
@@ -141,8 +139,6 @@ describe("React item components", () => {
       );
 
       expect(mockedNavigate).toHaveBeenCalledWith(`/items/${mockedInsertId}`);
-
-      spy.mockRestore();
     });
   });
   describe("<ItemDeleteForm />", () => {
@@ -155,16 +151,16 @@ describe("React item components", () => {
         <Stub initialEntries={[`/items/${mockedItems[0].id}`]} />,
       );
 
-      await waitFor(() => getSubmit());
+      await waitFor(() => screen.getByRole("button"));
     });
     test("should submit form editing an item", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
 
-      const spy = vi
-        .spyOn(ReactRouter, "useNavigate")
-        .mockImplementation(() => mockedNavigate);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
+        () => mockedNavigate,
+      );
 
       const Stub = stubRoute("/items/:id", ItemDeleteForm);
 
@@ -174,7 +170,7 @@ describe("React item components", () => {
 
       const user = userEvent.setup();
 
-      await user.click(getSubmit());
+      await user.click(screen.getByRole("button"));
 
       expect(globalThis.fetch).toHaveBeenCalledWith(
         `/api/items/${mockedItems[0].id}`,
@@ -184,8 +180,6 @@ describe("React item components", () => {
       );
 
       expect(mockedNavigate).toHaveBeenCalledWith("/items");
-
-      spy.mockRestore();
     });
   });
   describe("<ItemEdit />", () => {
@@ -198,7 +192,7 @@ describe("React item components", () => {
         <Stub initialEntries={[`/items/${mockedItems[0].id}/edit`]} />,
       );
 
-      await waitFor(() => getSubmit());
+      await waitFor(() => screen.getByRole("button"));
     });
     test("should throw 404 when params contain invalid id", async () => {
       mockAuth(null);
@@ -214,9 +208,9 @@ describe("React item components", () => {
 
       const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
 
-      const spy = vi
-        .spyOn(ReactRouter, "useNavigate")
-        .mockImplementation(() => mockedNavigate);
+      vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
+        () => mockedNavigate,
+      );
 
       const Stub = stubRoute("/items/:id/edit", ItemEdit);
 
@@ -228,7 +222,7 @@ describe("React item components", () => {
 
       await user.clear(screen.getByLabelText(/title/i));
       await user.type(screen.getByLabelText(/title/i), "Updated item");
-      await user.click(getSubmit());
+      await user.click(screen.getByRole("button"));
 
       expect(globalThis.fetch).toHaveBeenCalledWith(
         `/api/items/${mockedItems[0].id}`,
@@ -244,8 +238,6 @@ describe("React item components", () => {
       expect(mockedNavigate).toHaveBeenCalledWith(
         `/items/${mockedItems[0].id}`,
       );
-
-      spy.mockRestore();
     });
   });
   describe("<ItemList />", () => {
@@ -267,7 +259,7 @@ describe("React item components", () => {
 
       await renderAsync(<Stub initialEntries={["/items"]} />);
 
-      expect(() => getByHref(/\/items\/new$/i)).toThrow();
+      await waitFor(() => expect(screen.queryByTestId("items-new")).toBeNull());
     });
     test("should display link to create item when authentified", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
@@ -276,7 +268,7 @@ describe("React item components", () => {
 
       await renderAsync(<Stub initialEntries={["/items"]} />);
 
-      await waitFor(() => getByHref(/\/items\/new$/i));
+      await waitFor(() => screen.getByTestId("items-new"));
     });
   });
   describe("<ItemShow />", () => {
@@ -311,9 +303,11 @@ describe("React item components", () => {
         <Stub initialEntries={[`/items/${mockedItems[0].id}`]} />,
       );
 
-      expect(() =>
-        getByHref(new RegExp(`/items/${mockedItems[0].id}/edit$`, "i")),
-      ).toThrow();
+      await waitFor(() =>
+        expect(
+          screen.queryByTestId(`items-edit-/${mockedItems[0].id}`),
+        ).toBeNull(),
+      );
     });
     test("should display link to edit item when authentified", async () => {
       mockAuth({ id: 1, email: "foo@mail.com" });
@@ -325,7 +319,7 @@ describe("React item components", () => {
       );
 
       await waitFor(() =>
-        getByHref(new RegExp(`/items/${mockedItems[0].id}/edit$`, "i")),
+        screen.getByTestId(`items-edit-${mockedItems[0].id}`),
       );
     });
   });

@@ -17,7 +17,12 @@ function ItemShow() {
       <h1>{item.title}</h1>
       {auth.user?.id === item.user_id && (
         <>
-          <Link to={`/items/${item.id}/edit`}>Modifier</Link>
+          <Link
+            to={`/items/${item.id}/edit`}
+            data-testid={`items-edit-${item.id}`}
+          >
+            Modifier
+          </Link>
           <ItemDeleteForm />
         </>
       )}

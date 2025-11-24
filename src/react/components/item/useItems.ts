@@ -1,4 +1,4 @@
-import { use, useMemo } from "react";
+import { use, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { cache, invalidateCache } from "../utils";
@@ -24,59 +24,56 @@ const useItems = () => {
 
   // edit
 
-  const editItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (!auth.check()) {
-      alert("Please log in");
-      return;
-    }
+  const editItem = useCallback(
+    (partialItem: Omit<Item, "id" | "user_id">) => {
+      if (!auth.check()) return alert("Please log in");
 
-    fetch(`/api/items/${id}`, {
-      method: "put",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(partialItem),
-    }).then((response) => {
-      if (response.status === 204) {
-        invalidateCache("/api/items");
-        navigate(`/items/${id}`);
-      }
-    });
-  };
+      fetch(`/api/items/${id}`, {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(partialItem),
+      }).then((response) => {
+        if (response.status === 204) {
+          invalidateCache("/api/items");
+          navigate(`/items/${id}`);
+        }
+      });
+    },
+    [auth.check, id, navigate],
+  );
 
   // add
 
-  const addItem = (partialItem: Omit<Item, "id" | "user_id">) => {
-    if (!auth.check()) {
-      alert("Please log in");
-      return;
-    }
+  const addItem = useCallback(
+    (partialItem: Omit<Item, "id" | "user_id">) => {
+      if (!auth.check()) return alert("Please log in");
 
-    fetch("/api/items", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(partialItem),
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          return response.json();
-        }
+      fetch("/api/items", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(partialItem),
       })
-      .then(({ insertId }) => {
-        invalidateCache("/api/items");
-        navigate(`/items/${insertId}`);
-      });
-  };
+        .then((response) => {
+          if (response.status === 201) {
+            return response.json();
+          }
+        })
+        .then(({ insertId }) => {
+          invalidateCache("/api/items");
+          navigate(`/items/${insertId}`);
+        });
+    },
+    [auth.check, navigate],
+  );
 
   // delete
 
-  const deleteItem = () => {
-    if (!auth.check()) {
-      alert("Please log in");
-      return;
-    }
+  const deleteItem = useCallback(() => {
+    if (!auth.check()) return alert("Please log in");
 
     fetch(`/api/items/${id}`, {
       method: "delete",
@@ -86,7 +83,7 @@ const useItems = () => {
         navigate("/items");
       }
     });
-  };
+  }, [auth.check, id, navigate]);
 
   // pack them all
 

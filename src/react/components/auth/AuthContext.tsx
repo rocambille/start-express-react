@@ -1,6 +1,7 @@
 import {
   createContext,
   type PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -31,8 +32,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       });
   }, []);
 
-  const login = (credentials: Credentials) => {
-    fetch("/api/access-token", {
+  const login = useCallback((credentials: Credentials) => {
+    fetch("/api/access-tokens", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -47,35 +48,38 @@ export function AuthProvider({ children }: PropsWithChildren) {
       .then((user: User) => {
         setUser(user);
       });
-  };
+  }, []);
 
-  const logout = () => {
-    fetch("/api/access-token", {
+  const logout = useCallback(() => {
+    fetch("/api/access-tokens", {
       method: "delete",
     }).then((response) => {
       if (response.status === 204) {
         setUser(null);
       }
     });
-  };
+  }, []);
 
-  const register = (credentials: Credentials & { confirmPassword: string }) => {
-    fetch("/api/users", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    })
-      .then((response) => {
-        if (response.status === 201) {
-          return response.json();
-        }
+  const register = useCallback(
+    (credentials: Credentials & { confirmPassword: string }) => {
+      fetch("/api/users", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
       })
-      .then(({ insertId }) => {
-        setUser({ id: insertId, email: credentials.email });
-      });
-  };
+        .then((response) => {
+          if (response.status === 201) {
+            return response.json();
+          }
+        })
+        .then(({ insertId }) => {
+          setUser({ id: insertId, email: credentials.email });
+        });
+    },
+    [],
+  );
 
   return (
     <AuthContext

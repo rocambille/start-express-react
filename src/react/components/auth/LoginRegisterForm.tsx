@@ -41,6 +41,7 @@ function LoginRegisterForm() {
       <button
         type="submit"
         name="login"
+        data-testid="login"
         style={{ borderStartStartRadius: 0, borderEndStartRadius: 0 }}
       >
         Me connecter
@@ -58,6 +59,7 @@ function LoginRegisterForm() {
       <button
         type="submit"
         name="register"
+        data-testid="register"
         className="secondary"
         style={{ borderStartStartRadius: 0, borderEndStartRadius: 0 }}
       >
