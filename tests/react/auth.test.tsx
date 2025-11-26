@@ -10,16 +10,15 @@ import LogoutForm from "../../src/react/components/auth/LogoutForm";
 
 import { mockFetch, mockUseAuth, stubRoute } from "./utils";
 
-beforeEach(() => {
-  mockFetch();
-});
-
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe("React auth components", () => {
   describe("<AuthProvider />", () => {
+    beforeEach(() => {
+      mockFetch();
+    });
     it("should render its children", async () => {
       const Stub = stubRoute("/", () => (
         <AuthProvider>hello, world!</AuthProvider>
@@ -40,6 +39,9 @@ describe("React auth components", () => {
     });
   });
   describe("useAuth()", () => {
+    beforeEach(() => {
+      mockFetch();
+    });
     it("should be used within <AuthProvider>", async () => {
       // Avoid exception noise in console
       vi.spyOn(console, "error").mockImplementation(() => {});

@@ -20,16 +20,15 @@ import {
   stubRoute,
 } from "./utils";
 
-beforeEach(() => {
-  mockFetch();
-});
-
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe("React item components", () => {
   describe("useItems", () => {
+    beforeEach(() => {
+      mockFetch();
+    });
     it("should return items", async () => {
       mockUseAuth(null);
 
