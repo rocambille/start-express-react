@@ -8,7 +8,7 @@ import {
 import LoginRegisterForm from "../../src/react/components/auth/LoginRegisterForm";
 import LogoutForm from "../../src/react/components/auth/LogoutForm";
 
-import { mockAuth, mockFetch, stubRoute } from "./utils";
+import { mockFetch, mockUseAuth, stubRoute } from "./utils";
 
 beforeEach(() => {
   mockFetch();
@@ -131,7 +131,7 @@ describe("React auth components", () => {
   });
   describe("<LoginRegisterForm />", () => {
     it("should mount successfully", async () => {
-      mockAuth(null);
+      mockUseAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
 
@@ -141,7 +141,7 @@ describe("React auth components", () => {
       await waitFor(() => screen.getByTestId("register"));
     });
     it("should submit form login", async () => {
-      const [auth] = mockAuth(null);
+      const [auth] = mockUseAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
 
@@ -161,7 +161,7 @@ describe("React auth components", () => {
       });
     });
     it("should submit form register", async () => {
-      const [auth] = mockAuth(null);
+      const [auth] = mockUseAuth(null);
 
       const Stub = stubRoute("/", LoginRegisterForm);
 
@@ -185,7 +185,7 @@ describe("React auth components", () => {
   });
   describe("<LogoutForm />", () => {
     it("should mount successfully", async () => {
-      mockAuth({ id: 1, email: "foo@mail.com" });
+      mockUseAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/", LogoutForm);
 
@@ -194,7 +194,7 @@ describe("React auth components", () => {
       await waitFor(() => screen.getByRole("button"));
     });
     it("should submit form logout", async () => {
-      const [auth] = mockAuth({ id: 1, email: "foo@mail.com" });
+      const [auth] = mockUseAuth({ id: 1, email: "foo@mail.com" });
 
       const Stub = stubRoute("/", LogoutForm);
 

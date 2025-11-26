@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
-import useItems from "./useItems";
+import { useItems } from "./hooks";
 
 function ItemList() {
   const auth = useAuth();

@@ -2,6 +2,7 @@ import { act, render, renderHook } from "@testing-library/react";
 import { createRoutesStub } from "react-router";
 
 import * as AuthContext from "../../src/react/components/auth/AuthContext";
+import * as itemHooks from "../../src/react/components/item/hooks";
 
 export const mockedItems = [{ id: 1, title: "foo", user_id: 1 }];
 
@@ -106,7 +107,7 @@ export const mockFetch = (
     });
 };
 
-export const mockAuth = (user: User | null) => {
+export const mockUseAuth = (user: User | null) => {
   const auth: ReturnType<typeof AuthContext.useAuth> = {
     user,
     check: () => user != null,
@@ -118,6 +119,22 @@ export const mockAuth = (user: User | null) => {
   const spy = vi.spyOn(AuthContext, "useAuth").mockImplementation(() => auth);
 
   return [auth, spy] as [typeof auth, typeof spy];
+};
+
+export const mockUseItems = (params?: { id: string }) => {
+  const itemsStuff: ReturnType<typeof itemHooks.useItems> = {
+    items: mockedItems,
+    item: mockedItems.find((item) => item.id === Number(params?.id)),
+    editItem: vi.fn(),
+    addItem: vi.fn(),
+    deleteItem: vi.fn(),
+  };
+
+  const spy = vi
+    .spyOn(itemHooks, "useItems")
+    .mockImplementation(() => itemsStuff);
+
+  return [itemsStuff, spy] as [typeof itemsStuff, typeof spy];
 };
 
 type StubRouteObject = Parameters<typeof createRoutesStub>[0][number];

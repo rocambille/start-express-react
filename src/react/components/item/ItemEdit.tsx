@@ -1,5 +1,5 @@
+import { useItems } from "./hooks";
 import ItemForm from "./ItemForm";
-import useItems from "./useItems";
 
 function ItemEdit() {
   const { item, editItem } = useItems();
