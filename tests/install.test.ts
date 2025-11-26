@@ -1,27 +1,38 @@
-import fs from "node:fs";
+import path from "node:path";
+import fs from "fs-extra";
 
 import databaseClient, { type Rows } from "../src/database/client";
 
 describe("Installation", () => {
-  test("you created .env", async () => {
-    expect(fs.existsSync(`${__dirname}/../.env`)).toBe(true);
-  });
-  test("you filled .env with valid information to connect to your database", async () => {
-    expect.assertions(0);
+  describe(".env file", () => {
+    test("should exist at project root", async () => {
+      const envPath = path.resolve(__dirname, "../.env");
 
-    try {
-      // Check if the connection is successful
-      await databaseClient.getConnection();
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+      expect(await fs.exists(envPath)).toBe(true);
+    });
+    test("should define required environment variables", () => {
+      expect(process.env.APP_SECRET).toBeDefined();
+      expect(process.env.MYSQL_ROOT_PASSWORD).toBeDefined();
+      expect(process.env.MYSQL_DATABASE).toBeDefined();
+    });
   });
-  test("schema.sql was executed", async () => {
-    // Query the 'user' table to check if any data has been inserted
-    const [rows] = await databaseClient.query<Rows>("select * from user");
+  describe("Database connection", () => {
+    test("should connect successfully", async () => {
+      const connection = await databaseClient.getConnection();
 
-    // Expecting rows to be returned, indicating successful migration
-    expect(rows.length).toBeGreaterThanOrEqual(0);
+      expect(connection).toBeDefined();
+
+      await connection.release();
+    });
+  });
+  describe("Database schema", () => {
+    test("should contain a 'user' table as defined in schema.sql", async () => {
+      const [rows] = await databaseClient.query<Rows>(
+        "show tables like 'user'",
+      );
+
+      expect(rows.length).toBe(1);
+    });
   });
 });
 

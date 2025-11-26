@@ -19,13 +19,9 @@ const read: RequestHandler = async (req, res) => {
 /* ************************************************************************ */
 
 const edit: RequestHandler = async (req, res) => {
-  const affectedRows = await userRepository.update(req.user.id, req.body);
+  await userRepository.update(req.user.id, req.body);
 
-  if (affectedRows === 0) {
-    res.sendStatus(404);
-  } else {
-    res.sendStatus(204);
-  }
+  res.sendStatus(204);
 };
 
 /* ************************************************************************ */

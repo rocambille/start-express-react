@@ -1,4 +1,4 @@
-import useItems from "./useItems";
+import { useItems } from "./hooks";
 
 function ItemDeleteForm() {
   const { deleteItem } = useItems();

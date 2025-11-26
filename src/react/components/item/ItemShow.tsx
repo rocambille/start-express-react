@@ -1,15 +1,15 @@
 import { Link } from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
+import { useItems } from "./hooks";
 import ItemDeleteForm from "./ItemDeleteForm";
-import useItems from "./useItems";
 
 function ItemShow() {
   const auth = useAuth();
   const { item } = useItems();
 
   if (item == null) {
-    throw 404;
+    throw new Error("404");
   }
 
   return (
@@ -17,7 +17,12 @@ function ItemShow() {
       <h1>{item.title}</h1>
       {auth.user?.id === item.user_id && (
         <>
-          <Link to={`/items/${item.id}/edit`}>Modifier</Link>
+          <Link
+            to={`/items/${item.id}/edit`}
+            data-testid={`items-edit-${item.id}`}
+          >
+            Modifier
+          </Link>
           <ItemDeleteForm />
         </>
       )}

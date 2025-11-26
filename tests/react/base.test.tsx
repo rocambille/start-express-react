@@ -1,27 +1,13 @@
-import { act, render } from "@testing-library/react";
-import { BrowserRouter } from "react-router";
-
-import * as AuthContext from "../../src/react/components/auth/AuthContext";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import Home from "../../src/react/components/Home";
 import Layout from "../../src/react/components/Layout";
 
-const authContextValue = {
-  user: null,
-  check: () => false,
-  login: () => {},
-  logout: () => {},
-  register: () => {},
-};
+import { mockFetch, stubRoute } from "./utils";
 
 beforeEach(() => {
-  globalThis.fetch = vi.fn().mockImplementation(() =>
-    Promise.resolve({
-      json: () => Promise.resolve([]),
-    }),
-  );
-
-  vi.spyOn(AuthContext, "useAuth").mockImplementation(() => authContextValue);
+  mockFetch();
 });
 
 afterEach(() => {
@@ -29,21 +15,48 @@ afterEach(() => {
 });
 
 describe("React base components", () => {
-  test("<Home />", async () => {
-    await act(async () => {
-      render(<Home />, { wrapper: BrowserRouter });
+  describe("<Home />", () => {
+    it("should mount successfully", async () => {
+      const Stub = stubRoute("/", Home);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() =>
+        screen.getByRole("heading", { level: 1, name: /starter/i }),
+      );
     });
+    it("should count the clicks", async () => {
+      const Stub = stubRoute("/", Home);
 
-    expect(true).toBeTruthy();
-  });
+      render(<Stub initialEntries={["/"]} />);
 
-  test("<Layout />", async () => {
-    await act(async () => {
-      render(<Layout>hello, world!</Layout>, {
-        wrapper: BrowserRouter,
+      const count = screen.getByTestId("count-value");
+
+      expect(count.textContent).toBe("0");
+
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole("button", { name: /count/i }));
+
+      await waitFor(() => {
+        expect(count.textContent).toBe("1");
       });
     });
+  });
+  describe("<Layout />", () => {
+    it("should mount successfully", async () => {
+      const Stub = stubRoute("/", () => <Layout />);
 
-    expect(true).toBeTruthy();
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByRole("navigation"));
+    });
+    it("should render its children", async () => {
+      const Stub = stubRoute("/", () => <Layout>hello, world!</Layout>);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByText("hello, world!"));
+    });
   });
 });

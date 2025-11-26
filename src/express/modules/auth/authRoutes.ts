@@ -9,7 +9,7 @@ import authActions from "./authActions";
 /* ************************************************************************ */
 
 router
-  .route("/api/access-token")
+  .route("/api/access-tokens")
   .post(authActions.createAccessToken)
   .delete(authActions.destroyAccessToken);
 

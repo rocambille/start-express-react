@@ -1,52 +1,214 @@
-import { act, render } from "@testing-library/react";
-import { BrowserRouter } from "react-router";
+import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import {
   AuthProvider,
   useAuth,
 } from "../../src/react/components/auth/AuthContext";
+import LoginRegisterForm from "../../src/react/components/auth/LoginRegisterForm";
+import LogoutForm from "../../src/react/components/auth/LogoutForm";
 
-beforeEach(() => {
-  globalThis.fetch = vi.fn().mockImplementation(() =>
-    Promise.resolve({
-      json: () => Promise.resolve([]),
-    }),
-  );
-
-  vi.spyOn(window, "alert").mockImplementation(() => {});
-});
+import { mockFetch, mockUseAuth, stubRoute } from "./utils";
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe("React auth components", () => {
-  test("<AuthProvider />", async () => {
-    const Consumer = () => {
-      const { login, logout, register } = useAuth();
+  describe("<AuthProvider />", () => {
+    beforeEach(() => {
+      mockFetch();
+    });
+    it("should render its children", async () => {
+      const Stub = stubRoute("/", () => (
+        <AuthProvider>hello, world!</AuthProvider>
+      ));
 
-      login({ email: "foo@mail.com", password: "123456" });
-      logout();
-      register({
-        email: "foo@mail.com",
-        password: "123456",
-        confirmPassword: "123456",
-      });
+      render(<Stub initialEntries={["/"]} />);
 
-      return <p>hello, world!</p>;
-    };
+      await waitFor(() => screen.getByText("hello, world!"));
+    });
+    it("should fetch /api/me on mount", async () => {
+      const Stub = stubRoute("/", () => (
+        <AuthProvider>hello, world!</AuthProvider>
+      ));
 
-    await act(async () => {
-      render(
-        <AuthProvider>
-          <Consumer />
-        </AuthProvider>,
-        {
-          wrapper: BrowserRouter,
-        },
+      render(<Stub initialEntries={["/"]} />);
+
+      expect(globalThis.fetch).toHaveBeenCalledWith("/api/me");
+    });
+  });
+  describe("useAuth()", () => {
+    beforeEach(() => {
+      mockFetch();
+    });
+    it("should be used within <AuthProvider>", async () => {
+      // Avoid exception noise in console
+      vi.spyOn(console, "error").mockImplementation(() => {});
+
+      expect(() => {
+        renderHook(() => useAuth());
+      }).toThrow(/\buseAuth\b.*\bwithin\b.*\bAuthProvider\b/i);
+    });
+    it("should return an auth object", async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+      const auth = result.current;
+
+      expect(auth).toBeDefined();
+    });
+    it("should return a check function", async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+      const auth = result.current;
+
+      expect(typeof auth.check).toBe("function");
+
+      expect(auth.check()).toBe(auth.user != null);
+    });
+    it("should return a login function", async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+      const auth = result.current;
+
+      expect(typeof auth.login).toBe("function");
+
+      auth.login({ email: "foo@mail.com", password: "secret" });
+
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "/api/access-tokens",
+        expect.objectContaining({
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: "foo@mail.com", password: "secret" }),
+        }),
       );
     });
+    it("should return a logout function", async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
-    expect(true).toBeTruthy();
+      const auth = result.current;
+
+      expect(typeof auth.logout).toBe("function");
+
+      auth.logout();
+
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "/api/access-tokens",
+        expect.objectContaining({
+          method: "delete",
+        }),
+      );
+    });
+    it("should return a register function", async () => {
+      const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+      const auth = result.current;
+
+      expect(typeof auth.register).toBe("function");
+
+      auth.register({
+        email: "foo@mail.com",
+        password: "secret",
+        confirmPassword: "secret",
+      });
+
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "/api/users",
+        expect.objectContaining({
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: "foo@mail.com",
+            password: "secret",
+            confirmPassword: "secret",
+          }),
+        }),
+      );
+    });
+  });
+  describe("<LoginRegisterForm />", () => {
+    it("should mount successfully", async () => {
+      mockUseAuth(null);
+
+      const Stub = stubRoute("/", LoginRegisterForm);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByTestId("login"));
+      await waitFor(() => screen.getByTestId("register"));
+    });
+    it("should submit form login", async () => {
+      const [auth] = mockUseAuth(null);
+
+      const Stub = stubRoute("/", LoginRegisterForm);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByTestId("login"));
+
+      const user = userEvent.setup();
+
+      await user.type(screen.getByLabelText(/^email$/i), "foo@mail.com");
+      await user.type(screen.getByLabelText(/^password$/i), "secret");
+      await user.click(screen.getByTestId("login"));
+
+      expect(auth.login).toHaveBeenCalledWith({
+        email: "foo@mail.com",
+        password: "secret",
+      });
+    });
+    it("should submit form register", async () => {
+      const [auth] = mockUseAuth(null);
+
+      const Stub = stubRoute("/", LoginRegisterForm);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByTestId("register"));
+
+      const user = userEvent.setup();
+
+      await user.type(screen.getByLabelText(/^email$/i), "foo@mail.com");
+      await user.type(screen.getByLabelText(/^password$/i), "secret");
+      await user.type(screen.getByLabelText(/^confirm\spassword$/i), "secret");
+      await user.click(screen.getByTestId("register"));
+
+      expect(auth.register).toHaveBeenCalledWith({
+        email: "foo@mail.com",
+        password: "secret",
+        confirmPassword: "secret",
+      });
+    });
+  });
+  describe("<LogoutForm />", () => {
+    it("should mount successfully", async () => {
+      mockUseAuth({ id: 1, email: "foo@mail.com" });
+
+      const Stub = stubRoute("/", LogoutForm);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByRole("button"));
+    });
+    it("should submit form logout", async () => {
+      const [auth] = mockUseAuth({ id: 1, email: "foo@mail.com" });
+
+      const Stub = stubRoute("/", LogoutForm);
+
+      render(<Stub initialEntries={["/"]} />);
+
+      await waitFor(() => screen.getByRole("button"));
+
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole("button"));
+
+      expect(auth.logout).toHaveBeenCalled();
+    });
   });
 });

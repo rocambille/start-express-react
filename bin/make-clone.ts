@@ -89,12 +89,12 @@ async function main() {
 
     await replaceInsideFile(destPath, oldName, newName);
 
-    console.log(`✅ Cloned file ${srcPath} → ${destPath}`);
+    console.info(`✅ Cloned file ${srcPath} → ${destPath}`);
   } else if (stat.isDirectory()) {
     // ✅ Handle folder cloning
     await fs.copy(srcPath, destPath);
     await walkAndReplace(destPath, oldName, newName);
-    console.log(`✅ Cloned folder ${srcPath} → ${destPath}`);
+    console.info(`✅ Cloned folder ${srcPath} → ${destPath}`);
   } else {
     console.error("❌ Source is neither a file nor a directory.");
     process.exit(1);

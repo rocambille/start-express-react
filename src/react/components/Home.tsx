@@ -5,10 +5,20 @@ function Home() {
 
   return (
     <>
-      <h1>Home</h1>
-      <p>Lorem Ipsum</p>
+      <hgroup>
+        <h1>StartER</h1>
+        <p>
+          <a
+            href="https://github.com/rocambille/start-express-react/wiki/home-en-US"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn more
+          </a>
+        </p>
+      </hgroup>
       <div>
-        <div>{count}</div>
+        <p data-testid="count-value">{count}</p>
         <button type="button" onClick={() => setCount(count + 1)}>
           Count
         </button>

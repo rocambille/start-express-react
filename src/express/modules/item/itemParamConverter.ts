@@ -10,8 +10,8 @@ declare global {
   }
 }
 
-const convert: RequestParamHandler = async (req, res, next, id) => {
-  const item = await itemRepository.read(+id);
+const convert: RequestParamHandler = async (req, res, next, itemId) => {
+  const item = await itemRepository.read(+itemId);
 
   if (item == null) {
     res.sendStatus(req.method === "DELETE" ? 204 : 404);

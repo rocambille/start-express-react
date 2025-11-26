@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
-import useItems from "./useItems";
+import { useItems } from "./hooks";
 
 function ItemList() {
   const auth = useAuth();
@@ -10,7 +10,11 @@ function ItemList() {
   return (
     <>
       <h1>Items</h1>
-      {auth.user && <Link to="/items/new">Ajouter</Link>}
+      {auth.check() && (
+        <Link to="/items/new" data-testid="items-new">
+          Ajouter
+        </Link>
+      )}
       <ul>
         {items.map((item) => (
           <li key={item.id}>

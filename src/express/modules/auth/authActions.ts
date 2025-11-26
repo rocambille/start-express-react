@@ -49,10 +49,6 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   // Everything is ok
 
-  const { password: _password, ...userWithoutInsertId } = req.body;
-
-  const user = { ...userWithoutInsertId, insertId };
-
   const token = await jwt.sign(
     {
       sub: insertId,
@@ -65,7 +61,7 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   res.cookie("auth", token, cookieOptions);
 
-  res.status(201).json(user);
+  res.status(201).json({ insertId });
 };
 
 /* ************************************************************************ */
