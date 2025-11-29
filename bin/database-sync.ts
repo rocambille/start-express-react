@@ -20,7 +20,7 @@ const rl = readline.createInterface({
 // Get variables from .env file for database connection
 const { MYSQL_ROOT_PASSWORD, MYSQL_DATABASE } = process.env;
 
-let databaseClient = null as mysql.Connection | null;
+let databaseClient: mysql.Connection | null = null;
 
 // Asks the user for confirmation.
 async function confirm(question: string): Promise<boolean> {

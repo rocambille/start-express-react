@@ -15,10 +15,10 @@ type AuthContextType = {
   register: (credentials: Credentials & { confirmPassword: string }) => void;
 };
 
-const AuthContext = createContext(null as AuthContextType | null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState(null as User | null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetch("/api/me")

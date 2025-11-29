@@ -92,7 +92,9 @@ async function createServer() {
     } catch (err) {
       // If an error is caught, let Vite fix the stack trace so it maps back
       // to your actual source code.
-      maybeVite?.ssrFixStacktrace(err as Error);
+      if (err instanceof Error) {
+        maybeVite?.ssrFixStacktrace(err);
+      }
       next(err);
     }
   });

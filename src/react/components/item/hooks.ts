@@ -10,7 +10,7 @@ export const useItems = () => {
 
   // browse
 
-  const items = use(cache("/api/items")) as Item[];
+  const items = use<Item[]>(cache("/api/items"));
 
   // read
 

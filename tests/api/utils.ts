@@ -1,87 +1,168 @@
-import type { FieldPacket, QueryOptions } from "mysql2";
-import databaseClient, {
-  type Result,
-  type Rows,
-} from "../../src/database/client";
+import express, { type ErrorRequestHandler } from "express";
+import jwt, { type JwtPayload } from "jsonwebtoken";
+import type { QueryOptions } from "mysql2";
+import supertest from "supertest";
 
-export const mockedData: { item: Item[]; user: User[] } = {
+import databaseClient from "../../src/database/client";
+import routes from "../../src/express/routes";
+
+// -------------------------
+// Mocked DB content
+// -------------------------
+export const mockedData = {
   item: [{ id: 1, title: "foo", user_id: 1 }],
   user: [{ id: 1, email: "foo@mail.com" }],
 };
 
+// Allows a clean slate per test
+export const resetMockData = () => {
+  mockedData.item = [{ id: 1, title: "foo", user_id: 1 }];
+  mockedData.user = [{ id: 1, email: "foo@mail.com" }];
+};
+
 export const mockedInsertId = 42;
 
+// -------------------------
+// DB mock
+// -------------------------
 export const mockDatabaseClient = () => {
   databaseClient.query = vi
     .fn()
     .mockImplementation(
       async (sqlOrOptions: string | QueryOptions, values?: unknown) => {
-        const sql =
+        let sql =
           typeof sqlOrOptions === "string" ? sqlOrOptions : sqlOrOptions.sql;
 
-        if (sql.match(/\binsert\b/i)) {
-          return [{ insertId: 42 } as Result, [] as FieldPacket[]];
-        }
-        if (sql.match(/\bselect\b/i)) {
-          const tableName = sql.match(/\bfrom\s([A-Za-z][\w]*)/i)?.at(1) as
-            | null
-            | keyof typeof mockedData;
-
-          if (tableName != null) {
-            const table = mockedData[tableName];
-
-            if (sql.match(/\bwhere\s*id\s*=/i)) {
-              return [
-                table.filter(
-                  ({ id }) => id === (values as number[]).at(0),
-                ) as Rows,
-                [] as FieldPacket[],
-              ];
-            }
-
-            return [table as Rows, [] as FieldPacket[]];
-          }
-        }
-        if (sql.match(/\bupdate\b/i)) {
-          const tableName = sql.match(/\bupdate\s([A-Za-z][\w]*)/i)?.at(1) as
-            | null
-            | keyof typeof mockedData;
-
-          if (tableName != null) {
-            const table = mockedData[tableName];
-
-            if (sql.match(/\bwhere\s*id\s*=/i)) {
-              return [
-                table.find(({ id }) => id === (values as number[]).at(-1)) !=
-                null
-                  ? { affectedRows: 1 }
-                  : { affectedRows: 0 },
-                [] as FieldPacket[],
-              ];
-            }
-          }
-        }
-        if (sql.match(/\bdelete\b/i)) {
-          const tableName = sql.match(/\bfrom\s([A-Za-z][\w]*)/i)?.at(1) as
-            | null
-            | keyof typeof mockedData;
-
-          if (tableName != null) {
-            const table = mockedData[tableName];
-
-            if (sql.match(/\bwhere\s*id\s*=/i)) {
-              return [
-                table.find(({ id }) => id === (values as number[]).at(0)) !=
-                null
-                  ? { affectedRows: 1 }
-                  : { affectedRows: 0 },
-                [] as FieldPacket[],
-              ];
-            }
+        if (Array.isArray(values)) {
+          for (const value of values as unknown[]) {
+            sql = sql.replace(/\?/, new Object(value).toString());
           }
         }
 
-        throw new Error(`Unhandled query: ${sql}`);
+        // INSERT -----------------------------------
+        if (/\binsert\b/i.test(sql)) {
+          return [{ insertId: mockedInsertId }, []];
+        }
+
+        // SELECT -----------------------------------
+        if (/\bselect\b/i.test(sql)) {
+          const mayBeTable = sql.match(/\bfrom\s+(\w+)/i)?.[1];
+
+          if (!mayBeTable || !Object.hasOwn(mockedData, mayBeTable)) {
+            throw new Error(`Unrecognized table in query: ${sql}`);
+          }
+
+          const table: keyof typeof mockedData =
+            mayBeTable as keyof typeof mockedData;
+
+          // WHERE id = ?
+          if (/\bwhere\s+id\s*=/i.test(sql)) {
+            const id = sql.match(/\s+id\s*=\s*([^\s]+)/)?.at(1);
+
+            return [
+              mockedData[table].filter((row) => row.id === Number(id)),
+              [],
+            ];
+          }
+
+          // WHERE email = ?
+          if (/\bwhere\s+email\s*=/i.test(sql)) {
+            const email = sql.match(/\s+email\s*=\s*([^\s]+)/)?.at(1);
+
+            return [
+              mockedData[table].filter(
+                (row) =>
+                  ((
+                    row as {
+                      email?: string;
+                    }
+                  ).email ?? "") === email,
+              ),
+              [],
+            ];
+          }
+
+          return [mockedData[table], []];
+        }
+
+        // UPDATE -----------------------------------
+        if (/\bupdate\b/i.test(sql)) {
+          const mayBeTable = sql.match(/\bupdate\s+(\w+)/i)?.[1];
+
+          if (!mayBeTable || !Object.hasOwn(mockedData, mayBeTable)) {
+            throw new Error(`Unrecognized table in query: ${sql}`);
+          }
+
+          const table: keyof typeof mockedData =
+            mayBeTable as keyof typeof mockedData;
+
+          const id = sql.match(/\s+id\s*=\s*([^\s]+)/)?.at(1);
+
+          return [
+            {
+              affectedRows: mockedData[table].some(
+                (row) => row.id === Number(id),
+              )
+                ? 1
+                : 0,
+            },
+            [],
+          ];
+        }
+
+        // DELETE -----------------------------------
+        if (/\bdelete\b/i.test(sql)) {
+          const mayBeTable = sql.match(/\bfrom\s+(\w+)/i)?.[1];
+
+          if (!mayBeTable || !Object.hasOwn(mockedData, mayBeTable)) {
+            throw new Error(`Unrecognized table in query: ${sql}`);
+          }
+
+          const table: keyof typeof mockedData =
+            mayBeTable as keyof typeof mockedData;
+
+          const id = sql.match(/\s+id\s*=\s*([^\s]+)/)?.at(1);
+
+          return [
+            {
+              affectedRows: mockedData[table].some(
+                (row) => row.id === Number(id),
+              )
+                ? 1
+                : 0,
+            },
+            [],
+          ];
+        }
+
+        throw new Error(`Unhandled SQL query: ${sql}`);
       },
     );
 };
+
+// -------------------------
+// JWT.verify mock
+// -------------------------
+export const mockJwtVerify = (sub: string) => {
+  return vi
+    .spyOn(jwt, "verify")
+    .mockImplementation((): JwtPayload => ({ sub }));
+};
+
+// -------------------------
+// Express app for tests
+// -------------------------
+const app = express();
+app.use(routes);
+
+// Log server-side errors for debugging
+const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
+  console.error("Express error:", err);
+  console.error("Request:", req.method, req.path);
+  next(err);
+};
+
+app.use(logErrors);
+
+// Wrapper for supertest
+export const api = supertest(app);

@@ -19,36 +19,50 @@ class UserRepository {
 
   // The Rs of CRUD - Read operations
 
-  async read(id: number) {
+  async read(byId: number): Promise<User | null> {
     // Execute the SQL SELECT query to retrieve a specific user by its ID
     const [rows] = await databaseClient.query<Rows>(
       "select id, email from user where id = ? and deleted_at is null",
-      [id],
+      [byId],
     );
 
     // Return the first row of the result, which represents the user
-    return rows[0] as User | null;
+    if (rows[0] == null) {
+      return null;
+    }
+
+    const { id, email } = rows[0];
+
+    return { id, email };
   }
 
-  async readAll() {
+  async readAll(): Promise<User[]> {
     // Execute the SQL SELECT query to retrieve all users from the "user" table
     const [rows] = await databaseClient.query<Rows>(
       "select id, email from user where deleted_at is null",
     );
 
     // Return the array of users
-    return rows as User[];
+    return rows.map<User>(({ id, email }) => ({ id, email }));
   }
 
-  async readByEmailWithPassword(email: string) {
+  async readByEmailWithPassword(
+    byEmail: string,
+  ): Promise<UserWithPassword | null> {
     // Execute the SQL SELECT query to retrieve a specific user by its email
     const [rows] = await databaseClient.query<Rows>(
-      "select * from user where email = ?",
-      [email],
+      "select id, email, password from user where email = ?",
+      [byEmail],
     );
 
     // Return the first row of the result, which represents the user
-    return rows[0] as UserWithPassword | null;
+    if (rows[0] == null) {
+      return null;
+    }
+
+    const { id, email, password } = rows[0];
+
+    return { id, email, password };
   }
 
   // The U of CRUD - Update operation

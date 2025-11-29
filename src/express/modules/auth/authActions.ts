@@ -13,6 +13,12 @@ declare global {
   }
 }
 
+const appSecret = process.env.APP_SECRET;
+
+if (appSecret == null) {
+  throw new Error("process.env.APP_SECRET is not defined");
+}
+
 /* ************************************************************************ */
 
 // Options de hachage (voir documentation : https://github.com/ranisalt/node-argon2/wiki/Options)
@@ -49,15 +55,13 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   // Everything is ok
 
-  const token = await jwt.sign(
-    {
-      sub: insertId,
-    },
-    process.env.APP_SECRET as string,
-    {
-      expiresIn: "1h",
-    },
-  );
+  const payload: typeof req.auth = {
+    sub: insertId.toString(),
+  };
+
+  const token = await jwt.sign(payload, appSecret, {
+    expiresIn: "1h",
+  });
 
   res.cookie("auth", token, cookieOptions);
 
@@ -94,15 +98,13 @@ const createAccessToken: RequestHandler = async (req, res) => {
 
   const { password: _password, ...user } = userWithPassword;
 
-  const token = await jwt.sign(
-    {
-      sub: user.id,
-    },
-    process.env.APP_SECRET as string,
-    {
-      expiresIn: "1h",
-    },
-  );
+  const payload: typeof req.auth = {
+    sub: user.id.toString(),
+  };
+
+  const token = await jwt.sign(payload, appSecret, {
+    expiresIn: "1h",
+  });
 
   res.cookie("auth", token, cookieOptions);
 
@@ -132,10 +134,7 @@ const verifyAccessToken: RequestHandler[] = [
 
       // Vérifier la validité du token (son authenticité et sa date d'expériation)
       // En cas de succès, le payload est extrait et décodé
-      req.auth = jwt.verify(
-        token,
-        process.env.APP_SECRET as string,
-      ) as JwtPayload;
+      req.auth = jwt.verify(token, appSecret) as typeof req.auth;
 
       next();
     } catch (_err) {

@@ -11,7 +11,9 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
   return (
     <form
       action={(formData) => {
-        const title = formData.get("title") as string;
+        const title = formData.get("title")?.toString() ?? "";
+
+        // Data should be validated here
 
         action({ title });
       }}
