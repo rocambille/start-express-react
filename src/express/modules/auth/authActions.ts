@@ -5,10 +5,36 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import userRepository from "../user/userRepository";
 
+const appSecret = process.env.APP_SECRET;
+
+if (appSecret == null) {
+  throw new Error("process.env.APP_SECRET is not defined");
+}
+
+class Auth<Payload extends JwtPayload | string = JwtPayload> {
+  #secret: string;
+
+  constructor(secret: string) {
+    this.#secret = secret;
+  }
+
+  async sign(payload: Payload): Promise<string> {
+    return await jwt.sign(payload, this.#secret, {
+      expiresIn: "1h",
+    });
+  }
+
+  verify(token: string): Payload {
+    return jwt.verify(token, this.#secret) as Payload;
+  }
+}
+
+const auth = new Auth(appSecret);
+
 declare global {
   namespace Express {
     export interface Request {
-      auth: JwtPayload;
+      auth: ReturnType<typeof auth.verify>;
     }
   }
 }
@@ -49,15 +75,7 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   // Everything is ok
 
-  const token = await jwt.sign(
-    {
-      sub: insertId,
-    },
-    process.env.APP_SECRET as string,
-    {
-      expiresIn: "1h",
-    },
-  );
+  const token = await auth.sign({ sub: insertId.toString() });
 
   res.cookie("auth", token, cookieOptions);
 
@@ -94,15 +112,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
 
   const { password: _password, ...user } = userWithPassword;
 
-  const token = await jwt.sign(
-    {
-      sub: user.id,
-    },
-    process.env.APP_SECRET as string,
-    {
-      expiresIn: "1h",
-    },
-  );
+  const token = await auth.sign({ sub: user.id.toString() });
 
   res.cookie("auth", token, cookieOptions);
 
@@ -132,10 +142,7 @@ const verifyAccessToken: RequestHandler[] = [
 
       // Vérifier la validité du token (son authenticité et sa date d'expériation)
       // En cas de succès, le payload est extrait et décodé
-      req.auth = jwt.verify(
-        token,
-        process.env.APP_SECRET as string,
-      ) as JwtPayload;
+      req.auth = auth.verify(token);
 
       next();
     } catch (_err) {

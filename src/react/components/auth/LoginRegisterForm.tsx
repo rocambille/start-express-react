@@ -6,12 +6,14 @@ function LoginRegisterForm() {
   return (
     <form
       action={(formData) => {
-        const email = formData.get("email") as string;
+        const email = formData.get("email")?.toString() ?? "";
+        const password = formData.get("password")?.toString() ?? "";
 
-        const password = formData.get("password") as string;
+        // Data should be validated here
 
         if (formData.get("register") != null) {
-          const confirmPassword = formData.get("confirmPassword") as string;
+          const confirmPassword =
+            formData.get("confirmPassword")?.toString() ?? "";
 
           register({ email, password, confirmPassword });
         } else {

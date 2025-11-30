@@ -118,7 +118,9 @@ export const mockUseAuth = (user: User | null) => {
 
   const spy = vi.spyOn(AuthContext, "useAuth").mockImplementation(() => auth);
 
-  return [auth, spy] as [typeof auth, typeof spy];
+  const result: [typeof auth, typeof spy] = [auth, spy];
+
+  return result;
 };
 
 export const mockUseItems = (params?: { id: string }) => {
@@ -134,7 +136,9 @@ export const mockUseItems = (params?: { id: string }) => {
     .spyOn(itemHooks, "useItems")
     .mockImplementation(() => itemsStuff);
 
-  return [itemsStuff, spy] as [typeof itemsStuff, typeof spy];
+  const result: [typeof itemsStuff, typeof spy] = [itemsStuff, spy];
+
+  return result;
 };
 
 type StubRouteObject = Parameters<typeof createRoutesStub>[0][number];
@@ -155,23 +159,20 @@ export const stubRoute = (
     },
   ]);
 
-type RenderParameters = Parameters<typeof render>;
-
 // Wrapping render in act is required here because useItems is suspending
 // see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
 export const renderAsync = async (
-  ui: RenderParameters[0],
-  options?: RenderParameters[1],
+  ui: Parameters<typeof render>[0],
+  options?: Parameters<typeof render>[1],
 ) => await act(async () => render(ui, options));
-
-type RenderHookParameters = Parameters<typeof renderHook>;
 
 // Wrapping render in act is required here because useItems is suspending
 // see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
-export const renderHookAsync = async <T extends RenderHookParameters[0]>(
-  render: T,
+export const renderHookAsync = async <
+  Result,
+  Props,
+  RenderHookParameters extends Parameters<typeof renderHook<Result, Props>>,
+>(
+  render: RenderHookParameters[0],
   options?: RenderHookParameters[1],
-) =>
-  (await act(async () => renderHook(render, options))) as {
-    result: { current: ReturnType<T> };
-  };
+) => await act(async () => renderHook<Result, Props>(render, options));

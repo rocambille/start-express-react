@@ -19,7 +19,9 @@ const validate: RequestHandler = (req, res, next) => {
 
     next();
   } catch (err) {
-    res.status(400).json((err as ZodError).issues);
+    const { issues } = err as ZodError;
+
+    res.status(400).json(issues);
   }
 };
 

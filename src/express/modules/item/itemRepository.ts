@@ -19,25 +19,31 @@ class ItemRepository {
 
   // The Rs of CRUD - Read operations
 
-  async read(id: number) {
+  async read(byId: number): Promise<Item | null> {
     // Execute the SQL SELECT query to retrieve a specific item by its ID
     const [rows] = await databaseClient.query<Rows>(
-      "select * from item where id = ? and deleted_at is null",
-      [id],
+      "select id, title, user_id from item where id = ? and deleted_at is null",
+      [byId],
     );
 
     // Return the first row of the result, which represents the item
-    return rows[0] as Item | null;
+    if (rows[0] == null) {
+      return null;
+    }
+
+    const { id, title, user_id } = rows[0];
+
+    return { id, title, user_id };
   }
 
-  async readAll() {
+  async readAll(): Promise<Item[]> {
     // Execute the SQL SELECT query to retrieve all items from the "item" table
     const [rows] = await databaseClient.query<Rows>(
-      "select * from item where deleted_at is null",
+      "select id, title, user_id from item where deleted_at is null",
     );
 
     // Return the array of items
-    return rows as Item[];
+    return rows.map<Item>(({ id, title, user_id }) => ({ id, title, user_id }));
   }
 
   // The U of CRUD - Update operation
