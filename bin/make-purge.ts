@@ -148,7 +148,7 @@ async function main() {
   const [, , keepAuth, ...unexpected] = process.argv;
 
   if ((keepAuth && keepAuth !== "--keep-auth") || unexpected.length > 0) {
-    console.error("Usage: npm run make:purge [--keep-auth]");
+    console.error("Usage: npm run make:purge [-- --keep-auth]");
     process.exit(1);
   }
 
