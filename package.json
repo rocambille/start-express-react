@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "starter",
-  "version": "2025.11.30",
+  "version": "2025.12.01",
   "main": "server.ts",
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
@@ -19,7 +19,7 @@
     "types:check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.7",
+    "@biomejs/biome": "2.3.8",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
@@ -35,9 +35,9 @@
     "fs-extra": "^11.3.2",
     "jsdom": "^27.2.0",
     "supertest": "^7.1.4",
-    "tsx": "^4.20.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
+    "vite": "^7.2.6",
     "vitest": "^4.0.14"
   },
   "dependencies": {
