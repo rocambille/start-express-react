@@ -2,23 +2,18 @@ import express, { Router } from "express";
 
 const router = Router().use(express.json());
 
-/* ************************************************************************ */
-
-import authRoutes from "./modules/auth/authRoutes";
-
-router.use(authRoutes);
+const importAndUse = async (path: string) =>
+  router.use((await import(path)).default);
 
 /* ************************************************************************ */
 
-import itemRoutes from "./modules/item/itemRoutes";
+router.get("/api", (_req, res) => {
+  res.send("hello, world!");
+});
 
-router.use(itemRoutes);
-
-/* ************************************************************************ */
-
-import userRoutes from "./modules/user/userRoutes";
-
-router.use(userRoutes);
+await importAndUse("./modules/auth/authRoutes");
+await importAndUse("./modules/item/itemRoutes");
+await importAndUse("./modules/user/userRoutes");
 
 /* ************************************************************************ */
 
