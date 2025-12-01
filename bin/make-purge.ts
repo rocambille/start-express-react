@@ -71,22 +71,24 @@ async function purgeItems() {
 
   // Remove item routes and imports from Express and React.
   await updateFile("src/express/routes.ts", (content) =>
-    content
-      .replace(`import itemRoutes from "./modules/item/itemRoutes";\n\n`, "")
-      .replace(`router.use(itemRoutes);\n\n`, ""),
+    content.replace(`await importAndUse("./modules/item/itemRoutes");\n`, ""),
   );
 
   await updateFile("src/react/routes.tsx", (content) =>
     content
       .replace(`import { itemRoutes } from "./components/item";\n`, "")
-      .replace(`      itemRoutes,\n`, ""),
+      .replace(`      ...itemRoutes,\n`, ""),
   );
 
-  // Remove item table and inserts from schema and types.
+  // Remove item table and inserts from schema, seeder and types.
   await updateFile("src/database/schema.sql", (content) => {
     const itemTableRegex = /create table item[\s\S]*?;\n\n/m;
+    return content.replace(itemTableRegex, "");
+  });
+
+  await updateFile("src/database/seeder.sql", (content) => {
     const itemInsertRegex = /insert into item[\s\S]*?;\n/m;
-    return content.replace(itemTableRegex, "").replace(itemInsertRegex, "");
+    return content.replace(itemInsertRegex, "");
   });
 
   await updateFile("src/types/index.d.ts", (content) =>
@@ -103,26 +105,29 @@ async function purgeItems() {
 async function purgeAuth() {
   console.info("\nPurging 'auth' and 'user' modules...");
   // Remove auth and user module files and related React components.
-  await remove("src/express/modules/user");
   await remove("src/express/modules/auth");
+  await remove("src/express/modules/user");
   await remove("src/react/components/auth");
+  await remove("tests/api/auth.test.ts");
   await remove("tests/api/users.test.ts");
   await remove("tests/react/auth.test.tsx");
 
   // Remove auth/user routes and imports from Express.
   await updateFile("src/express/routes.ts", (content) =>
     content
-      .replace(`import authRoutes from "./modules/auth/authRoutes";\n\n`, "")
-      .replace(`router.use(authRoutes);\n\n`, "")
-      .replace(`import userRoutes from "./modules/user/userRoutes";\n\n`, "")
-      .replace(`router.use(userRoutes);\n\n`, ""),
+      .replace(`await importAndUse("./modules/auth/authRoutes");\n`, "")
+      .replace(`await importAndUse("./modules/user/userRoutes");\n`, ""),
   );
 
-  // Remove user table and inserts from schema and types.
+  // Remove user table and inserts from schema, seeder and types.
   await updateFile("src/database/schema.sql", (content) => {
     const userTableRegex = /create table user[\s\S]*?;\n\n/m;
+    return content.replace(userTableRegex, "");
+  });
+
+  await updateFile("src/database/seeder.sql", (content) => {
     const userInsertRegex = /insert into user[\s\S]*?;\n\n/m;
-    return content.replace(userTableRegex, "").replace(userInsertRegex, "");
+    return content.replace(userInsertRegex, "");
   });
 
   await updateFile("src/types/index.d.ts", (content) =>
@@ -148,7 +153,7 @@ async function main() {
   const [, , keepAuth, ...unexpected] = process.argv;
 
   if ((keepAuth && keepAuth !== "--keep-auth") || unexpected.length > 0) {
-    console.error("Usage: npm run make:purge [--keep-auth]");
+    console.error("Usage: npm run make:purge [-- --keep-auth]");
     process.exit(1);
   }
 

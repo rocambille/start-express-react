@@ -125,12 +125,12 @@ Pour débuter, consultez les pages principales :
 | `docker compose up --build`                                     | Build et démarre les services (ajouter `-d` pour démarrer en mode détaché).      |
 | `docker compose -f compose.prod.yaml up --build -d`             | Build et démarre l'application en mode production.                               |
 | `docker compose logs -t`                                        | Affiche les logs avec timestamps.                                                |
-| `docker compose run --build --rm server npm run database:sync`  | Synchronise la base de données avec `src/database/schema.sql`.                   |
+| `docker compose run --build --rm server npm run database:sync`  | Synchronise la base de données avec `src/database/schema.sql` (`-- --use-seeder` pour remplir la base de données avec `src/database/seeder.sql`).                   |
 | `docker compose run --build --rm server npm run test`           | Exécute les tests.                                                               |
 | `npm run biome:check`                                           | Contrôle la qualité du code avec Biome (exécuté en pre-commit).                  |
 | `npm run types:check`                                           | Contrôle la cohérence des types TypeScript (exécuté en pre-commit).              |
 | `npm run make:clone <source> <destination> <OldName> <NewName>` | Clone un module ou un fichier en renommant automatiquement les identifiants.     |
-| `npm run make:purge`                                            | Supprime les modules par défaut (`--keep-auth` pour conserver `user` et `auth`). |
+| `npm run make:purge`                                            | Supprime les modules par défaut (`-- --keep-auth` pour conserver `user` et `auth`). |
 
 ## REST cheatsheet
 

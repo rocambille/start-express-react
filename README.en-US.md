@@ -131,7 +131,7 @@ To get started, see the main pages:
 
 | `docker compose logs -t` | Displays logs with timestamps. |
 
-| `docker compose run --build --rm server npm run database:sync` | Synchronizes the database with `src/database/schema.sql`. |
+| `docker compose run --build --rm server npm run database:sync` | Synchronizes the database with `src/database/schema.sql` (`-- --use-seeder` to insert data with ``src/database/seeder.sql``). |
 
 | `docker compose run --build --rm server npm run test` | Runs the tests. |
 
@@ -141,7 +141,7 @@ To get started, see the main pages:
 
 | `npm run make:clone <source> <destination> <OldName> <NewName>` | Clones a module or file, automatically renaming the identifiers. |
 
-| `npm run make:purge` | Removes default modules (`--keep-auth` to keep `user` and `auth`). |
+| `npm run make:purge` | Removes default modules (`-- --keep-auth` to keep `user` and `auth`). |
 
 ## REST cheatsheet
 

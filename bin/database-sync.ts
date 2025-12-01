@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const schema = path.join(__dirname, "../src/database/schema.sql");
+const seeder = path.join(__dirname, "../src/database/seeder.sql");
 
 // Setup readline for interactive confirmation.
 const rl = readline.createInterface({
@@ -29,6 +30,13 @@ async function confirm(question: string): Promise<boolean> {
 }
 
 async function main() {
+  const [, , useSeeder, ...unexpected] = process.argv;
+
+  if ((useSeeder && useSeeder !== "--use-seeder") || unexpected.length > 0) {
+    console.error("Usage: npm run database:sync [-- --use-seeder]");
+    process.exit(1);
+  }
+
   console.info(
     `This script will drop existing database '${MYSQL_DATABASE}' to create a new one.`,
   );
@@ -66,6 +74,16 @@ async function main() {
   console.info(
     `\nDatabase '${MYSQL_DATABASE}' in sync with '${path.normalize(schema)}' 🆙`,
   );
+
+  if (useSeeder) {
+    // Read the SQL statements from the seeder file
+    const sql = await fs.readFile(seeder, "utf8");
+
+    // Execute the SQL statements to seed the database
+    await databaseClient.query(sql);
+
+    console.info(`\nSeeded using '${path.normalize(seeder)}' 🌱`);
+  }
 }
 
 main()
