@@ -1,7 +1,7 @@
 import { use, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAuth } from "../auth/AuthContext";
-import { cache, invalidateCache } from "../utils";
+import { cache, csrfToken, invalidateCache } from "../utils";
 
 export const useItems = () => {
   const navigate = useNavigate();
@@ -25,13 +25,14 @@ export const useItems = () => {
   // edit
 
   const editItem = useCallback(
-    (partialItem: Omit<Item, "id" | "user_id">) => {
+    async (partialItem: Omit<Item, "id" | "user_id">) => {
       if (!auth.check()) return alert("Please log in");
 
       fetch(`/api/items/${id}`, {
         method: "put",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": await csrfToken(),
         },
         body: JSON.stringify(partialItem),
       }).then((response) => {
@@ -47,13 +48,14 @@ export const useItems = () => {
   // add
 
   const addItem = useCallback(
-    (partialItem: Omit<Item, "id" | "user_id">) => {
+    async (partialItem: Omit<Item, "id" | "user_id">) => {
       if (!auth.check()) return alert("Please log in");
 
       fetch("/api/items", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": await csrfToken(),
         },
         body: JSON.stringify(partialItem),
       })
@@ -72,11 +74,14 @@ export const useItems = () => {
 
   // delete
 
-  const deleteItem = useCallback(() => {
+  const deleteItem = useCallback(async () => {
     if (!auth.check()) return alert("Please log in");
 
     fetch(`/api/items/${id}`, {
       method: "delete",
+      headers: {
+        "X-CSRF-Token": await csrfToken(),
+      },
     }).then((response) => {
       if (response.status === 204) {
         invalidateCache("/api/items");

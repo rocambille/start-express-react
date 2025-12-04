@@ -6,13 +6,16 @@ import {
   useEffect,
   useState,
 } from "react";
+import { csrfToken } from "../utils";
 
 type AuthContextType = {
   user: User | null;
   check: () => boolean;
-  login: (credentials: Credentials) => void;
-  logout: () => void;
-  register: (credentials: Credentials & { confirmPassword: string }) => void;
+  login: (credentials: Credentials) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (
+    credentials: Credentials & { confirmPassword: string },
+  ) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,11 +35,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
       });
   }, []);
 
-  const login = useCallback((credentials: Credentials) => {
+  const login = useCallback(async (credentials: Credentials) => {
     fetch("/api/access-tokens", {
       method: "post",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRF-Token": await csrfToken(),
       },
       body: JSON.stringify(credentials),
     })
@@ -50,9 +54,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
       });
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     fetch("/api/access-tokens", {
       method: "delete",
+      headers: {
+        "X-CSRF-Token": await csrfToken(),
+      },
     }).then((response) => {
       if (response.status === 204) {
         setUser(null);
@@ -61,11 +68,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   const register = useCallback(
-    (credentials: Credentials & { confirmPassword: string }) => {
+    async (credentials: Credentials & { confirmPassword: string }) => {
       fetch("/api/users", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
+          "X-CSRF-Token": await csrfToken(),
         },
         body: JSON.stringify(credentials),
       })
