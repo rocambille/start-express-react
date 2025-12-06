@@ -20,3 +20,30 @@ export const invalidateCache = (basePath: string) => {
     }
   });
 };
+
+const csrfTokenExpiresIn = 30 * 1000; // 30s, renewable
+let expires = Date.now();
+
+export const csrfToken = async () => {
+  const getToken = async () => {
+    if (Date.now() > expires) {
+      return crypto.randomUUID();
+    } else {
+      return (await cookieStore.get("csrfToken"))?.value ?? crypto.randomUUID();
+    }
+  };
+
+  const token = await getToken();
+
+  expires = Date.now() + csrfTokenExpiresIn;
+
+  await cookieStore.set({
+    expires,
+    name: "_csrf_token",
+    path: "/",
+    sameSite: "strict",
+    value: token,
+  });
+
+  return token;
+};
