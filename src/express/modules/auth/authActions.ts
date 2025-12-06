@@ -132,7 +132,8 @@ const destroyAccessToken: RequestHandler = (_req, res) => {
 const verifyCsrfToken: RequestHandler = (req, res, next) => {
   if (
     req.method.match(/(post|put|patch|delete)/i) &&
-    req.headers["x-csrf-token"] !== req.cookies._csrf_token
+    (req.headers["x-csrf-token"] == null ||
+      req.headers["x-csrf-token"] !== req.cookies._csrf_token)
   ) {
     res.sendStatus(403);
     return;
