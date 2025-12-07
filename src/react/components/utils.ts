@@ -29,7 +29,9 @@ export const csrfToken = async () => {
     if (Date.now() > expires) {
       return crypto.randomUUID();
     } else {
-      return (await cookieStore.get("csrfToken"))?.value ?? crypto.randomUUID();
+      return (
+        (await cookieStore.get("x-csrf-token"))?.value ?? crypto.randomUUID()
+      );
     }
   };
 
@@ -39,7 +41,7 @@ export const csrfToken = async () => {
 
   await cookieStore.set({
     expires,
-    name: "_csrf_token",
+    name: "x-csrf-token",
     path: "/",
     sameSite: "strict",
     value: token,

@@ -4,6 +4,13 @@ import { createRoutesStub } from "react-router";
 import * as AuthContext from "../../src/react/components/auth/AuthContext";
 import * as itemHooks from "../../src/react/components/item/hooks";
 
+export const mockedRandomUUID = "a-b-c-d-e";
+
+export const mockCsrfToken = () => {
+  vi.stubGlobal("cookieStore", { get: vi.fn(), set: vi.fn() });
+  vi.spyOn(crypto, "randomUUID").mockImplementation(() => mockedRandomUUID);
+};
+
 export const mockedItems = [{ id: 1, title: "foo", user_id: 1 }];
 
 export const mockedInsertId = 42;
