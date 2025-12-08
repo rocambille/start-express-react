@@ -1,5 +1,4 @@
 import argon2 from "argon2";
-import cookieParser from "cookie-parser";
 import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
@@ -129,27 +128,24 @@ const destroyAccessToken: RequestHandler = (_req, res) => {
 
 /* ************************************************************************ */
 
-const verifyAccessToken: RequestHandler[] = [
-  cookieParser(),
-  (req, res, next) => {
-    try {
-      // Vérifier la présence du token
-      const token = req.cookies.auth;
+const verifyAccessToken: RequestHandler = (req, res, next) => {
+  try {
+    // Vérifier la présence du token
+    const token = req.cookies.auth;
 
-      if (token == null) {
-        throw new Error("Access token is missing in cookies");
-      }
-
-      // Vérifier la validité du token (son authenticité et sa date d'expériation)
-      // En cas de succès, le payload est extrait et décodé
-      req.auth = auth.verify(token);
-
-      next();
-    } catch (_err) {
-      res.sendStatus(403);
+    if (token == null) {
+      throw new Error("Access token is missing in cookies");
     }
-  },
-];
+
+    // Vérifier la validité du token (son authenticité et sa date d'expériation)
+    // En cas de succès, le payload est extrait et décodé
+    req.auth = auth.verify(token);
+
+    next();
+  } catch (_err) {
+    res.sendStatus(403);
+  }
+};
 
 /* ************************************************************************ */
 

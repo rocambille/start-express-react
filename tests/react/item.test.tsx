@@ -10,8 +10,10 @@ import ItemList from "../../src/react/components/item/ItemList";
 import ItemShow from "../../src/react/components/item/ItemShow";
 
 import {
+  mockCsrfToken,
   mockedInsertId,
   mockedItems,
+  mockedRandomUUID,
   mockFetch,
   mockUseAuth,
   mockUseItems,
@@ -22,11 +24,13 @@ import {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("React item components", () => {
   describe("useItems", () => {
     beforeEach(() => {
+      mockCsrfToken();
       mockFetch();
     });
     it("should return items", async () => {
@@ -92,12 +96,20 @@ describe("React item components", () => {
         result.current.editItem({ title: "Updated item" });
       });
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         `/api/items/${mockedItems[0].id}`,
         expect.objectContaining({
           method: "put",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-Token": mockedRandomUUID,
           },
           body: JSON.stringify({ title: "Updated item" }),
         }),
@@ -125,12 +137,20 @@ describe("React item components", () => {
         result.current.addItem({ title: "New item" });
       });
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "/api/items",
         expect.objectContaining({
           method: "post",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-Token": mockedRandomUUID,
           },
           body: JSON.stringify({ title: "New item" }),
         }),
@@ -158,10 +178,20 @@ describe("React item components", () => {
         result.current.deleteItem();
       });
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         `/api/items/${mockedItems[0].id}`,
         expect.objectContaining({
           method: "delete",
+          headers: {
+            "X-CSRF-Token": mockedRandomUUID,
+          },
         }),
       );
 

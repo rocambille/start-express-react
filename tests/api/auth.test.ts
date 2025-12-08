@@ -7,6 +7,7 @@ import {
   mockedData,
   mockJwtVerify,
   resetMockData,
+  using,
 } from "./utils";
 
 beforeEach(() => {
@@ -19,14 +20,23 @@ afterEach(() => {
 });
 
 describe("POST /api/access-tokens", () => {
-  it("should return auth cookie successfully", async () => {
+  beforeEach(() => {
     // https://vitest.dev/guide/browser/#spying-on-module-exports
-    vi.mock("argon2");
+    vi.mock("argon2", { spy: true });
+  });
+  afterEach(() => {
+    // Need a deep restore
+    vi.mocked(argon2.verify).mockRestore();
+  });
+  it("should return auth cookie successfully", async () => {
     vi.mocked(argon2.verify).mockResolvedValue(true);
 
-    const response = await api
-      .post("/api/access-tokens")
-      .send({ email: mockedData.user[0].email, password: "whatever" });
+    const response = await using(
+      api
+        .post("/api/access-tokens")
+        .send({ email: mockedData.user[0].email, password: "whatever" }),
+      { withCsrf: true, withAuth: false },
+    );
 
     expect(response.status).toBe(201);
 
@@ -34,12 +44,32 @@ describe("POST /api/access-tokens", () => {
 
     expect(cookie).toMatch(/\bauth=.*;\s+HttpOnly;/i);
   });
-  it("should fail on invalid user", async () => {
-    const response = await api.post("/api/access-tokens").send({
-      email: "unknown@mail.com",
-      password: "whatever",
-    });
+  it("should fail without CSRF token", async () => {
+    vi.mocked(argon2.verify).mockResolvedValue(true);
 
+    const response = await using(
+      api
+        .post("/api/access-tokens")
+        .send({ email: mockedData.user[0].email, password: "whatever" }),
+      { withCsrf: false, withAuth: false },
+    );
+
+    expect(argon2.verify).not.toHaveBeenCalled();
+    expect(response.status).toBe(403);
+
+    const cookie = response.headers["set-cookie"]?.toString() ?? "";
+
+    expect(cookie).not.toMatch(/\bauth=.*/i);
+  });
+  it("should fail on invalid user", async () => {
+    const response = await using(
+      api
+        .post("/api/access-tokens")
+        .send({ email: "unknown@mail.com", password: "whatever" }),
+      { withCsrf: true, withAuth: false },
+    );
+
+    expect(argon2.verify).not.toHaveBeenCalled();
     expect(response.status).toBe(403);
 
     const cookie = response.headers["set-cookie"]?.toString() ?? "";
@@ -47,13 +77,16 @@ describe("POST /api/access-tokens", () => {
     expect(cookie).not.toMatch(/\bauth=.*/i);
   });
   it("should fail on invalid password", async () => {
-    vi.mock("argon2", { spy: true });
     vi.mocked(argon2.verify).mockResolvedValue(false);
 
-    const response = await api
-      .post("/api/access-tokens")
-      .send({ email: mockedData.user[0].email, password: "whatever" });
+    const response = await using(
+      api
+        .post("/api/access-tokens")
+        .send({ email: mockedData.user[0].email, password: "whatever" }),
+      { withCsrf: true, withAuth: false },
+    );
 
+    expect(argon2.verify).toHaveBeenCalled();
     expect(response.status).toBe(403);
 
     const cookie = response.headers["set-cookie"]?.toString() ?? "";
@@ -63,20 +96,26 @@ describe("POST /api/access-tokens", () => {
 });
 describe("GET /api/me", () => {
   it("should return the logged user", async () => {
-    mockJwtVerify(mockedData.user[0].id.toString());
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api.get("/api/me").set("Cookie", ["auth=token"]);
+    const response = await using(api.get("/api/me"), {
+      withCsrf: false,
+      withAuth: true,
+    });
 
+    expect(jwtVerify).toHaveBeenCalled();
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockedData.user[0]);
   });
-  it("should fail without cookie", async () => {
-    vi.spyOn(jwt, "verify").mockImplementation(() => {
-      throw new Error("should not be called");
+  it("should fail without access token", async () => {
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
+
+    const response = await using(api.get("/api/me"), {
+      withCsrf: false,
+      withAuth: false,
     });
 
-    const response = await api.get("/api/me");
-
+    expect(jwtVerify).not.toHaveBeenCalled();
     expect(response.status).toBe(403);
   });
   it("should fail with invalid token", async () => {
@@ -84,7 +123,10 @@ describe("GET /api/me", () => {
       throw new Error("invalid token");
     });
 
-    const response = await api.get("/api/me").set("Cookie", ["auth=token"]);
+    const response = await using(api.get("/api/me"), {
+      withCsrf: false,
+      withAuth: true,
+    });
 
     expect(response.status).toBe(403);
   });
