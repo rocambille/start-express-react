@@ -5,6 +5,7 @@ import {
   mockedInsertId,
   mockJwtVerify,
   resetMockData,
+  using,
 } from "./utils";
 
 beforeEach(() => {
@@ -40,17 +41,35 @@ describe("GET /api/users/:id", () => {
 });
 describe("POST /api/users", () => {
   it("should add a new user successfully", async () => {
-    const response = await api.post("/api/users").send({
-      email: "foo@mail.com",
-      password: "123456",
-      confirmPassword: "123456",
-    });
+    const response = await using(
+      api.post("/api/users").send({
+        email: "foo@mail.com",
+        password: "123456",
+        confirmPassword: "123456",
+      }),
+      { withCsrf: true, withAuth: false },
+    );
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual({ insertId: mockedInsertId });
   });
+  it("should fail without CSRF token", async () => {
+    const response = await using(
+      api.post("/api/users").send({
+        email: "foo@mail.com",
+        password: "123456",
+        confirmPassword: "123456",
+      }),
+      { withCsrf: false, withAuth: false },
+    );
+
+    expect(response.status).toBe(403);
+  });
   it("should fail on invalid request body", async () => {
-    const response = await api.post("/api/users").send({});
+    const response = await using(api.post("/api/users").send({}), {
+      withCsrf: true,
+      withAuth: false,
+    });
 
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Array);
@@ -61,39 +80,70 @@ describe("PUT /api/users/:id", () => {
   it("should update an existing user successfully", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .put(`/api/users/${mockedData.user[0].id}`)
-      .send({
+    const response = await using(
+      api.put(`/api/users/${mockedData.user[0].id}`).send({
         email: "foo@mail.com",
         password: "123456",
         confirmPassword: "123456",
-      })
-      .set("Cookie", ["auth=token"]);
+      }),
+      { withCsrf: true, withAuth: true },
+    );
 
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
   });
-  it("should fail on invalid authorization", async () => {
-    mockJwtVerify(mockedInsertId.toString());
+  it("should fail without CSRF token", async () => {
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .put(`/api/users/${mockedData.user[0].id}`)
-      .send({
+    const response = await using(
+      api.put(`/api/users/${mockedData.user[0].id}`).send({
         email: "foo@mail.com",
         password: "123456",
         confirmPassword: "123456",
-      })
-      .set("Cookie", ["auth=token"]);
+      }),
+      { withCsrf: false, withAuth: true },
+    );
 
+    expect(jwtVerify).not.toHaveBeenCalled();
+    expect(response.status).toBe(403);
+  });
+  it("should fail without access token", async () => {
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
+
+    const response = await using(
+      api.put(`/api/users/${mockedData.user[0].id}`).send({
+        email: "foo@mail.com",
+        password: "123456",
+        confirmPassword: "123456",
+      }),
+      { withCsrf: true, withAuth: false },
+    );
+
+    expect(jwtVerify).not.toHaveBeenCalled();
+    expect(response.status).toBe(403);
+  });
+  it("should fail on invalid authorization", async () => {
+    const jwtVerify = mockJwtVerify(mockedInsertId.toString());
+
+    const response = await using(
+      api.put(`/api/users/${mockedData.user[0].id}`).send({
+        email: "foo@mail.com",
+        password: "123456",
+        confirmPassword: "123456",
+      }),
+      { withCsrf: true, withAuth: true },
+    );
+
+    expect(jwtVerify).toHaveBeenCalled();
     expect(response.status).toBe(403);
   });
   it("should fail on invalid request body", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .put(`/api/users/${mockedData.user[0].id}`)
-      .send({})
-      .set("Cookie", ["auth=token"]);
+    const response = await using(
+      api.put(`/api/users/${mockedData.user[0].id}`).send({}),
+      { withCsrf: true, withAuth: true },
+    );
 
     expect(response.status).toBe(400);
     expect(response.body).toBeInstanceOf(Array);
@@ -102,66 +152,73 @@ describe("PUT /api/users/:id", () => {
   it("should fail on invalid id", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .put("/api/users/0")
-      .send({
+    const response = await using(
+      api.put("/api/users/0").send({
         email: "foo@mail.com",
         password: "123456",
         confirmPassword: "123456",
-      })
-      .set("Cookie", ["auth=token"]);
+      }),
+      { withCsrf: true, withAuth: true },
+    );
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({});
-  });
-  it("should fail without access token", async () => {
-    mockJwtVerify(mockedData.user[0].id.toString());
-
-    const response = await api.put(`/api/users/${mockedData.user[0].id}`).send({
-      email: "foo@mail.com",
-      password: "123456",
-      confirmPassword: "123456",
-    });
-
-    expect(response.status).toBe(403);
   });
 });
 describe("DELETE /api/users/:id", () => {
   it("should delete an existing user successfully", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .delete(`/api/users/${mockedData.user[0].id}`)
-      .set("Cookie", ["auth=token"]);
+    const response = await using(
+      api.delete(`/api/users/${mockedData.user[0].id}`),
+      { withCsrf: true, withAuth: true },
+    );
 
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
   });
+  it("should fail without CSRF token", async () => {
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
+
+    const response = await using(
+      api.delete(`/api/users/${mockedData.user[0].id}`),
+      { withCsrf: false, withAuth: true },
+    );
+
+    expect(jwtVerify).not.toHaveBeenCalled();
+    expect(response.status).toBe(403);
+  });
+  it("should fail without access token", async () => {
+    const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
+
+    const response = await using(
+      api.delete(`/api/users/${mockedData.user[0].id}`),
+      { withCsrf: true, withAuth: false },
+    );
+
+    expect(jwtVerify).not.toHaveBeenCalled();
+    expect(response.status).toBe(403);
+  });
   it("should fail on invalid authorization", async () => {
-    mockJwtVerify(mockedInsertId.toString());
+    const jwtVerify = mockJwtVerify(mockedInsertId.toString());
 
-    const response = await api
-      .delete(`/api/users/${mockedData.user[0].id}`)
-      .set("Cookie", ["auth=token"]);
+    const response = await using(
+      api.delete(`/api/users/${mockedData.user[0].id}`),
+      { withCsrf: true, withAuth: true },
+    );
 
+    expect(jwtVerify).toHaveBeenCalled();
     expect(response.status).toBe(403);
   });
   it("should not fail on invalid id", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
 
-    const response = await api
-      .delete("/api/users/0")
-      .set("Cookie", ["auth=token"]);
+    const response = await using(api.delete("/api/users/0"), {
+      withCsrf: true,
+      withAuth: true,
+    });
 
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
-  });
-  it("should fail without access token", async () => {
-    mockJwtVerify(mockedData.user[0].id.toString());
-
-    const response = await api.delete(`/api/users/${mockedData.user[0].id}`);
-
-    // Assertions
-    expect(response.status).toBe(403);
   });
 });

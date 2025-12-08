@@ -1,4 +1,10 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import {
@@ -8,15 +14,23 @@ import {
 import LoginRegisterForm from "../../src/react/components/auth/LoginRegisterForm";
 import LogoutForm from "../../src/react/components/auth/LogoutForm";
 
-import { mockFetch, mockUseAuth, stubRoute } from "./utils";
+import {
+  mockCsrfToken,
+  mockedRandomUUID,
+  mockFetch,
+  mockUseAuth,
+  stubRoute,
+} from "./utils";
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("React auth components", () => {
   describe("<AuthProvider />", () => {
     beforeEach(() => {
+      mockCsrfToken();
       mockFetch();
     });
     it("should render its children", async () => {
@@ -40,6 +54,7 @@ describe("React auth components", () => {
   });
   describe("useAuth()", () => {
     beforeEach(() => {
+      mockCsrfToken();
       mockFetch();
     });
     it("should be used within <AuthProvider>", async () => {
@@ -73,14 +88,25 @@ describe("React auth components", () => {
 
       expect(typeof auth.login).toBe("function");
 
-      auth.login({ email: "foo@mail.com", password: "secret" });
+      await act(
+        async () =>
+          await auth.login({ email: "foo@mail.com", password: "secret" }),
+      );
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "/api/access-tokens",
         expect.objectContaining({
           method: "post",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-Token": mockedRandomUUID,
           },
           body: JSON.stringify({ email: "foo@mail.com", password: "secret" }),
         }),
@@ -93,12 +119,22 @@ describe("React auth components", () => {
 
       expect(typeof auth.logout).toBe("function");
 
-      auth.logout();
+      await act(async () => await auth.logout());
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "/api/access-tokens",
         expect.objectContaining({
           method: "delete",
+          headers: {
+            "X-CSRF-Token": mockedRandomUUID,
+          },
         }),
       );
     });
@@ -109,18 +145,29 @@ describe("React auth components", () => {
 
       expect(typeof auth.register).toBe("function");
 
-      auth.register({
-        email: "foo@mail.com",
-        password: "secret",
-        confirmPassword: "secret",
-      });
+      await act(
+        async () =>
+          await auth.register({
+            email: "foo@mail.com",
+            password: "secret",
+            confirmPassword: "secret",
+          }),
+      );
 
+      expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
+        expires: expect.any(Number),
+        name: "x-csrf-token",
+        path: "/",
+        sameSite: "strict",
+        value: mockedRandomUUID,
+      });
       expect(globalThis.fetch).toHaveBeenCalledWith(
         "/api/users",
         expect.objectContaining({
           method: "post",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-Token": mockedRandomUUID,
           },
           body: JSON.stringify({
             email: "foo@mail.com",
