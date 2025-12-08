@@ -1,7 +1,7 @@
 import express, { type ErrorRequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import type { QueryOptions } from "mysql2";
-import supertest from "supertest";
+import supertest, { type Test } from "supertest";
 
 import databaseClient from "../../src/database/client";
 import routes from "../../src/express/routes";
@@ -166,3 +166,26 @@ app.use(logErrors);
 
 // Wrapper for supertest
 export const api = supertest(app);
+
+// Helper for call options
+export const using = (
+  apiCall: Test,
+  {
+    withAuth,
+    withCsrf,
+  }: {
+    withAuth: boolean;
+    withCsrf: boolean;
+  },
+) =>
+  withAuth && withCsrf
+    ? apiCall
+        .set("Cookie", ["auth=jwt", "x-csrf-token=a-b-c-d-e"])
+        .set("X-CSRF-Token", "a-b-c-d-e")
+    : withAuth
+      ? apiCall.set("Cookie", ["auth=jwt"])
+      : withCsrf
+        ? apiCall
+            .set("Cookie", ["x-csrf-token=a-b-c-d-e"])
+            .set("X-CSRF-Token", "a-b-c-d-e")
+        : apiCall;
