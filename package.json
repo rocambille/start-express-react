@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "starter",
-  "version": "2025.12.01",
+  "version": "2025.12.08",
   "main": "server.ts",
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
@@ -24,33 +24,33 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
-    "@types/express": "^5.0.5",
+    "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/supertest": "^6.0.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "@vitest/coverage-v8": "^4.0.14",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.15",
     "fs-extra": "^11.3.2",
     "jsdom": "^27.2.0",
     "supertest": "^7.1.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6",
-    "vitest": "^4.0.14"
+    "vite": "^7.2.7",
+    "vitest": "^4.0.15"
   },
   "dependencies": {
     "argon2": "^0.44.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.15.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router": "^7.9.6",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-router": "^7.10.1",
     "zod": "^4.1.13"
   }
 }
