@@ -77,7 +77,7 @@ In alphabetical order (non-exhaustive list):
 * [**MySQL**](https://dev.mysql.com/doc/refman/8.4/en/): relational database management system.
 * [**Pico CSS**](https://picocss.com/): minimalist and semantic CSS kit.
 * [**React Router (Mode Data)**](https://reactrouter.com/home): route manager for React.
-* TypeScript (https://www.typescriptlang.org/): JavaScript superset that adds static types.
+* [**TypeScript**](https://www.typescriptlang.org/): JavaScript superset that adds static types.
 * [**Vite**](https://vite.dev/guide/): a rapid build tool for development and production.
 * [**Vitest**](https://vitest.dev/guide/): testing framework integrated into Vite.
 * [**Zod**](https://zod.dev/) : validation and typing of TypeScript schemas.
