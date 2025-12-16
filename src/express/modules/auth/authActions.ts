@@ -53,6 +53,7 @@ const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: "strict",
+  maxAge: 60 * 60 * 1000, // 1h
 };
 
 /* ************************************************************************ */
@@ -76,7 +77,7 @@ const createUserAndAccessToken: RequestHandler = async (req, res) => {
 
   const token = await auth.sign({ sub: insertId.toString() });
 
-  res.cookie("auth", token, cookieOptions);
+  res.cookie("__Host-auth", token, cookieOptions);
 
   res.status(201).json({ insertId });
 };
@@ -91,7 +92,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
   );
 
   if (userWithPassword == null) {
-    res.sendStatus(403);
+    res.sendStatus(401);
     return;
   }
 
@@ -103,7 +104,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
   );
 
   if (!verified) {
-    res.sendStatus(403);
+    res.sendStatus(401);
     return;
   }
 
@@ -113,7 +114,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
 
   const token = await auth.sign({ sub: user.id.toString() });
 
-  res.cookie("auth", token, cookieOptions);
+  res.cookie("__Host-auth", token, cookieOptions);
 
   res.status(201).json(user);
 };
@@ -121,7 +122,7 @@ const createAccessToken: RequestHandler = async (req, res) => {
 /* ************************************************************************ */
 
 const destroyAccessToken: RequestHandler = (_req, res) => {
-  res.clearCookie("auth", cookieOptions);
+  res.clearCookie("__Host-auth", cookieOptions);
 
   res.sendStatus(204);
 };
@@ -143,7 +144,7 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
 
     next();
   } catch (_err) {
-    res.sendStatus(403);
+    res.sendStatus(401);
   }
 };
 

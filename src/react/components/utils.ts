@@ -30,7 +30,8 @@ export const csrfToken = async () => {
       return crypto.randomUUID();
     } else {
       return (
-        (await cookieStore.get("x-csrf-token"))?.value ?? crypto.randomUUID()
+        (await cookieStore.get("__Host-x-csrf-token"))?.value ??
+        crypto.randomUUID()
       );
     }
   };
@@ -41,7 +42,7 @@ export const csrfToken = async () => {
 
   await cookieStore.set({
     expires,
-    name: "x-csrf-token",
+    name: "__Host-x-csrf-token",
     path: "/",
     sameSite: "strict",
     value: token,

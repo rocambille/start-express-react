@@ -1,7 +1,7 @@
 import type { Request, RequestHandler } from "express";
 
 const csrfDefaults = {
-  cookieName: "x-csrf-token",
+  cookieName: "__Host-x-csrf-token",
   ignoredMethods: ["GET", "HEAD", "OPTIONS"],
   getCsrfTokenFromRequest: (req: Request) => req.headers["x-csrf-token"],
 };
@@ -18,7 +18,7 @@ export const csrf =
       (getCsrfTokenFromRequest(req) == null ||
         getCsrfTokenFromRequest(req) !== req.cookies[cookieName])
     ) {
-      res.sendStatus(403);
+      res.sendStatus(401);
       return;
     }
 
