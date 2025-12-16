@@ -55,7 +55,7 @@ describe("POST /api/access-tokens", () => {
     );
 
     expect(argon2.verify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
 
     const cookie = response.headers["set-cookie"]?.toString() ?? "";
 
@@ -70,7 +70,7 @@ describe("POST /api/access-tokens", () => {
     );
 
     expect(argon2.verify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
 
     const cookie = response.headers["set-cookie"]?.toString() ?? "";
 
@@ -87,7 +87,7 @@ describe("POST /api/access-tokens", () => {
     );
 
     expect(argon2.verify).toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
 
     const cookie = response.headers["set-cookie"]?.toString() ?? "";
 
@@ -116,7 +116,7 @@ describe("GET /api/me", () => {
     });
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail with invalid token", async () => {
     vi.spyOn(jwt, "verify").mockImplementation(() => {
@@ -128,6 +128,6 @@ describe("GET /api/me", () => {
       withAuth: true,
     });
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
 });

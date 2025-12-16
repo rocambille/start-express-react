@@ -95,7 +95,7 @@ describe("React auth components", () => {
 
       expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
         expires: expect.any(Number),
-        name: "x-csrf-token",
+        name: "__Host-x-csrf-token",
         path: "/",
         sameSite: "strict",
         value: mockedRandomUUID,
@@ -123,7 +123,7 @@ describe("React auth components", () => {
 
       expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
         expires: expect.any(Number),
-        name: "x-csrf-token",
+        name: "__Host-x-csrf-token",
         path: "/",
         sameSite: "strict",
         value: mockedRandomUUID,
@@ -156,7 +156,7 @@ describe("React auth components", () => {
 
       expect(globalThis.cookieStore.set).toHaveBeenCalledWith({
         expires: expect.any(Number),
-        name: "x-csrf-token",
+        name: "__Host-x-csrf-token",
         path: "/",
         sameSite: "strict",
         value: mockedRandomUUID,

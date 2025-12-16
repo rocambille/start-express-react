@@ -60,7 +60,7 @@ describe("POST /api/items", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail without access token", async () => {
     const jwtVerify = mockJwtVerify(mockedData.user[0].id.toString());
@@ -71,7 +71,7 @@ describe("POST /api/items", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail on invalid request body", async () => {
     mockJwtVerify(mockedData.user[0].id.toString());
@@ -107,7 +107,7 @@ describe("PUT /api/items/:id", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail without access token", async () => {
     const jwtVerify = mockJwtVerify(mockedData.item[0].user_id.toString());
@@ -118,7 +118,7 @@ describe("PUT /api/items/:id", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail on invalid authorization", async () => {
     const jwtVerify = mockJwtVerify(mockedInsertId.toString());
@@ -176,7 +176,7 @@ describe("DELETE /api/items/:id", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail without access token", async () => {
     const jwtVerify = mockJwtVerify(mockedData.item[0].user_id.toString());
@@ -187,7 +187,7 @@ describe("DELETE /api/items/:id", () => {
     );
 
     expect(jwtVerify).not.toHaveBeenCalled();
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
   });
   it("should fail on invalid authorization", async () => {
     const jwtVerify = mockJwtVerify(mockedInsertId.toString());

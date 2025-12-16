@@ -180,12 +180,12 @@ export const using = (
 ) =>
   withAuth && withCsrf
     ? apiCall
-        .set("Cookie", ["auth=jwt", "x-csrf-token=a-b-c-d-e"])
+        .set("Cookie", ["auth=jwt", "__Host-x-csrf-token=a-b-c-d-e"])
         .set("X-CSRF-Token", "a-b-c-d-e")
     : withAuth
       ? apiCall.set("Cookie", ["auth=jwt"])
       : withCsrf
         ? apiCall
-            .set("Cookie", ["x-csrf-token=a-b-c-d-e"])
+            .set("Cookie", ["__Host-x-csrf-token=a-b-c-d-e"])
             .set("X-CSRF-Token", "a-b-c-d-e")
         : apiCall;
