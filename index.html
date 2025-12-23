@@ -1,18 +1,69 @@
 <!DOCTYPE html>
+<!--
+  Purpose:
+  Base HTML template used for both development and production.
+
+  Responsibilities:
+  - Provide the root container for React
+  - Serve as the entry point for SSR and client hydration
+  - Define global layout, metadata, and base styles
+
+  Design notes:
+  - This file is intentionally minimal
+  - No dynamic logic lives here
+  - All rendering is delegated to React (SSR + hydration)
+
+  Related docs:
+  - https://vite.dev/guide/ssr#source-structure
+  - https://react.dev/reference/react-dom/client/hydrateRoot
+-->
 <html lang="fr">
   <head>
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Document metadata                                                 -->
+    <!-- ----------------------------------------------------------------- -->
+
     <meta charset="UTF-8" />
+
+    <!--
+      Responsive behavior is required for most modern layouts.
+      This keeps CSS frameworks and custom styles predictable.
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Start Express React</title>
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Assets                                                            -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!--
+      Favicon is served as a static asset by Vite in dev
+      and by the production static server after build.
+    -->
     <link
       rel="shortcut icon"
       href="/src/react/assets/images/favicon.webp"
       type="image/png"
     />
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Base styling                                                      -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!--
+      Pico.css is used as a lightweight, classless CSS framework.
+      It provides sensible defaults without enforcing a design system.
+    -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
     />
+
+    <!--
+      Local CSS variables allow small visual tweaks
+      without overriding or forking the framework.
+    -->
     <style>
       :root {
         --pico-border-radius: 2rem;
@@ -22,7 +73,31 @@
     </style>
   </head>
   <body>
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Application root                                                  -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!--
+      This is the single mounting point for the React application.
+
+      In SSR mode:
+      - The server injects rendered HTML here
+      - The client hydrates it on load
+
+      In client-only mode:
+      - React renders everything from scratch
+    -->
     <div class="container" id="root"><!--ssr-outlet--></div>
+
+    <!-- ----------------------------------------------------------------- -->
+    <!-- Client entry                                                      -->
+    <!-- ----------------------------------------------------------------- -->
+
+    <!--
+      Client-side entry point:
+      - Attaches React to the existing DOM
+      - Enables interactivity and navigation
+    -->
     <script type="module" src="/src/entry-client"></script>
   </body>
 </html>
