@@ -1,28 +1,76 @@
+/*
+  Purpose:
+  Centralize all item-related client logic in a single domain hook.
+
+  Responsibilities:
+  - Fetch and cache the item collection
+  - Derive a single item from the route parameters
+  - Expose mutation helpers (add / edit / delete)
+  - Handle navigation and cache invalidation after mutations
+
+  Design notes:
+  - Components remain declarative and dumb
+  - Network effects are explicit and localized
+  - Authentication is checked, never assumed
+  - Cache is the single source of truth for lists
+*/
+
 import { use, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
+
 import { useAuth } from "../auth/AuthContext";
 import { cache, csrfToken, invalidateCache } from "../utils";
 
+/* ************************************************************************ */
+/* Hooks                                                                    */
+/* ************************************************************************ */
+
 export const useItems = () => {
+  /*
+    Routing helpers:
+    - `navigate` handles post-mutation redirects
+  */
   const navigate = useNavigate();
 
+  /*
+    Authentication context:
+    - Used only as a gate before mutations
+  */
   const auth = useAuth();
 
-  // browse
+  /* ********************************************************************** */
+  /* Browse                                                                 */
+  /* ********************************************************************** */
 
+  /*
+    Items collection:
+    - Retrieved through the shared cache layer
+    - Suspends while loading (via `use`)
+    - Invalidated explicitly after mutations
+  */
   const items = use<Item[]>(cache("/api/items"));
 
-  // read
+  /* ********************************************************************** */
+  /* Read                                                                   */
+  /* ********************************************************************** */
 
   const { id } = useParams();
 
+  /*
+    Selected item:
+    - Derived from route params
+    - No additional fetch required
+    - Keeps list and detail views consistent
+  */
   const item: Item | undefined = useMemo(() => {
     if (id != null) {
       return items.find((item) => item.id === +id);
     }
   }, [id, items]);
 
-  // edit
+  /* ********************************************************************** */
+  /* Edit                                                                   */
+  /* ********************************************************************** */
 
   const editItem = useCallback(
     async (partialItem: Omit<Item, "id" | "user_id">) => {
@@ -45,7 +93,9 @@ export const useItems = () => {
     [auth.check, id, navigate],
   );
 
-  // add
+  /* ********************************************************************** */
+  /* Add                                                                    */
+  /* ********************************************************************** */
 
   const addItem = useCallback(
     async (partialItem: Omit<Item, "id" | "user_id">) => {
@@ -72,7 +122,9 @@ export const useItems = () => {
     [auth.check, navigate],
   );
 
-  // delete
+  /* ********************************************************************** */
+  /* Delete                                                                 */
+  /* ********************************************************************** */
 
   const deleteItem = useCallback(async () => {
     if (!auth.check()) return alert("Please log in");
@@ -90,7 +142,20 @@ export const useItems = () => {
     });
   }, [auth.check, id, navigate]);
 
-  // pack them all
+  /* ********************************************************************** */
+  /* Public API                                                             */
+  /* ********************************************************************** */
 
-  return { items, item, editItem, addItem, deleteItem };
+  /*
+    Expose a compact, intention-revealing API:
+    - Data (items, item)
+    - Mutations (edit, add, delete)
+  */
+  return {
+    items,
+    item,
+    editItem,
+    addItem,
+    deleteItem,
+  };
 };
