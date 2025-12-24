@@ -1,32 +1,77 @@
+/*
+  Purpose:
+  Centralize all persistence logic related to Item entities.
+
+  This repository:
+  - Is the single place that knows SQL details
+  - Exposes a minimal, explicit CRUD interface
+  - Enforces soft-deletion rules at the data-access level
+
+  What this file intentionally does NOT do:
+  - No authorization checks
+  - No HTTP concerns
+  - No business rules beyond persistence semantics
+
+  Design notes:
+  - Controllers and services rely on repository contracts
+  - SQL queries are explicit (no ORM, no magic)
+  - Soft delete is the default read behavior
+*/
+
 import databaseClient, {
   type Result,
   type Rows,
 } from "../../../database/client";
 
-class ItemRepository {
-  // The C of CRUD - Create operation
+/* ************************************************************************ */
+/* Repository                                                               */
+/* ************************************************************************ */
 
+class ItemRepository {
+  /* ********************************************************************** */
+  /* Create                                                                 */
+  /* ********************************************************************** */
+
+  /*
+    Insert a new item.
+
+    Contract:
+    - Expects a complete Item payload without `id`
+    - Returns the newly generated primary key
+
+    Notes:
+    - No validation here (done earlier in the pipeline)
+    - Assumes referential integrity (user_id exists)
+  */
   async create(item: Omit<Item, "id">) {
-    // Execute the SQL INSERT query to add a new item to the "item" table
     const [result] = await databaseClient.query<Result>(
       "insert into item (title, user_id) values (?, ?)",
       [item.title, item.user_id],
     );
 
-    // Return the ID of the newly inserted item
     return result.insertId;
   }
 
-  // The Rs of CRUD - Read operations
+  /* ********************************************************************** */
+  /* Read                                                                   */
+  /* ********************************************************************** */
 
+  /*
+    Read a single item by id.
+
+    Behavior:
+    - Ignores soft-deleted rows (`deleted_at is null`)
+    - Returns `null` when no matching item exists
+
+    Why null instead of throwing:
+    - Allows upper layers to decide HTTP semantics (404, 204, etc.)
+  */
   async read(byId: number): Promise<Item | null> {
-    // Execute the SQL SELECT query to retrieve a specific item by its ID
     const [rows] = await databaseClient.query<Rows>(
       "select id, title, user_id from item where id = ? and deleted_at is null",
       [byId],
     );
 
-    // Return the first row of the result, which represents the item
     if (rows[0] == null) {
       return null;
     }
@@ -36,63 +81,98 @@ class ItemRepository {
     return { id, title, user_id };
   }
 
+  /*
+    Read all non-deleted items.
+
+    Notes:
+    - No pagination here by design
+    - Meant to be composed or extended if needed
+  */
   async readAll(): Promise<Item[]> {
-    // Execute the SQL SELECT query to retrieve all items from the "item" table
     const [rows] = await databaseClient.query<Rows>(
       "select id, title, user_id from item where deleted_at is null",
     );
 
-    // Return the array of items
-    return rows.map<Item>(({ id, title, user_id }) => ({ id, title, user_id }));
+    return rows.map<Item>(({ id, title, user_id }) => ({
+      id,
+      title,
+      user_id,
+    }));
   }
 
-  // The U of CRUD - Update operation
+  /* ********************************************************************** */
+  /* Update                                                                 */
+  /* ********************************************************************** */
 
+  /*
+    Update an existing item.
+
+    Contract:
+    - Returns the number of affected rows
+    - Does not check existence beforehand
+
+    Why:
+    - Allows callers to decide how to interpret "0 rows affected"
+  */
   async update(id: number, item: Omit<Item, "id">) {
-    // Execute the SQL UPDATE query to update an existing item in the "item" table
     const [result] = await databaseClient.query<Result>(
-      "update item set title = ?, user_id = ? where id = ?",
+      "update item set title = ?, user_id = ? where id = ? and deleted_at is null",
       [item.title, item.user_id, id],
     );
 
-    // Return the number of affected rows
     return result.affectedRows;
   }
 
-  // The Ds of CRUD - Delete operations
+  /* ********************************************************************** */
+  /* Delete (soft & hard)                                                   */
+  /* ********************************************************************** */
 
+  /*
+    Soft delete an item.
+
+    Semantics:
+    - Marks the row as deleted without removing it
+    - Default read queries automatically ignore it
+  */
   async softDelete(id: number) {
-    // Execute the SQL UPDATE query to update an existing item in the "item" table
     const [result] = await databaseClient.query<Result>(
       "update item set deleted_at = now() where id = ?",
       [id],
     );
 
-    // Return the number of affected rows
     return result.affectedRows;
   }
 
+  /*
+    Restore a soft-deleted item.
+  */
   async softUndelete(id: number) {
-    // Execute the SQL UPDATE query to update an existing item in the "item" table
     const [result] = await databaseClient.query<Result>(
       "update item set deleted_at = null where id = ?",
       [id],
     );
 
-    // Return the number of affected rows
     return result.affectedRows;
   }
 
+  /*
+    Hard delete an item.
+
+    Warning:
+    - This permanently removes the row
+  */
   async hardDelete(id: number) {
-    // Execute the SQL DELETE query to delete a specific item by its ID
     const [result] = await databaseClient.query<Result>(
       "delete from item where id = ?",
       [id],
     );
 
-    // Return the number of affected rows
     return result.affectedRows;
   }
 }
+
+/* ************************************************************************ */
+/* Export                                                                   */
+/* ************************************************************************ */
 
 export default new ItemRepository();

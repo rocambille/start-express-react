@@ -17,14 +17,11 @@
   - https://expressjs.com/en/guide/using-middleware.html
 */
 
-import cookieParser from "cookie-parser";
-import { json, Router } from "express";
-
-import { csrf } from "./middlewares";
-
 /* ************************************************************************ */
 /* Router initialization                                                    */
 /* ************************************************************************ */
+
+import { Router } from "express";
 
 /*
   A single root router is used for the entire API.
@@ -35,6 +32,11 @@ const router = Router();
 /* ************************************************************************ */
 /* Global middlewares                                                       */
 /* ************************************************************************ */
+
+import cookieParser from "cookie-parser";
+import { json } from "express";
+
+import { csrf } from "./middlewares";
 
 /*
   Middleware order matters:

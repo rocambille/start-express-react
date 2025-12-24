@@ -1,16 +1,69 @@
-import type { RequestHandler } from "express";
+/*
+  Purpose:
+  Validate and normalize incoming Item payloads for mutative requests.
+
+  This validator:
+  - Enforces shape and constraints of Item DTOs
+  - Injects trusted server-side data (user_id)
+  - Acts as a boundary between untrusted input and business logic
+
+  What this file intentionally does NOT do:
+  - No authorization checks (handled elsewhere)
+  - No persistence logic
+  - No HTTP routing decisions
+
+  Design notes:
+  - Validation happens as early as possible in the request pipeline
+  - Zod is used for explicit, composable schemas
+  - Parsed data replaces req.body to guarantee type safety downstream
+
+  Related docs:
+  - https://zod.dev/
+*/
+
+/* ************************************************************************ */
+/* Schema                                                                   */
+/* ************************************************************************ */
+
 import { type ZodError, z } from "zod";
 
+/*
+  Item Data Transfer Object (DTO)
+
+  Notes:
+  - `id` is optional to allow reuse for different operations
+  - `user_id` is NOT trusted from the client:
+    it will always be overridden by the authenticated user
+*/
 const itemDTOSchema = z.object({
   id: z.number().optional(),
   title: z.string().max(255),
   user_id: z.number(),
 });
 
+/* ************************************************************************ */
+/* Middleware                                                               */
+/* ************************************************************************ */
+
+import type { RequestHandler } from "express";
+
+/*
+  Validate and sanitize request body.
+
+  Behavior:
+  - Merges client payload with server-controlled fields
+  - Replaces req.body with a validated, typed object
+  - Returns 400 with detailed issues on validation failure
+
+  Why override req.body:
+  - Downstream handlers can rely on a safe, known structure
+  - Eliminates repeated parsing or defensive checks
+*/
 const validate: RequestHandler = (req, res, next) => {
   try {
     req.body = itemDTOSchema.parse({
       ...req.body,
+      // user_id is derived from the authenticated JWT, not the client
       user_id: Number(req.auth.sub),
     });
 
@@ -21,5 +74,9 @@ const validate: RequestHandler = (req, res, next) => {
     res.status(400).json(issues);
   }
 };
+
+/* ************************************************************************ */
+/* Export                                                                   */
+/* ************************************************************************ */
 
 export default { validate };
