@@ -4,16 +4,16 @@
 
 <div align="right">
 
-[![en-US](https://img.shields.io/badge/lang-en--US-green.svg)](./README.en-US.md)
-[![fr-FR](https://img.shields.io/badge/lang-fr--FR-white.svg)](./README.md)
+[en français ?](./README.md)
 
 </div>
 
 <div align="center">
 
-# StartER – A modern, full-stack Express + React starter pack
+# StartER - A readable and complete Express + React framework
 
-🔧 **Educational framework** for building web applications in Express + React with integrated production tools.
+Opinionated React + Express framework for rapid prototyping and learning.  
+Designed to be understood first, and adapted easily through a module cloning system.
 
 ⭐️ If you find this project useful, **leave a star** to support it! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
 
@@ -25,37 +25,7 @@
 
 ## Overview
 
-```mermaid
-sequenceDiagram
-    box Web Client
-    participant React as React
-    participant Fetcher as Fetcher
-    end
-    box Web Server
-    participant Express as Express
-    participant Module as Module
-    end
-    box DB Server
-    participant DB as MySQL Server
-    end
-
-    React-)Fetcher: event
-    activate Fetcher
-    Fetcher-)Express: request (HTTP)
-    activate Express
-    Express-)Module: route
-    activate Module
-    Module-)DB: request (SQL)
-    activate DB
-    DB--)Module: data
-    deactivate DB
-    Module--)Express: json
-    deactivate Module
-    Express--)Fetcher: response (HTTP)
-    deactivate Express
-    Fetcher--)React: render
-    deactivate Fetcher
-```
+![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
 StartER is a **full-stack starter** combining Express (backend) and React (frontend) into a single, cohesive project.
 

@@ -1,43 +1,98 @@
+/**
+ * Purpose:
+ * Main application entry point.
+ *
+ * Responsibilities:
+ * - Create and configure the Express server
+ * - Mount API routes
+ * - Integrate Vite for SSR in development
+ * - Serve static assets in production
+ *
+ * Design notes:
+ * - Single server for API + SSR
+ * - Fully stateless backend
+ * - No Express sessions
+ *
+ * Related docs:
+ * - https://expressjs.com/
+ * - https://vitejs.dev/guide/ssr
+ */
+
 import fs from "node:fs";
 import express, { type ErrorRequestHandler, type Express } from "express";
 import { rateLimit } from "express-rate-limit";
 import { createServer as createViteServer } from "vite";
 
+// NOTE:
+// This import is executed for its side effects only.
+// It ensures the database connection is validated at startup.
 import "./src/database/checkConnection";
+
+/* ************************************************************************ */
+/*                                  Startup                                 */
+/* ************************************************************************ */
 
 const port = +(process.env.APP_PORT ?? 5173);
 
+// Server creation is async because it may initialize Vite in dev mode
 createServer().then((server) => {
   server.listen(port, () => {
     console.info(`Listening on http://localhost:${port}`);
   });
 });
 
+/* ************************************************************************ */
+/*                             Server creation                              */
+/* ************************************************************************ */
+
 async function createServer() {
   const app = express();
 
+  /* ********************************************************************** */
+  /* Rate limiting                                                          */
+  /* ********************************************************************** */
+
+  // SECURITY:
+  // Basic rate limiting to mitigate brute-force and abuse.
+  // This is intentionally simple and should be tuned per deployment.
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100, // max 100 requests per windowMs
+    limit: 100, // max 100 requests per window
   });
 
   app.use(limiter);
 
+  /* ********************************************************************** */
+  /* API routes                                                             */
+  /* ********************************************************************** */
+
+  // All API routes are mounted here.
+  // They are isolated, stateless, and independently testable.
   app.use((await import("./src/express/routes")).default);
+
+  /* ********************************************************************** */
+  /* Frontend / SSR configuration                                           */
+  /* ********************************************************************** */
 
   const maybeVite = await configure(app);
 
+  // Catch-all handler for SSR
   app.use(/(.*)/, async (req, res, next) => {
     const url = req.originalUrl;
 
-    // The fetch api is ambiguous and depends on the context where it is executed :
+    /* ******************************************************************** */
+    /* Fix fetch behavior during SSR                                        */
+    /* ******************************************************************** */
 
-    // * in the browser, it will refer to the fetch API from window
-    //   => fetch("/api") is working
-    // * on the server (and build phase), it will refer to the fetch API from node
-    //   => fetch("/api") is not working
+    // NOTE:
+    // The Fetch API behaves differently depending on the runtime:
+    //
+    // - Browser: fetch("/api") works (relative to current origin)
+    // - Node.js: fetch("/api") is invalid (no implicit base URL)
+    //
+    // During SSR, we run in Node.js, so we patch fetch to resolve
+    // relative URLs against the current request URL.
 
-    // SSR is using node API here, so we need to fix fetch for non-absolute urls :
     {
       const nodeFetch = globalThis.fetch;
 
@@ -46,38 +101,42 @@ async function createServer() {
           new URL(resource.toString(), `http://localhost:${port}${url}`),
         );
 
-      // URL constructor manages relative/absolute paths all by itself,
-      // so with base = http://localhost:${port}${url} :
-      // * if resource = "/foo",
-      //   then URL = http://localhost:${port}/foo
-      // * if resource = "./bar",
-      //   then URL = http://localhost:${port}${url}./bar
-      // * if resource = "http://example.com/baz",
-      //   then URL = http://example.com/baz
+      // TIP:
+      // The URL constructor handles absolute vs relative paths automatically:
+      //
+      // base = http://localhost:5173/some/page
+      // - "/foo"        -> http://localhost:5173/foo
+      // - "./bar"       -> http://localhost:5173/some/page/bar
+      // - "http://x.y"  -> http://x.y
     }
 
     try {
+      /* **************************************************************** */
+      /* Load HTML template and SSR renderer                              */
+      /* **************************************************************** */
+
       const getTemplateAndRender = async () => {
         const indexHtml = readIndexHtml();
 
+        // Production mode:
+        // SSR bundle is prebuilt and loaded from dist/
         if (maybeVite == null) {
-          // Note: ./dist/server/entry-server doesn't exist *before* build
-          // @ts-expect-error
+          // NOTE:
+          // This file does not exist before the build step.
+          // @ts-expect-error - runtime-only import
           const { render } = await import("./dist/server/entry-server");
 
           return { template: indexHtml, render };
         }
 
+        // Development mode:
+        // Vite handles on-the-fly module loading and HMR
         const vite = maybeVite;
 
-        // 1. Apply Vite HTML transforms. This injects the Vite HMR client,
-        //    and also applies HTML transforms from Vite plugins, e.g. global
-        //    preambles from @vitejs/plugin-react
+        // 1. Apply Vite HTML transforms (HMR client, plugin hooks, etc.)
         const template = await vite.transformIndexHtml(url, indexHtml);
 
-        // 2. Load the server entry. ssrLoadModule automatically transforms
-        //    ESM source code to be usable in Node.js! There is no bundling
-        //    required, and provides efficient invalidation similar to HMR.
+        // 2. Load the SSR entry module via Vite
         const { render } = await vite.ssrLoadModule("/src/entry-server");
 
         return { template, render };
@@ -85,19 +144,28 @@ async function createServer() {
 
       const { template, render } = await getTemplateAndRender();
 
-      // 3. render the app HTML. This assumes entry-server.js's exported
-      //     `render` function calls appropriate framework SSR APIs,
-      //    e.g. ReactDOMServer.renderToString()
+      /* **************************************************************** */
+      /* Render application                                               */
+      /* **************************************************************** */
+
+      // The render function is responsible for:
+      // - Rendering the React app
+      // - Injecting HTML into the template
+      // - Sending the response
       await render(template, req, res);
     } catch (err) {
-      // If an error is caught, let Vite fix the stack trace so it maps back
-      // to your actual source code.
+      // DEV EXPERIENCE:
+      // Let Vite rewrite stack traces so they map to source files.
       if (err instanceof Error) {
         maybeVite?.ssrFixStacktrace(err);
       }
       next(err);
     }
   });
+
+  /* ********************************************************************** */
+  /* Error handling                                                         */
+  /* ********************************************************************** */
 
   const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
     console.error(err);
@@ -111,8 +179,18 @@ async function createServer() {
   return app;
 }
 
+/* ************************************************************************ */
+/*                              Helper utils                                */
+/* ************************************************************************ */
+
 const isProduction = process.env.NODE_ENV === "production";
 
+/**
+ * Reads the HTML template depending on the environment.
+ *
+ * - Development: unbuilt index.html
+ * - Production: generated dist/client/index.html
+ */
 function readIndexHtml() {
   return fs.readFileSync(
     isProduction ? "dist/client/index.html" : "index.html",
@@ -120,6 +198,17 @@ function readIndexHtml() {
   );
 }
 
+/**
+ * Configure frontend serving depending on environment.
+ *
+ * - Production:
+ *   - Enable compression
+ *   - Serve static assets
+ *
+ * - Development:
+ *   - Create a Vite dev server in middleware mode
+ *   - Let Express control routing
+ */
 async function configure(app: Express) {
   if (isProduction) {
     const compression = (await import("compression")).default;
@@ -127,20 +216,16 @@ async function configure(app: Express) {
     app.use(compression());
     app.use(express.static("./dist/client", { extensions: [] }));
   } else {
-    // Create Vite server in middleware mode and configure the app type as
-    // 'custom', disabling Vite's own HTML serving logic so parent server
-    // can take control
+    // Create Vite server in middleware mode.
+    // Express remains the main HTTP server.
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "custom",
     });
 
-    // Use vite's connect instance as middleware. If you use your own
-    // express router (express.Router()), you should use router.use
-    // When the server restarts (for example after the user modifies
-    // vite.config.js), `vite.middlewares` is still going to be the same
-    // reference (with a new internal stack of Vite and plugin-injected
-    // middlewares). The following is valid even after restarts.
+    // NOTE:
+    // vite.middlewares remains stable across restarts,
+    // even if Vite internally reloads plugins or config.
     app.use(vite.middlewares);
 
     return vite;

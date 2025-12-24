@@ -4,16 +4,16 @@
 
 <div align="right">
 
-[![en-US](https://img.shields.io/badge/lang-en--US-white.svg)](./README.en-US.md)
-[![fr-FR](https://img.shields.io/badge/lang-fr--FR-green.svg)](./README.md)
+[in english?](./README.en-US.md)
 
 </div>
 
 <div align="center">
 
-# StartER – Un starter Express + React full-stack moderne
+# StartER - Un framework Express + React complet et lisible
 
-🔧 **Framework pédagogique** pour créer des applications web en Express + React avec des outils de production intégrés.
+Framework React + Express pensé pour le prototypage rapide et l’apprentissage.  
+Conçu pour être compris avant tout, et facilement adaptable grâce à un système de clonage de modules.
 
 ⭐️ Si vous trouvez ce projet utile, **laissez une étoile** pour soutenir le projet ! [![GitHub Stars](https://img.shields.io/github/stars/rocambille/start-express-react.svg?style=social)](https://github.com/rocambille/start-express-react)
 
@@ -25,37 +25,7 @@
 
 ## Vue d'ensemble
 
-```mermaid
-sequenceDiagram
-    box Web Client
-    participant React as React
-    participant Fetcher as Fetcher
-    end
-    box Web Server
-    participant Express as Express
-    participant Module as Module
-    end
-    box DB Server
-    participant DB as MySQL Server
-    end
-
-    React-)Fetcher: event
-    activate Fetcher
-    Fetcher-)Express: request (HTTP)
-    activate Express
-    Express-)Module: route
-    activate Module
-    Module-)DB: request (SQL)
-    activate DB
-    DB--)Module: data
-    deactivate DB
-    Module--)Express: json
-    deactivate Module
-    Express--)Fetcher: response (HTTP)
-    deactivate Express
-    Fetcher--)React: render
-    deactivate Fetcher
-```
+![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
 StartER est un **starter full-stack** combinant Express (backend) et React (frontend) dans un seul projet cohérent.
 Il est conçu à la fois comme un **outil pédagogique** et comme une base de production solide pour **prototyper** rapidement des applications web modernes.
