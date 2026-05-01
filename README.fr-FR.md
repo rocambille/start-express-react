@@ -8,7 +8,7 @@
 
 # StartER 🚀
 
-**Le starter fullstack Express + React qu'on peut vraiment lire**
+## L'environnement pour le prototypage rapide à l'ère de l'IA
 
 [![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/tags/)
 [![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
@@ -18,11 +18,27 @@
 [![Use this template](https://img.shields.io/badge/Démarrer-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 [![Read the manual](https://img.shields.io/badge/Apprendre-Read_the_manual-blue?style=for-the-badge)](https://github.com/rocambille/start-express-react/wiki/home-fr-FR)
 
-<br/>
+**Apprenez le développement fullstack. Créez des prototypes avec l'IA. Gardez le contrôle.**
+
+</div>
+
+## 🧠 Starter, le framework idéal pour l'IA
+
+La plupart des frameworks sont trop complexes pour l'IA. Ils dissimulent la logique derrière des abstractions complexes et opaques, ce qui peut entraîner des dysfonctionnements et des erreurs de conception chez les agents.
+
+**Nous avons conçu StartER pour nous démarquer.** Il s'agit d'une plateforme "sans magie" conçue pour la **co-création humain-IA**. En conservant un code lisible et explicite, nous fournissons aux agents IA un modèle mental optimal. StartER devient ainsi le terrain de jeu idéal pour le prototypage et l'apprentissage rapides.
 
 ![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
-</div>
+## 📚 Exemple de structure de projet Express + React simple et lisible
+
+Ce projet présente une méthode simple et lisible pour structurer une application fullstack avec :
+
+* Backend Express
+* Frontend React
+* Contrats partagés pour l'API
+
+Si vous recherchez un "starter Express + React" ou un "boilerplate Node React", ce dépôt est un exemple pratique.
 
 ## ⚡ Démarrage Rapide
 
@@ -41,42 +57,47 @@ npm run dev
 ```
 > L'application est disponible sur `http://localhost:5173`
 
-## 🤔 Pourquoi StartER ?
+## ✨ Pourquoi le prototypage avec StartER est plus rapide
 
-Nous avons conçu StartER avec une philosophie simple : **zéro magie cachée**. 
-C'est un framework pensé pour l'apprentissage, le prototypage rapide et le *hacking*. Les frameworks lourds tendent à dissimuler leur complexité. StartER offre une architecture fullstack (Express + React) totalement lisible et modifiable. Vous comprenez chaque ligne de code et gardez le contrôle total sur votre application.
+### 🧬 Clonage de modèles plutôt qu'hallucination
 
-## ✨ Fonctionnalités Clés
+Ne laissez pas l'IA "deviner" votre architecture. Utilisez `make:clone` pour répliquer la logique fonctionnelle.
 
-* **Codebase 100% lisible** : une architecture claire, sans boîte noire. Votre outil pour apprendre et maîtriser le développement fullstack.
-* **Authentification "Magic Link"** : système de connexion sécurisé et sans mot de passe inclus nativement.
-* **Architecture minimaliste** : la simplicité d'Express alliée à la modularité de React.
-* **Prêt à l'emploi** : TypeScript, SQLite et Docker pour une expérience de développement fluide.
+```bash
+npm run make:clone -- src/express/modules/item src/express/modules/task item task
+```
+Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agent IA reste ainsi concentré et précis.
 
-## 🧬 Ne générez pas, clonez ! (`make:clone`)
+### 🧪 Vérification basée sur un contrat
 
-StartER introduit la commande `make:clone`. Contrairement à un générateur CRUD, vous **clonez votre logique**.
+Vous définissez le comportement de l'API dans `tests/contracts.ts` : une source de vérité centrale et déclarative.
 
-Besoin d'une nouvelle ressource ? Clonez un module existant, comme `item`. La commande duplique les fichiers et renomme toutes les variables et références. Vous obtenez un code source complet, immédiatement fonctionnel et entièrement personnalisable.
+* **Pour vous :** une documentation claire et évolutive.
 
-## 🧪 Tests d'API par Contrats
+* **Pour l'IA :** un "contrat" strict qu'elle doit respecter lors de la génération des endpoints.
 
-StartER simplifie la fiabilité de votre code avec une approche innovante basée sur des contrats.
+* **Pour l'application :** vérification instantanée que l'IA n'a omis aucun scénario.
 
-Définissez la structure de votre API une seule fois. Nous utilisons vos contrats pour **générer les tests de l'API** et pour **simuler vos appels API côté React**. Moins de code répétitif, plus de fiabilité.
+### 🔍 Simplicité sans magie
 
-## 💻 Stack Technique
+* **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
 
-* **Backend** : Node.js, Express 5, Zod
+* **Conversion explicite :** typage des données aux emplacements clés. Ceci évite les bugs silencieux souvent introduits par l'IA.
+
+* **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
+
+## 💻 Stack technique
+
+* **Backend** : Node.js, Express 5, Zod (validation)
 * **Frontend** : React 19, React Router, Vite, Pico CSS
-* **Database** : SQLite
+* **Database** : SQLite (zero-config, API synchrone)
 * **Tooling** : TypeScript, Biome, Vitest, Docker
 
 ## 📖 Documentation
 
-L'ensemble de la documentation, des guides de déploiement et des concepts techniques est sur notre wiki.
+StartER est un projet pédagogique. Si cette architecture vous aide à prototyper plus rapidement avec l'IA, **laissez-nous une ⭐ sur GitHub !**
 
-👉 **[Consulter le Wiki officiel](https://github.com/rocambille/start-express-react/wiki/home-fr-FR)**
+👉 **[Consultez le wiki et le modèle mental de l'IA](https://github.com/rocambille/start-express-react/wiki)**
 
 ## 📄 Licence
 
