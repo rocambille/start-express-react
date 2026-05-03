@@ -1,4 +1,8 @@
 /**
+ * BEGINNERS:
+ * You don't need to understand or edit this file to build your app.
+ * This file contains advanced Vite SSR and backend wiring.
+ *
  * Purpose:
  * Main application entry point.
  *
@@ -20,6 +24,7 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import fs from "node:fs";
+import http from "node:http";
 import express, { type ErrorRequestHandler, type Express } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
@@ -91,6 +96,7 @@ createServer().then((server) => {
 
 export async function createServer() {
   const app = express();
+  const httpServer = http.createServer(app);
 
   /* ********************************************************************** */
   /* Helmet                                                                 */
@@ -138,7 +144,7 @@ export async function createServer() {
   /* Frontend / SSR configuration                                           */
   /* ********************************************************************** */
 
-  const maybeVite = await configure(app);
+  const maybeVite = await configure(app, httpServer);
 
   /* ****************************************************************** */
   /* Load HTML template and SSR renderer                                */
@@ -233,7 +239,7 @@ export async function createServer() {
   app.use(logErrors);
   app.use(sendErrors);
 
-  return app;
+  return httpServer;
 }
 
 /* ************************************************************************ */
@@ -264,7 +270,7 @@ function readIndexHtml() {
  *   - Create a Vite dev server in middleware mode
  *   - Let Express control routing
  */
-async function configure(app: Express) {
+async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
     const compression = (await import("compression")).default;
 
@@ -274,7 +280,10 @@ async function configure(app: Express) {
     // Create Vite server in middleware mode.
     // Express remains the main HTTP server.
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: { server: httpServer },
+      },
       appType: "custom",
     });
 

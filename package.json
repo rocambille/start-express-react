@@ -3,6 +3,9 @@
   "name": "starter",
   "version": "2026.05.14",
   "main": "server.ts",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
     "biome:check": "biome check --error-on-warnings .",
@@ -13,7 +16,7 @@
     "database:schema:load": "tsx --env-file=.env bin/database-sync schema",
     "database:seeder:load": "tsx --env-file=.env bin/database-sync seeder",
     "database:sync": "tsx --env-file=.env bin/database-sync both",
-    "dev": "tsx --env-file=.env server",
+    "dev": "tsx watch --include .env --env-file=.env server",
     "install:check": "vitest run tests/install",
     "make:clone": "tsx  --env-file=.env bin/make-clone",
     "make:purge": "tsx --env-file=.env bin/make-purge",
