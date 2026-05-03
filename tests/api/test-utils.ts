@@ -37,7 +37,7 @@ const mockDatabase = () => {
   database.exec("PRAGMA foreign_keys = OFF");
 
   for (const table of existingTables) {
-    database.exec(`drop table ${table.name}`);
+    database.exec(`drop table "${table.name}"`);
   }
 
   /* re-enable cascade deletion */

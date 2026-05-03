@@ -71,7 +71,7 @@ export async function main(
     database.exec("PRAGMA foreign_keys = OFF");
 
     for (const table of existingTables) {
-      database.exec(`drop table ${table.name}`);
+      database.exec(`drop table "${table.name}"`);
     }
 
     // Re-enable cascade deletion
@@ -98,7 +98,7 @@ export async function main(
       .all();
 
     for (const table of existingTables) {
-      database.exec(`delete from ${table.name}`);
+      database.exec(`delete from "${table.name}"`);
     }
 
     // Read the SQL statements from the seeder file
