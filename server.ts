@@ -36,13 +36,35 @@ import { createServer as createViteServer } from "vite";
  * - Create a storage that holds the base URL for the current request
  * - Patch fetch to resolve relative URLs against this base URL
  */
-const fetchBaseStorage = new AsyncLocalStorage<string>();
+const fetchBaseStorage = new AsyncLocalStorage<{
+  base: string;
+  cookie?: string;
+}>();
 
 const nodeFetch = globalThis.fetch;
 
 globalThis.fetch = (resource, init) => {
-  const base = fetchBaseStorage.getStore();
-  const url = base ? new URL(resource.toString(), base) : resource;
+  const store = fetchBaseStorage.getStore();
+
+  // 1. Resolve relative URLs against the request base URL
+  const url = store?.base ? new URL(resource.toString(), store.base) : resource;
+
+  // 2. Forward cookies for internal API calls (relative paths) during SSR
+  // Security: Only forward for relative paths starting with "/" but not "//"
+  // to avoid leaking cookies to external domains via protocol-relative URLs.
+  const isInternal =
+    typeof resource === "string" &&
+    resource.startsWith("/") &&
+    !resource.startsWith("//");
+
+  if (isInternal && store?.cookie) {
+    const headers = new Headers(init?.headers);
+    if (!headers.has("cookie")) {
+      headers.set("cookie", store.cookie);
+    }
+    return nodeFetch(url, { ...init, headers });
+  }
+
   return nodeFetch(url, init);
 };
 
@@ -151,8 +173,9 @@ export async function createServer() {
   app.use(/(.*)/, async (req, res, next) => {
     const url = req.originalUrl;
     const base = `http://localhost:${port}${url}`;
+    const cookie = req.headers.cookie;
 
-    fetchBaseStorage.run(base, async () => {
+    fetchBaseStorage.run({ base, cookie }, async () => {
       try {
         // Prevent caching of the HTML page
         // SSR is auth-aware and must not be cached

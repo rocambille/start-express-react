@@ -66,18 +66,9 @@ const routes: RouteObject[] = [
       Root loader:
       - Fetches the current user from the /api/me endpoint
       - Returns the user to the root component
-
-      This loader runs on both server and client, so we need to use fetch
-      with the appropriate headers:
-      - cookie forwarding for server (req.headers.get("cookie") ?? "")
-      - attached cookies for client (already attached: invisible here)
     */
-    loader: async ({ request }) => {
-      // On the server: forward cookies explicitly (Node has no cookie jar)
-      // On the client: browser attaches cookies automatically, this is a no-op
-      const response = await fetch("/api/me", {
-        headers: { cookie: request.headers.get("cookie") ?? "" },
-      });
+    loader: async () => {
+      const response = await fetch("/api/me");
 
       const me: User | null = response.ok ? await response.json() : null;
 
