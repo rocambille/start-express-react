@@ -4,10 +4,10 @@ import * as ReactRouter from "react-router";
 import {
   AuthProvider,
   useAuth,
-} from "../../src/react/components/auth/AuthContext";
-import LogoutForm from "../../src/react/components/auth/LogoutForm";
-import MagicLinkForm from "../../src/react/components/auth/MagicLinkForm";
-import VerifyPage from "../../src/react/components/auth/VerifyPage";
+} from "../../../src/react/components/auth/AuthContext";
+import LogoutForm from "../../../src/react/components/auth/LogoutForm";
+import MagicLinkForm from "../../../src/react/components/auth/MagicLinkForm";
+import VerifyPage from "../../../src/react/components/auth/VerifyPage";
 import {
   expectContractCall,
   fooUser,
@@ -15,7 +15,7 @@ import {
   renderWithStub,
   requestValue,
   setupMocks,
-} from "./test-utils";
+} from "../test-utils";
 
 describe("React auth components", () => {
   beforeEach(() => {

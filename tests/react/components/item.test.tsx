@@ -1,12 +1,12 @@
 import { fireEvent, screen } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 
-import ItemCreate from "../../src/react/components/item/ItemCreate";
-import ItemDeleteForm from "../../src/react/components/item/ItemDeleteForm";
-import ItemEdit from "../../src/react/components/item/ItemEdit";
-import ItemForm from "../../src/react/components/item/ItemForm";
-import ItemList from "../../src/react/components/item/ItemList";
-import ItemShow from "../../src/react/components/item/ItemShow";
+import ItemCreate from "../../../src/react/components/item/ItemCreate";
+import ItemDeleteForm from "../../../src/react/components/item/ItemDeleteForm";
+import ItemEdit from "../../../src/react/components/item/ItemEdit";
+import ItemForm from "../../../src/react/components/item/ItemForm";
+import ItemList from "../../../src/react/components/item/ItemList";
+import ItemShow from "../../../src/react/components/item/ItemShow";
 
 import {
   allItems,
@@ -15,7 +15,7 @@ import {
   renderWithStub,
   requestValue,
   setupMocks,
-} from "./test-utils";
+} from "../test-utils";
 
 describe("React item components", () => {
   beforeEach(() => {
