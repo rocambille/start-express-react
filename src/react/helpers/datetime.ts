@@ -30,6 +30,17 @@ function toDate(input: string | Date): Date {
   return typeof input === "string" ? new Date(input) : input;
 }
 
+function toParts(
+  date: Date,
+  options: Intl.DateTimeFormatOptions,
+): Record<string, string> {
+  return Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", options)
+      .formatToParts(date)
+      .map(({ type, value }) => [type, value]),
+  );
+}
+
 /**
  * Parses local date and time strings (from <input type="date|time">)
  * into a native Date object, interpreted in the target timezone.
@@ -49,17 +60,6 @@ export function fromInputParts(
   // then we calculate the offset difference to "shift" it to the target timezone.
   const naiveUtc = new Date(`${dateStr}T${timeStr}:00Z`);
 
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    hour12: false,
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-  });
-
   /**
    * Native JS Dates don't provide an easy way to get the offset of a SPECIFIC timezone
    * at a specific moment (especially with DST).
@@ -67,15 +67,23 @@ export function fromInputParts(
    * then we parse those parts back into a UTC timestamp to see the difference.
    */
   const getOffsetMinutes = (d: Date) => {
-    const parts = formatter.formatToParts(d);
-    const p = (type: string) => parts.find((it) => it.type === type)?.value;
+    const { year, month, day, hour, minute, second } = toParts(d, {
+      timeZone,
+      hour12: false,
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    });
     const localized = Date.UTC(
-      Number(p("year")),
-      Number(p("month")) - 1,
-      Number(p("day")),
-      Number(p("hour")) % 24,
-      Number(p("minute")),
-      Number(p("second")),
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour) % 24,
+      Number(minute),
+      Number(second),
     );
     return (localized - d.getTime()) / 60000;
   };
@@ -94,15 +102,14 @@ export function toInputDate(
 ): string {
   const date = toDate(input);
 
-  const parts = new Intl.DateTimeFormat("en-US", {
+  const { year, month, day } = toParts(date, {
     timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).formatToParts(date);
+  });
 
-  const f = (type: string) => parts.find((p) => p.type === type)?.value;
-  return `${f("year")}-${f("month")}-${f("day")}`;
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -115,16 +122,14 @@ export function toInputTime(
 ): string {
   const date = toDate(input);
 
-  const parts = new Intl.DateTimeFormat("en-US", {
+  const { hour, minute } = toParts(date, {
     timeZone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).formatToParts(date);
+  });
 
-  const f = (type: string) => parts.find((p) => p.type === type)?.value;
-  const hour = String(Number(f("hour")) % 24).padStart(2, "0");
-  return `${hour}:${f("minute")}`;
+  return `${String(Number(hour) % 24).padStart(2, "0")}:${minute}`;
 }
 
 /**
