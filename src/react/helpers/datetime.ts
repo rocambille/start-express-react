@@ -22,14 +22,6 @@
 
 const DEFAULT_TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "Europe/Paris";
 
-/**
- * Normalizes input to a Date object.
- * Returns an "Invalid Date" object if parsing fails.
- */
-function toDate(input: string | Date): Date {
-  return typeof input === "string" ? new Date(input) : input;
-}
-
 function toParts(
   date: Date,
   options: Intl.DateTimeFormatOptions,
@@ -66,49 +58,47 @@ export function fromInputParts(
    * We use Intl.DateTimeFormat to "render" the date in the target timezone,
    * then we parse those parts back into a UTC timestamp to see the difference.
    */
-  const getOffsetMinutes = (d: Date) => {
-    const { year, month, day, hour, minute, second } = toParts(d, {
-      timeZone,
-      hour12: false,
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    });
-    const localized = Date.UTC(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour) % 24,
-      Number(minute),
-      Number(second),
-    );
-    return (localized - d.getTime()) / 60000;
-  };
+  const { year, month, day, hour, minute } = toParts(naiveUtc, {
+    timeZone,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  const localized = Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+  );
+  const offset = localized - naiveUtc.getTime();
 
-  const offset = getOffsetMinutes(naiveUtc);
-  return new Date(naiveUtc.getTime() - offset * 60000);
+  return new Date(naiveUtc.getTime() - offset);
 }
+
+/**
+ * A string representing a Date in UTC format (must end with 'Z').
+ * Example: "2026-05-05T10:00:00Z"
+ */
+export type UtcDateString = `${string}Z`;
 
 /**
  * Returns a string in YYYY-MM-DD format based on the target timezone.
  * Suitable for <input type="date">.
  */
 export function toInputDate(
-  input: string | Date,
+  input: UtcDateString,
   timeZone: string = DEFAULT_TIMEZONE,
 ): string {
-  const date = toDate(input);
-
-  const { year, month, day } = toParts(date, {
+  const { year, month, day } = toParts(new Date(input), {
     timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   });
-
   return `${year}-${month}-${day}`;
 }
 
@@ -117,45 +107,55 @@ export function toInputDate(
  * Suitable for <input type="time">.
  */
 export function toInputTime(
-  input: string | Date,
+  input: UtcDateString,
   timeZone: string = DEFAULT_TIMEZONE,
 ): string {
-  const date = toDate(input);
-
-  const { hour, minute } = toParts(date, {
+  const { hour, minute } = toParts(new Date(input), {
     timeZone,
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,
+    hourCycle: "h23",
   });
+  return `${hour}:${minute}`;
+}
 
-  return `${String(Number(hour) % 24).padStart(2, "0")}:${minute}`;
+type DisplayOptions = {
+  timeZone: string;
+  locale: string;
+  dateStyle: "full" | "long" | "medium" | "short";
+  timeStyle: "full" | "long" | "medium" | "short";
+};
+
+const globalDisplayOptions: DisplayOptions = {
+  timeZone: DEFAULT_TIMEZONE,
+  locale: "fr-FR",
+  dateStyle: "long",
+  timeStyle: "short",
+};
+
+export function setDisplayOptions(options: Partial<DisplayOptions>) {
+  Object.assign(globalDisplayOptions, options);
+}
+
+export function getDisplayOptions(): DisplayOptions {
+  return globalDisplayOptions;
 }
 
 /**
  * Formats an ISO string or Date into a human-readable localized string.
  */
 export function toDisplayString(
-  input: string | Date,
-  options: {
-    timeZone?: string;
-    locale?: string;
-    dateStyle?: "full" | "long" | "medium" | "short";
-    timeStyle?: "full" | "long" | "medium" | "short";
-  } = {},
+  input: UtcDateString,
+  options?: Partial<DisplayOptions>,
 ): string {
-  const {
-    timeZone = DEFAULT_TIMEZONE,
-    locale = "fr-FR",
-    dateStyle = "long",
-    timeStyle = "short",
-  } = options;
-
-  const date = toDate(input);
+  const { timeZone, locale, dateStyle, timeStyle } = {
+    ...globalDisplayOptions,
+    ...options,
+  };
 
   return new Intl.DateTimeFormat(locale, {
     dateStyle,
     timeStyle,
     timeZone,
-  }).format(date);
+  }).format(new Date(input));
 }

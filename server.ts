@@ -107,9 +107,9 @@ export async function createServer() {
   // Strict-Transport-Security. See https://helmetjs.github.io/ for details.
   //
   // Content-Security-Policy is enabled only in production.
-  // In development it is disabled because Vite’s HMR relies on
+  // In development it is disabled because Vite's HMR relies on
   // WebSocket connections and dynamic module evaluation, which
-  // are blocked by Helmet’s default CSP.
+  // are blocked by Helmet's default CSP.
   app.use(
     helmet({
       contentSecurityPolicy: isProduction,
