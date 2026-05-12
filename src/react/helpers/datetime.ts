@@ -71,7 +71,7 @@ export function fromInputParts(
   // 1. Create a UTC date representing the "naive" parts.
   // We append 'Z' to treat the input as if it were UTC initially,
   // then we calculate the offset difference to "shift" it to the target timezone.
-  const naiveUtc = new Date(`${dateStr}T${timeStr}:00Z`);
+  const naiveUtc = new Date(`${dateStr}T${timeStr}Z`);
 
   /**
    * Native JS Dates don't provide an easy way to get the offset of a SPECIFIC timezone
