@@ -20,7 +20,28 @@
   ```
 */
 
-const DEFAULT_TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "Europe/Paris";
+/**
+ * A string representing a Date in UTC format (must end with 'Z').
+ * Example: "2026-05-05T10:00:00Z"
+ */
+type UtcDateString = `${string}Z`;
+
+/**
+ * Format for HTML5 input date element.
+ * Example: "2026-05-05"
+ */
+type InputDateString = `${string}-${string}-${string}`;
+
+/**
+ * Format for HTML5 input time element.
+ * Example: "10:00"
+ */
+type InputTimeString = `${string}:${string}`;
+
+/**
+ * The default timezone to use for date and time operations.
+ */
+export const DEFAULT_TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "Europe/Paris";
 
 function toParts(
   date: Date,
@@ -43,8 +64,8 @@ function toParts(
  * @returns A Date object representing the moment in UTC.
  */
 export function fromInputParts(
-  dateStr: string,
-  timeStr: string,
+  dateStr: InputDateString,
+  timeStr: InputTimeString,
   timeZone: string = DEFAULT_TIMEZONE,
 ): Date {
   // 1. Create a UTC date representing the "naive" parts.
@@ -78,12 +99,6 @@ export function fromInputParts(
 
   return new Date(naiveUtc.getTime() - offset);
 }
-
-/**
- * A string representing a Date in UTC format (must end with 'Z').
- * Example: "2026-05-05T10:00:00Z"
- */
-export type UtcDateString = `${string}Z`;
 
 /**
  * Returns a string in YYYY-MM-DD format based on the target timezone.
