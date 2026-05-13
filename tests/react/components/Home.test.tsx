@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import Home from "../../../src/react/components/Home";
 import { renderWithStub, setupMocks } from "../test-utils";
 
-describe("React Component: <Home />", () => {
+describe("<Home />", () => {
   beforeEach(() => {
     setupMocks();
   });
