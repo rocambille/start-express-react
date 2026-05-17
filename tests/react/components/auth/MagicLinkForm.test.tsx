@@ -29,7 +29,7 @@ describe("<MagicLinkForm />", () => {
 
     await user.type(
       screen.getByLabelText(/^email$/i),
-      requestValue("auth", "magic_link", "success", "email"),
+      String(requestValue("auth", "magic_link", "success", "email")),
     );
     await user.click(screen.getByRole("button"));
 

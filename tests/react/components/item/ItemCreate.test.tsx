@@ -8,13 +8,18 @@ import {
   fooUser,
   renderWithStub,
   requestValue,
+  responseValue,
   setupMocks,
 } from "../../test-utils";
 
 describe("<ItemCreate />", () => {
   beforeEach(() => {
     setupMocks();
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
+
+    const mockedNavigate = vi.fn();
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
+      () => mockedNavigate,
+    );
   });
 
   afterEach(() => {
@@ -39,10 +44,43 @@ describe("<ItemCreate />", () => {
 
     await user.type(
       screen.getByLabelText(/title/i),
-      requestValue("items", "create", "success", "title"),
+      String(requestValue("items", "create", "success", "title")),
     );
     await user.click(screen.getByRole("button"));
 
     expectContractCall("items", "create", "success");
+
+    const navigate = ReactRouter.useNavigate();
+    expect(navigate).toHaveBeenCalledWith(
+      `/items/${responseValue("items", "create", "success", "insertId")}`,
+    );
+  });
+  it("should not redirect if server returns an error", async () => {
+    setupMocks({
+      force500: [
+        {
+          path: "/api/items",
+          method: "post",
+        },
+      ],
+    });
+
+    const { user } = await renderWithStub(
+      "/items/new",
+      ItemCreate,
+      ["/items/new"],
+      { me: fooUser },
+    );
+
+    await user.type(
+      screen.getByLabelText(/title/i),
+      String(requestValue("items", "create", "success", "title")),
+    );
+    await user.click(screen.getByRole("button"));
+
+    expectContractCall("items", "create", "success");
+
+    const navigate = ReactRouter.useNavigate();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

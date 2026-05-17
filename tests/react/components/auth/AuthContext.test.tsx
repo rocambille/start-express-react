@@ -72,7 +72,7 @@ describe("React Components: AuthContext", () => {
       await act(
         async () =>
           await auth.sendMagicLink(
-            requestValue("auth", "magic_link", "success", "email"),
+            String(requestValue("auth", "magic_link", "success", "email")),
           ),
       );
 
@@ -88,7 +88,7 @@ describe("React Components: AuthContext", () => {
       await act(
         async () =>
           await auth.verifyMagicLink(
-            requestValue("auth", "verify", "success", "token"),
+            String(requestValue("auth", "verify", "success", "token")),
           ),
       );
 
@@ -106,7 +106,14 @@ describe("React Components: AuthContext", () => {
       expectContractCall("auth", "logout", "anyone");
     });
     it("should throw when logout fails", async () => {
-      setupMocks({ force500: true });
+      setupMocks({
+        force500: [
+          {
+            path: "/api/auth/logout",
+            method: "post",
+          },
+        ],
+      });
 
       const { result } = await renderHookAsync(() => useAuth(), {
         wrapper: AuthProvider,

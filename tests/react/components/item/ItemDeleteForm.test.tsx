@@ -14,7 +14,11 @@ import {
 describe("<ItemDeleteForm />", () => {
   beforeEach(() => {
     setupMocks();
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => () => {});
+
+    const mockedNavigate = vi.fn();
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
+      () => mockedNavigate,
+    );
   });
 
   afterEach(() => {
@@ -43,5 +47,32 @@ describe("<ItemDeleteForm />", () => {
     await user.click(screen.getByRole("button"));
 
     expectContractCall("items", "delete", "success");
+
+    const navigate = ReactRouter.useNavigate();
+    expect(navigate).toHaveBeenCalledWith("/items");
+  });
+  it("should not redirect when server returns an error", async () => {
+    setupMocks({
+      force500: [
+        {
+          path: `/api/items/${allItems[0].id}`,
+          method: "delete",
+        },
+      ],
+    });
+
+    const { user } = await renderWithStub(
+      "/items/:id",
+      ItemDeleteForm,
+      [`/items/${allItems[0].id}`],
+      { me: fooUser },
+    );
+
+    await user.click(screen.getByRole("button"));
+
+    expectContractCall("items", "delete", "success");
+
+    const navigate = ReactRouter.useNavigate();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });
