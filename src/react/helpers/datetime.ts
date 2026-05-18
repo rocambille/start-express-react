@@ -21,24 +21,6 @@
 */
 
 /**
- * A string representing a Date in UTC format (must end with 'Z').
- * Example: "2026-05-05T10:00:00Z"
- */
-type UtcDateString = `${string}Z`;
-
-/**
- * Format for HTML5 input date element.
- * Example: "2026-05-05"
- */
-type InputDateString = `${string}-${string}-${string}`;
-
-/**
- * Format for HTML5 input time element.
- * Example: "10:00"
- */
-type InputTimeString = `${string}:${string}`;
-
-/**
  * The default timezone to use for date and time operations.
  */
 export const DEFAULT_TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "Europe/Paris";
@@ -64,8 +46,8 @@ function toParts(
  * @returns A Date object representing the moment in UTC.
  */
 export function fromInputParts(
-  dateStr: InputDateString,
-  timeStr: InputTimeString,
+  dateStr: string,
+  timeStr: string,
   timeZone: string = DEFAULT_TIMEZONE,
 ): Date {
   // 1. Create a UTC date representing the "naive" parts.
@@ -105,7 +87,7 @@ export function fromInputParts(
  * Suitable for <input type="date">.
  */
 export function toInputDate(
-  input: UtcDateString,
+  input: string,
   timeZone: string = DEFAULT_TIMEZONE,
 ): string {
   const { year, month, day } = toParts(new Date(input), {
@@ -122,7 +104,7 @@ export function toInputDate(
  * Suitable for <input type="time">.
  */
 export function toInputTime(
-  input: UtcDateString,
+  input: string,
   timeZone: string = DEFAULT_TIMEZONE,
 ): string {
   const { hour, minute } = toParts(new Date(input), {
@@ -160,7 +142,7 @@ export function getDisplayOptions(): DisplayOptions {
  * Formats an ISO string or Date into a human-readable localized string.
  */
 export function toDisplayString(
-  input: UtcDateString,
+  input: string,
   options?: Partial<DisplayOptions>,
 ): string {
   const { timeZone, locale, dateStyle, timeStyle } = {
