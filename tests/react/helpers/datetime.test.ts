@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import {
   fromInputParts,
   getDisplayOptions,
@@ -8,8 +7,8 @@ import {
   toInputTime,
 } from "../../../src/react/helpers/datetime";
 
-describe("DateTime Helpers", () => {
-  describe("fromInputParts", () => {
+describe("React Helpers: datetime", () => {
+  describe("fromInputParts()", () => {
     it("should parse standard date and time (Europe/Paris)", () => {
       // 10:00 AM in Paris on May 5th (CEST, UTC+2) -> 08:00 UTC
       const date = fromInputParts("2026-05-05", "10:00", "Europe/Paris");
@@ -36,7 +35,7 @@ describe("DateTime Helpers", () => {
     });
   });
 
-  describe("toInputDate", () => {
+  describe("toInputDate()", () => {
     it("should format date as YYYY-MM-DD (Europe/Paris)", () => {
       expect(toInputDate("2026-05-05T00:00:00.000Z", "Europe/Paris")).toBe(
         "2026-05-05",
@@ -57,7 +56,7 @@ describe("DateTime Helpers", () => {
     });
   });
 
-  describe("toInputTime", () => {
+  describe("toInputTime()", () => {
     it("should format time as HH:mm (Europe/Paris)", () => {
       // 09:05 UTC -> 11:05 Paris (UTC+2)
       expect(toInputTime("2026-05-05T09:05:00.000Z", "Europe/Paris")).toBe(
@@ -80,7 +79,7 @@ describe("DateTime Helpers", () => {
     });
   });
 
-  describe("setDisplayOptions", () => {
+  describe("setDisplayOptions()", () => {
     const originalOptions = getDisplayOptions();
 
     afterAll(() => {
