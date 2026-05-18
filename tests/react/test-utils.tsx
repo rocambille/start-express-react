@@ -177,13 +177,13 @@ export const setupMocks = ({
   force500,
 }: {
   forceCases?: Record<`${string}.${string}`, keyof Test["cases"]>;
-  force500?: boolean;
+  force500?: { path: string; method: "get" | "post" | "put" | "delete" }[];
 } = {}) => {
   vi.stubGlobal("cookieStore", { get: vi.fn(), set: vi.fn() });
   vi.spyOn(crypto, "randomUUID").mockImplementation(() => mockedRandomUUID);
 
   const customFetch = (path: string, method: string) => {
-    if (force500) {
+    if (force500?.some((f) => f.path === path && f.method === method)) {
       return respond(null, 500);
     }
     if (forceCases) {
@@ -216,8 +216,21 @@ export const requestValue = (
   field: string,
 ) => {
   const body = contracts[contractName][testName].cases[caseName].request.body;
-  if (typeof body === "object" && body !== null && !Array.isArray(body)) {
-    return body[field]?.toString() ?? "";
+  if (body != null && typeof body === "object" && !Array.isArray(body)) {
+    return body[field];
+  }
+  throw new Error(`Case body is not an object: ${JSON.stringify(body)}`);
+};
+
+export const responseValue = (
+  contractName: keyof typeof contracts,
+  testName: keyof Contract,
+  caseName: keyof Test["cases"],
+  field: string,
+) => {
+  const body = contracts[contractName][testName].cases[caseName].response.body;
+  if (body != null && typeof body === "object" && !Array.isArray(body)) {
+    return JSON.parse(JSON.stringify(body[field]));
   }
   throw new Error(`Case body is not an object: ${JSON.stringify(body)}`);
 };

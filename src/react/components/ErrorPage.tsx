@@ -1,5 +1,3 @@
-import { isRouteErrorResponse, Link, useRouteError } from "react-router";
-
 /**
  * Purpose:
  * Root error boundary for the application.
@@ -9,6 +7,9 @@ import { isRouteErrorResponse, Link, useRouteError } from "react-router";
  * - Catch and display application crashes (500)
  * - Provide a way back to the home page
  */
+
+import { isRouteErrorResponse, Link, useRouteError } from "react-router";
+
 export default function ErrorPage() {
   const error = useRouteError();
 

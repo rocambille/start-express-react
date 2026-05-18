@@ -3,6 +3,9 @@
   "name": "starter",
   "version": "2026.05.14",
   "main": "server.ts",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "prepare": "git config core.hooksPath .git-hooks || true",
     "biome:check": "biome check --error-on-warnings .",
@@ -13,7 +16,7 @@
     "database:schema:load": "tsx --env-file=.env bin/database-sync schema",
     "database:seeder:load": "tsx --env-file=.env bin/database-sync seeder",
     "database:sync": "tsx --env-file=.env bin/database-sync both",
-    "dev": "tsx --env-file=.env server",
+    "dev": "tsx watch --include .env --env-file=.env server",
     "install:check": "vitest run tests/install",
     "make:clone": "tsx  --env-file=.env bin/make-clone",
     "make:purge": "tsx --env-file=.env bin/make-purge",
@@ -22,7 +25,7 @@
     "types:check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.13",
+    "@biomejs/biome": "2.4.15",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
@@ -37,26 +40,26 @@
     "@types/supertest": "^7.2.0",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.5",
-    "fs-extra": "^11.3.4",
+    "fs-extra": "^11.3.5",
     "jsdom": "^29.1.1",
     "pluralize": "^8.0.0",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10",
+    "vite": "^8.0.11",
     "vitest": "^4.1.5"
   },
   "dependencies": {
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.4.1",
+    "express-rate-limit": "^8.5.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.7",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-router": "^7.14.2",
-    "zod": "^4.4.1"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router": "^7.15.0",
+    "zod": "^4.4.3"
   }
 }
