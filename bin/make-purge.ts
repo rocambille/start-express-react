@@ -55,7 +55,7 @@ async function purgeItems(rootDir: string) {
   // Remove item module files and related React components.
   await remove(rootDir, "src/express/modules/item");
   await remove(rootDir, "src/react/components/item");
-  await remove(rootDir, "tests/react/item.test.tsx");
+  await remove(rootDir, "tests/react/components/item");
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
@@ -100,7 +100,7 @@ async function purgeAuth(rootDir: string) {
   await remove(rootDir, "src/express/modules/auth");
   await remove(rootDir, "src/express/modules/user");
   await remove(rootDir, "src/react/components/auth");
-  await remove(rootDir, "tests/react/auth.test.tsx");
+  await remove(rootDir, "tests/react/components/auth");
 
   // Remove auth/user routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>

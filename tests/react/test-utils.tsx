@@ -135,39 +135,44 @@ type StubRouteObject = Parameters<typeof createRoutesStub>[0][number];
 
 // Wrapping render() in act() because React's use() is suspending
 // see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
-export const renderWithStub = async (
-  path: StubRouteObject["path"],
-  Component: StubRouteObject["Component"],
-  initialEntries: string[],
-  options: { me: User | null },
-) => {
+export const renderWithStub = async ({
+  path,
+  Component,
+  ErrorBoundary,
+  loader,
+  initialEntries,
+  me,
+}: {
+  path: NonNullable<StubRouteObject["path"]>;
+  Component: NonNullable<StubRouteObject["Component"]>;
+  ErrorBoundary?: StubRouteObject["ErrorBoundary"];
+  loader?: StubRouteObject["loader"];
+  initialEntries: string[];
+  me: User | null;
+}) => {
   const Stub = createRoutesStub([
     {
       path,
-      Component: (props) => {
-        if (Component == null) {
-          return null;
-        }
-        return (
-          <AuthProvider initialUser={options.me}>
-            <DataRefreshProvider>
-              <Component {...props} />
-            </DataRefreshProvider>
-          </AuthProvider>
-        );
-      },
+      HydrateFallback: () => null,
+      Component: () => (
+        <AuthProvider initialUser={me}>
+          <DataRefreshProvider>
+            <Component />
+          </DataRefreshProvider>
+        </AuthProvider>
+      ),
       ErrorBoundary:
-        // Catch component errors and report them to the test runner
-        ({ error }) => {
+        ErrorBoundary ??
+        (({ error }: { error: unknown }) => {
           throw error;
-        },
+        }),
+      loader,
     },
   ]);
-  const user = userEvent.setup();
   const view = await act(async () =>
     render(<Stub initialEntries={initialEntries} />),
   );
-  return { user, ...view };
+  return { ...view, user: userEvent.setup() };
 };
 
 const mockedRandomUUID = "a-b-c-d-e";
@@ -177,13 +182,13 @@ export const setupMocks = ({
   force500,
 }: {
   forceCases?: Record<`${string}.${string}`, keyof Test["cases"]>;
-  force500?: boolean;
+  force500?: { path: string; method: "get" | "post" | "put" | "delete" }[];
 } = {}) => {
   vi.stubGlobal("cookieStore", { get: vi.fn(), set: vi.fn() });
   vi.spyOn(crypto, "randomUUID").mockImplementation(() => mockedRandomUUID);
 
   const customFetch = (path: string, method: string) => {
-    if (force500) {
+    if (force500?.some((f) => f.path === path && f.method === method)) {
       return respond(null, 500);
     }
     if (forceCases) {
@@ -216,8 +221,21 @@ export const requestValue = (
   field: string,
 ) => {
   const body = contracts[contractName][testName].cases[caseName].request.body;
-  if (typeof body === "object" && body !== null && !Array.isArray(body)) {
-    return body[field]?.toString() ?? "";
+  if (body != null && typeof body === "object" && !Array.isArray(body)) {
+    return body[field];
+  }
+  throw new Error(`Case body is not an object: ${JSON.stringify(body)}`);
+};
+
+export const responseValue = (
+  contractName: keyof typeof contracts,
+  testName: keyof Contract,
+  caseName: keyof Test["cases"],
+  field: string,
+) => {
+  const body = contracts[contractName][testName].cases[caseName].response.body;
+  if (body != null && typeof body === "object" && !Array.isArray(body)) {
+    return JSON.parse(JSON.stringify(body[field]));
   }
   throw new Error(`Case body is not an object: ${JSON.stringify(body)}`);
 };

@@ -19,7 +19,7 @@ import {
   useContext,
   useState,
 } from "react";
-
+import { HttpError } from "../../../errors/HttpError";
 import { apiMutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
@@ -69,7 +69,10 @@ export function AuthProvider({
       const data: User = await response.json();
       setUser(data);
     } else {
-      throw new Error("Invalid or expired magic link");
+      throw new HttpError(
+        response.status,
+        "Verification of the magic link failed",
+      );
     }
   }, []);
 
@@ -79,7 +82,7 @@ export function AuthProvider({
     if (response.ok) {
       setUser(null);
     } else {
-      throw new Error("Logout failed");
+      throw new HttpError(response.status, "Logout failed");
     }
   }, []);
 

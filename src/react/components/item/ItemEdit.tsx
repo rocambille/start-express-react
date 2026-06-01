@@ -15,6 +15,7 @@
 
 import { use, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
+import { NotFoundError } from "../../../errors/HttpError";
 import { cache } from "../../helpers/cache";
 import { useMutate } from "../../helpers/mutate";
 import ItemForm from "./ItemForm";
@@ -51,7 +52,7 @@ function ItemEdit() {
     Throwing allows the router error boundary to handle the 404.
   */
   if (item == null) {
-    throw new Error("404");
+    throw new NotFoundError();
   }
 
   return (

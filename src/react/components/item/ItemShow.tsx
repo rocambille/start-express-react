@@ -9,6 +9,7 @@
 
 import { use } from "react";
 import { Link, useParams } from "react-router";
+import { NotFoundError } from "../../../errors/HttpError";
 import { cache } from "../../helpers/cache";
 import { useAuth } from "../auth/AuthContext";
 import ItemDeleteForm from "./ItemDeleteForm";
@@ -30,7 +31,7 @@ function ItemShow() {
     Throwing allows the router error boundary to handle the 404.
   */
   if (item == null) {
-    throw new Error("404");
+    throw new NotFoundError();
   }
 
   return (

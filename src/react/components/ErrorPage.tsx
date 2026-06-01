@@ -1,35 +1,33 @@
-import { isRouteErrorResponse, Link, useRouteError } from "react-router";
-
 /**
  * Purpose:
  * Root error boundary for the application.
  *
  * Responsibilities:
- * - Catch and display routing errors (404)
- * - Catch and display application crashes (500)
+ * - Catch and display errors
  * - Provide a way back to the home page
  */
-export default function ErrorPage() {
-  const error = useRouteError();
 
-  let title = "Oops!";
-  let message = "An unexpected error has occurred.";
+import { isRouteErrorResponse, Link, useRouteError } from "react-router";
+import { HttpError } from "../../errors/HttpError";
 
+const getTitleAndMessage = (error: unknown): [string, string] => {
   if (isRouteErrorResponse(error)) {
-    if (error.status === 404) {
-      title = "404 - Page Not Found";
-      message =
-        "The page you are looking for does not exist or has been moved.";
-    } else if (error.status === 401) {
-      title = "401 - Unauthorized";
-      message = "You must be logged in to access this page.";
-    } else if (error.status === 503) {
-      title = "503 - Service Unavailable";
-      message = "The server is temporarily overloaded. Please try again later.";
-    }
-  } else if (error instanceof Error) {
-    message = error.message;
+    return [String(error.status), String(error.data)];
   }
+
+  if (error instanceof HttpError) {
+    return [String(error.status), error.message];
+  }
+
+  if (error instanceof Error) {
+    return ["Oops!", error.message];
+  }
+
+  return ["Oops!", "An unexpected error has occurred."];
+};
+
+export default function ErrorPage() {
+  const [title, message] = getTitleAndMessage(useRouteError());
 
   return (
     <main

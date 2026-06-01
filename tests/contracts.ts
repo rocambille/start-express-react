@@ -32,10 +32,11 @@ export type Json =
   | boolean
   | null
   | undefined
-  | { [key: string]: Json }
-  | Json[];
+  | JsonObject
+  | JsonArray;
 
 export type JsonObject = { [key: string]: Json };
+export type JsonArray = Json[];
 
 export type Case = {
   only?: boolean;
@@ -50,7 +51,7 @@ export type Case = {
   };
   response: {
     status: number;
-    body: unknown;
+    body?: JsonObject | JsonArray;
     // Optional hook to run extra assertions on the response
     and?: (response: { headers: { [key: string]: string } }) => void;
   };
