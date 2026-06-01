@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     env: loadEnv(mode, process.cwd(), ""),
+    typecheck: { tsconfig: "./tsconfig.test.json" },
     projects: [
       {
         extends: true,
@@ -27,8 +28,8 @@ export default defineConfig(({ mode }) => ({
     ],
     coverage: {
       exclude: [
-        "tests/**/contracts.ts",
-        "tests/**/data.ts",
+        "tests/**/contracts",
+        "tests/**/fixtures",
         "tests/**/test-utils*.ts",
       ],
     },

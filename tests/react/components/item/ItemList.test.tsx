@@ -1,10 +1,9 @@
 import { screen } from "@testing-library/react";
 
 import ItemList from "../../../../src/react/components/item/ItemList";
-
+import { fooUser } from "../../../fixtures/users";
 import {
   expectContractCall,
-  fooUser,
   renderWithStub,
   setupMocks,
 } from "../../test-utils";

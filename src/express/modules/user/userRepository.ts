@@ -139,13 +139,13 @@ class UserRepository {
 
     const id = this.create({
       email,
-      name: name ?? email.split("@")[0],
+      name: name ?? email.split("@")[0] ?? email,
     });
 
     return {
       id: Number(id),
       email: String(email),
-      name: String(name ?? email.split("@")[0]),
+      name: String(name ?? email.split("@")[0] ?? email),
     };
   }
 

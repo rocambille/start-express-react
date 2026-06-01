@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 
-import { main } from "../../bin/database-sync";
+import { main } from "../../scripts/database-sync";
 import database from "../../src/database";
 
 vi.mock("../../src/database", () => ({

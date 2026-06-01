@@ -45,7 +45,7 @@
 │   └── types/
 │       └── index.d.ts         # Shared TypeScript types (Item, User, etc.)
 ├── tests/
-│   └── contracts.ts           # API contract definitions — declarative source of truth
+│   └── contracts              # API contract definitions — declarative source of truth
 └── biome.json                 # Lint + format config
 ```
 

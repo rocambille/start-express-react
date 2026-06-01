@@ -2,7 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
 
-import { main } from "../../bin/make-purge";
+import { main } from "../../scripts/make-purge";
 
 const projectRoot = path.join(import.meta.dirname, "../..");
 

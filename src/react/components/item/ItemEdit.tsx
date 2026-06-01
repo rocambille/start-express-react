@@ -15,7 +15,6 @@
 
 import { use, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
-import { NotFoundError } from "../../../errors/HttpError";
 import { cache } from "../../helpers/cache";
 import { useMutate } from "../../helpers/mutate";
 import ItemForm from "./ItemForm";
@@ -27,33 +26,17 @@ function ItemEdit() {
 
   const editItem = useCallback(
     async (partialItem: Omit<Item, "id" | "user_id">) => {
-      const response = await mutate(`/api/items/${id}`, "put", partialItem, [
+      await mutate(`/api/items/${id}`, "put", partialItem, [
         "/api/items",
         `/api/items/${id}`,
       ]);
 
-      if (response.ok) {
-        navigate(`/items/${id}`);
-      }
+      navigate(`/items/${id}`);
     },
     [id, mutate, navigate],
   );
 
-  const item = use<Item | null>(cache(`/api/items/${id}`));
-
-  /*
-    Safety guard:
-
-    If the item is missing at this stage, it means:
-    - The route does not exist
-    - OR the user does not have access
-    - OR the data is stale
-
-    Throwing allows the router error boundary to handle the 404.
-  */
-  if (item == null) {
-    throw new NotFoundError();
-  }
+  const item = use(cache<Item>(`/api/items/${id}`));
 
   return (
     /*

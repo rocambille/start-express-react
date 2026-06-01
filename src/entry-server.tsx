@@ -104,17 +104,19 @@ export const render = async (template: string, req: Request, res: Response) => {
   */
   const leaf = context.matches[context.matches.length - 1];
 
-  const actionHeaders = context.actionHeaders[leaf.route.id];
-  if (actionHeaders) {
-    for (const [key, value] of actionHeaders.entries()) {
-      res.set(key, value);
+  if (leaf) {
+    const actionHeaders = context.actionHeaders[leaf.route.id];
+    if (actionHeaders) {
+      for (const [key, value] of actionHeaders.entries()) {
+        res.set(key, value);
+      }
     }
-  }
 
-  const loaderHeaders = context.loaderHeaders[leaf.route.id];
-  if (loaderHeaders) {
-    for (const [key, value] of loaderHeaders.entries()) {
-      res.set(key, value);
+    const loaderHeaders = context.loaderHeaders[leaf.route.id];
+    if (loaderHeaders) {
+      for (const [key, value] of loaderHeaders.entries()) {
+        res.set(key, value);
+      }
     }
   }
 

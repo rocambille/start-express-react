@@ -78,6 +78,10 @@ router.post("/api/health", (req, res) => {
   res.json(req.body);
 });
 
+router.delete("/api/health", (_req, res) => {
+  res.sendStatus(204);
+});
+
 /* ************************************************************************ */
 /* Module composition                                                       */
 /* ************************************************************************ */

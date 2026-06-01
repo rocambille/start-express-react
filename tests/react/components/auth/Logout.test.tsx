@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 
 import LogoutForm from "../../../../src/react/components/auth/LogoutForm";
+import { fooUser } from "../../../fixtures/users";
 import {
   expectContractCall,
-  fooUser,
   renderWithStub,
   setupMocks,
 } from "../../test-utils";

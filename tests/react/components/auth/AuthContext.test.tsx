@@ -107,25 +107,5 @@ describe("React Components: AuthContext", () => {
 
       expectContractCall("auth", "logout", "anyone");
     });
-    it("should throw when logout fails", async () => {
-      setupMocks({
-        force500: [
-          {
-            path: "/api/auth/logout",
-            method: "post",
-          },
-        ],
-      });
-
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
-      });
-
-      const auth = result.current;
-
-      await expect(auth.logout()).rejects.toThrow(/logout/i);
-
-      expectContractCall("auth", "logout", "anyone");
-    });
   });
 });

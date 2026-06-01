@@ -14,7 +14,7 @@
 /*
   In-memory cache used by React `use`.
 */
-const cacheData = new Map<string, ReturnType<typeof Response.prototype.json>>();
+const cacheData = new Map<string, React.Usable<Json>>();
 
 /*
   cache(url):
@@ -22,21 +22,20 @@ const cacheData = new Map<string, ReturnType<typeof Response.prototype.json>>();
   - Fetch is triggered only once per URL
   - Subsequent calls reuse the same Promise
 */
-export const cache = (url: string) => {
+export const cache = <T extends Json>(url: string): React.Usable<T> => {
   if (!cacheData.has(url)) {
     cacheData.set(
       url,
-      fetch(url).then((response) => {
+      fetch(url).then<T>((response) => {
         if (!response.ok) {
-          return null;
+          throw new Error(`${response.status}: ${response.statusText}`);
         }
         return response.json();
       }),
     );
   }
 
-  // biome-ignore lint/style/noNonNullAssertion: cacheData is set before get
-  return cacheData.get(url)!;
+  return cacheData.get(url) as React.Usable<T>;
 };
 
 /*

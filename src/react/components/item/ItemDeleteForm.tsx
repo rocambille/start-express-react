@@ -20,14 +20,12 @@ function ItemDeleteForm() {
   const { id } = useParams();
 
   const deleteItem = useCallback(async () => {
-    const response = await mutate(`/api/items/${id}`, "delete", null, [
+    await mutate(`/api/items/${id}`, "delete", null, [
       "/api/items",
       `/api/items/${id}`,
     ]);
 
-    if (response.ok) {
-      navigate("/items");
-    }
+    navigate("/items");
   }, [id, mutate, navigate]);
 
   return (

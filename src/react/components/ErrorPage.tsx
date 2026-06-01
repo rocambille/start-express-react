@@ -8,15 +8,10 @@
  */
 
 import { isRouteErrorResponse, Link, useRouteError } from "react-router";
-import { HttpError } from "../../errors/HttpError";
 
 const getTitleAndMessage = (error: unknown): [string, string] => {
   if (isRouteErrorResponse(error)) {
     return [String(error.status), String(error.data)];
-  }
-
-  if (error instanceof HttpError) {
-    return [String(error.status), error.message];
   }
 
   if (error instanceof Error) {

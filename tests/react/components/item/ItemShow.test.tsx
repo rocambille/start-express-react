@@ -1,11 +1,10 @@
 import { screen } from "@testing-library/react";
 
 import ItemShow from "../../../../src/react/components/item/ItemShow";
-
+import { allItems } from "../../../fixtures/items";
+import { fooUser } from "../../../fixtures/users";
 import {
-  allItems,
   expectContractCall,
-  fooUser,
   renderWithStub,
   setupMocks,
 } from "../../test-utils";
@@ -40,7 +39,7 @@ describe("<ItemShow />", () => {
         initialEntries: [`/items/${NaN}`],
         me: fooUser,
       }),
-    ).rejects.toThrow(/not found/i);
+    ).rejects.toThrow(/404/i);
 
     expectContractCall("items", "read", "not_found");
   });

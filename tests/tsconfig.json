@@ -1,0 +1,4 @@
+// This file is required for IDEs to correctly resolve the tsconfig for the test files
+{
+  "extends": "../tsconfig.test.json"
+}

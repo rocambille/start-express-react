@@ -1,7 +1,6 @@
 import { screen } from "@testing-library/react";
 import { data } from "react-router";
 
-import { HttpError, NotFoundError } from "../../../src/errors/HttpError";
 import ErrorPage from "../../../src/react/components/ErrorPage";
 import { renderWithStub, setupMocks } from "../test-utils";
 
@@ -42,36 +41,6 @@ describe("<ErrorPage />", () => {
 
     await screen.findByRole("heading", { level: 1 });
     await screen.findByText("Test error");
-  });
-
-  it("should handle a 404 error", async () => {
-    await renderWithStub({
-      path: "/",
-      Component: () => {
-        throw new NotFoundError();
-      },
-      ErrorBoundary: ErrorPage,
-      initialEntries: ["/"],
-      me: null,
-    });
-
-    await screen.findByRole("heading", { level: 1 });
-    await screen.findByText("Not Found");
-  });
-
-  it("should handle an HTTP error response", async () => {
-    await renderWithStub({
-      path: "/",
-      Component: () => {
-        throw new HttpError(418, "I'm a teapot");
-      },
-      ErrorBoundary: ErrorPage,
-      initialEntries: ["/"],
-      me: null,
-    });
-
-    await screen.findByRole("heading", { level: 1 });
-    await screen.findByText("I'm a teapot");
   });
 
   it("should handle a standard error", async () => {
