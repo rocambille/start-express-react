@@ -70,7 +70,7 @@ Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agen
 
 ### 🧪 Vérification basée sur un contrat
 
-Vous définissez le comportement de l'API dans `tests/contracts.ts` : une source de vérité centrale et déclarative.
+Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : une source de vérité centrale et déclarative.
 
 * **Pour vous :** une documentation claire et évolutive.
 

@@ -66,7 +66,7 @@ npm run make:clone -- src/express/modules/item src/express/modules/task item tas
 This enforces consistency by cloning your *actual* code patterns. This keeps your AI agent focused and accurate.
 
 ### 🧪 Contract-driven verification
-You define API behavior in `tests/contracts.ts`: a central, declarative source of truth.
+You define API behavior in the `tests/contracts/` directory: a central, declarative source of truth.
 *   **For you:** clear, living documentation.
 *   **For AI:** a strict "contract" it must follow when generating endpoints.
 *   **For the app:** instant verification that the AI didn't miss a scenario.

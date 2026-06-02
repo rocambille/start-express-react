@@ -9,7 +9,7 @@
 
 - **Backend**: Node.js + Express 5, TypeScript, Zod (validation), `node:sqlite` (sync API)
 - **Frontend**: React 19, React Router (with SSR/hydration), Vite, Pico CSS
-- **Database**: SQLite — zero-config, synchronous, file at `src/database/data/database.sqlite`
+- **Database**: SQLite — zero-config, synchronous, file at `data/sqlite/database.sqlite`
 - **Tooling**: Biome (lint + format), Vitest (tests), tsx (runtime), Docker (optional)
 
 ---
@@ -20,14 +20,16 @@
 .
 ├── server.ts                  # Single entry point — bridges Express + Vite
 ├── index.html                 # Vite root — contains <!--ssr-outlet-->
+├── data/
+│   ├── mailpit/               # Mailpit persistence (Docker)
+│   └── sqlite/
+│       └── database.sqlite    # Generated locally — NOT committed to git
 ├── src/
 │   ├── entry-client.tsx       # Client-side hydration (hydrateRoot)
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
-│   │   ├── seeder.sql         # Test/seed data
-│   │   └── data/
-│   │       └── database.sqlite  # Generated locally — NOT committed to git
+│   │   └── seeder.sql         # Test/seed data
 │   ├── express/
 │   │   ├── routes.ts          # Registers all Express modules via importAndUse()
 │   │   ├── helpers/           # Infrastructure: cache, validation, converters
@@ -262,7 +264,7 @@ StartER has no file upload handling. If adding one, store files outside the docu
 
 ### Environment variables
 
-Never commit `.env`. Never commit `src/database/data/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
+Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
 
 ---
 
