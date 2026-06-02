@@ -50,27 +50,27 @@ describe("React Helpers: cache", () => {
 
     it("should invalidate all cache when '*' is provided", async () => {
       const data = await cache("/api/health");
-      const data2 = await cache("/api/me");
+      const data2 = await cache("/api/users/me");
 
       invalidateCache("*");
 
       const data3 = await cache(`/api/health`);
       expect(data3).toEqual(data);
-      const data4 = await cache(`/api/me`);
+      const data4 = await cache(`/api/users/me`);
       expect(data4).toEqual(data2);
 
       expect(global.fetch).toHaveBeenCalledTimes(4);
       expect(global.fetch).toHaveBeenNthCalledWith(1, `/api/health`);
-      expect(global.fetch).toHaveBeenNthCalledWith(2, `/api/me`);
+      expect(global.fetch).toHaveBeenNthCalledWith(2, `/api/users/me`);
       expect(global.fetch).toHaveBeenNthCalledWith(3, `/api/health`);
-      expect(global.fetch).toHaveBeenNthCalledWith(4, `/api/me`);
+      expect(global.fetch).toHaveBeenNthCalledWith(4, `/api/users/me`);
     });
 
     it("should not invalidate cache for paths that do not match", async () => {
       await cache("/api/health");
-      await cache("/api/me");
+      await cache("/api/users/me");
 
-      invalidateCache("/api/me");
+      invalidateCache("/api/users/me");
 
       const data = await cache(`/api/health`);
       expect(data).toEqual({ hello: "world" });

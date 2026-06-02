@@ -12,9 +12,7 @@ const projectRoot = path.join(import.meta.dirname, "../..");
  * preventing regressions when the codebase changes.
  */
 async function scaffoldProject(rootDir: string) {
-  await fs.copy(path.join(projectRoot, "src"), path.join(rootDir, "src"), {
-    filter: (srcPath) => !srcPath.includes(path.join("database", "data")),
-  });
+  await fs.copy(path.join(projectRoot, "src"), path.join(rootDir, "src"));
   await fs.copy(path.join(projectRoot, "tests"), path.join(rootDir, "tests"));
 }
 
@@ -194,7 +192,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       );
 
       expect(result).not.toContain("/items");
-      expect(result).toContain("/logout");
+      expect(result).toContain("/account");
       expect(result).toContain("Home");
     });
 
@@ -211,7 +209,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         .replace(`      ...itemRoutes,\n`, "");
 
       expect(result).not.toContain("itemRoutes");
-      expect(result).toContain("LogoutForm");
+      expect(result).toContain("AccountPage");
     });
 
     it("removes item route from express routes.ts", async () => {
@@ -295,7 +293,10 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       );
 
       const result = content
-        .replace(`import LogoutForm from "./components/auth/LogoutForm";\n`, "")
+        .replace(
+          `import AccountPage from "./components/auth/AccountPage";\n`,
+          "",
+        )
         .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
         .replace(
           `import { AuthProvider } from "./components/auth/AuthContext";\n`,
@@ -311,7 +312,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
         .replace(
-          / {6}\{\n {8}path: "logout",\n {8}element: <LogoutForm \/>,\n {6}\},\n/m,
+          / {6}\{\n {8}path: "account",\n {8}element: <AccountPage \/>,\n {6}\},\n/m,
           "",
         )
         .replace(
@@ -319,12 +320,12 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
           "",
         );
 
-      expect(result).not.toContain("LogoutForm");
+      expect(result).not.toContain("AccountPage");
       expect(result).not.toContain("VerifyPage");
       expect(result).not.toContain("AuthProvider");
       expect(result).not.toContain("useLoaderData");
       expect(result).not.toContain("Root loader");
-      expect(result).not.toContain('path: "logout"');
+      expect(result).not.toContain('path: "account"');
       expect(result).not.toContain('path: "verify"');
       expect(result).toContain("DataRefreshProvider");
       expect(result).toContain("Layout");
@@ -383,7 +384,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("useAuth");
       expect(result).not.toContain("check()");
       expect(result).not.toContain("/items");
-      expect(result).not.toContain("/logout");
+      expect(result).not.toContain("/account");
       expect(result).toContain("Home");
     });
 

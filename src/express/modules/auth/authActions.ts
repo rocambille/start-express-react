@@ -224,18 +224,6 @@ const destroyAccessToken: RequestHandler = (_req, res) => {
 };
 
 /* ************************************************************************ */
-
-/*
-  Return the currently authenticated user.
-
-  Preconditions:
-  - verifyAccessToken has run successfully
-*/
-const readMe: RequestHandler = (req, res) => {
-  res.json(req.me);
-};
-
-/* ************************************************************************ */
 /* Middleware                                                               */
 /* ************************************************************************ */
 
@@ -280,6 +268,5 @@ export default {
   sendMagicLink,
   verifyMagicLink,
   destroyAccessToken,
-  readMe,
   verifyAccessToken,
 };

@@ -17,7 +17,14 @@ function LogoutForm() {
 
   return (
     <form action={logout}>
-      <button type="submit">Log out</button>
+      <hgroup>
+        <h2>Log out</h2>
+        <p>You will be logged out of your account.</p>
+      </hgroup>
+
+      <button className="secondary" type="submit">
+        Log out
+      </button>
     </form>
   );
 }

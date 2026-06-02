@@ -1,82 +1,53 @@
-import { allUsers, barUser, deletedUser, fooUser } from "../fixtures/users";
+import { fooUser } from "../fixtures/users";
 
 export default (<Contract>{
-  browse: {
+  read_me: {
     method: "get",
-    path: "/api/users",
+    path: "/api/users/me",
     cases: {
-      success: {
-        request: {},
+      as_me: {
+        request: {
+          jwtPayload: { sub: fooUser.id },
+        },
         response: {
           status: 200,
-          body: allUsers.filter((user) => user.id !== deletedUser.id),
+          body: fooUser,
         },
+      },
+      unauthorized: {
+        request: {},
+        response: { status: 401, body: {} },
+      },
+      invalid_user_id: {
+        request: { jwtPayload: { sub: NaN } },
+        response: { status: 401, body: {} },
       },
     },
   },
-  delete: {
-    method: "delete",
-    path: `/api/users/${fooUser.id}`,
+  edit_me: {
+    method: "put",
+    path: "/api/users/me",
     cases: {
-      success: {
+      as_me: {
+        request: {
+          body: { email: "updated@mail.com", name: "updated" },
+          jwtPayload: { sub: fooUser.id },
+        },
+        response: { status: 204, body: {} },
+      },
+    },
+  },
+  delete_me: {
+    method: "delete",
+    path: "/api/users/me",
+    cases: {
+      as_me: {
         request: { jwtPayload: { sub: fooUser.id } },
         response: { status: 204, body: {} },
       },
       unauthorized: {
         request: { jwtPayload: null },
         response: { status: 401, body: {} },
-      },
-      forbidden: {
-        request: { jwtPayload: { sub: barUser.id } },
-        response: { status: 403, body: {} },
-      },
-      not_found: {
-        specialPath: `/api/users/${NaN}`,
-        request: { jwtPayload: { sub: fooUser.id } },
-        response: { status: 204, body: {} },
-      },
-    },
-  },
-  edit: {
-    method: "put",
-    path: `/api/users/${fooUser.id}`,
-    cases: {
-      success: {
-        request: {
-          body: { email: "updated@mail.com", name: "updated" },
-          jwtPayload: { sub: fooUser.id },
-        },
-        response: { status: 204, body: {} },
-      },
-      forbidden: {
-        request: {
-          body: { email: "updated@mail.com", name: "updated" },
-          jwtPayload: { sub: barUser.id },
-        },
-        response: { status: 403, body: {} },
-      },
-      not_found: {
-        specialPath: `/api/users/${NaN}`,
-        request: {
-          body: { email: "updated@mail.com", name: "updated" },
-          jwtPayload: { sub: fooUser.id },
-        },
-        response: { status: 404, body: {} },
-      },
-    },
-  },
-  read: {
-    method: "get",
-    path: `/api/users/${fooUser.id}`,
-    cases: {
-      success: {
-        request: {},
-        response: { status: 200, body: fooUser },
-      },
-      not_found: {
-        specialPath: `/api/users/${NaN}`,
-        request: {},
-        response: { status: 404, body: {} },
       },
     },
   },

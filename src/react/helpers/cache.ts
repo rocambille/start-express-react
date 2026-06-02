@@ -14,7 +14,7 @@
 /*
   In-memory cache used by React `use`.
 */
-const cacheData = new Map<string, React.Usable<Json>>();
+const cacheData = new Map<string, Promise<Json>>();
 
 /*
   cache(url):
@@ -22,7 +22,7 @@ const cacheData = new Map<string, React.Usable<Json>>();
   - Fetch is triggered only once per URL
   - Subsequent calls reuse the same Promise
 */
-export const cache = <T extends Json>(url: string): React.Usable<T> => {
+export const cache = <T extends Json>(url: string): Promise<T> => {
   if (!cacheData.has(url)) {
     cacheData.set(
       url,
@@ -35,7 +35,7 @@ export const cache = <T extends Json>(url: string): React.Usable<T> => {
     );
   }
 
-  return cacheData.get(url) as React.Usable<T>;
+  return cacheData.get(url) as Promise<T>;
 };
 
 /*

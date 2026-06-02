@@ -5,7 +5,7 @@
   This context:
   - Stores the currently authenticated user (or null)
   - Exposes high-level auth actions (sendMagicLink, verifyMagicLink, logout)
-  - Performs an initial session check on mount (/api/me)
+  - Performs an initial session check on mount (/api/users/me)
 
   Usage:
   - Wrap the app with <AuthProvider>
@@ -19,6 +19,7 @@ import {
   useContext,
   useState,
 } from "react";
+import { cache } from "../../helpers/cache";
 import { apiMutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
@@ -31,6 +32,10 @@ type AuthContextType = {
   sendMagicLink: (email: string) => Promise<void>;
   verifyMagicLink: (token: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateMe: (
+    newMe: Omit<User, "id" | "created_at" | "deleted_at">,
+  ) => Promise<void>;
+  deleteMe: () => Promise<void>;
 };
 
 /* ************************************************************************ */
@@ -73,6 +78,21 @@ export function AuthProvider({
     setUser(null);
   }, []);
 
+  const updateMe = useCallback(
+    async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
+      await apiMutate("/api/users/me", "put", newMe);
+
+      setUser(await cache<User | null>("/api/users/me"));
+    },
+    [],
+  );
+
+  const deleteMe = useCallback(async () => {
+    await apiMutate("/api/users/me", "delete");
+
+    setUser(null);
+  }, []);
+
   /* ********************************************************************** */
   /* Provider value                                                         */
   /* ********************************************************************** */
@@ -85,6 +105,8 @@ export function AuthProvider({
         sendMagicLink,
         verifyMagicLink,
         logout,
+        updateMe,
+        deleteMe,
       }}
     >
       {children}

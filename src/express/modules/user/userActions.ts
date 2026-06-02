@@ -28,52 +28,29 @@ import userRepository from "./userRepository";
 /* ************************************************************************ */
 
 /*
-  Browse all users.
+  Return the currently authenticated user.
 
   Preconditions:
-  - None (public endpoint)
-
-  Response:
-  - 200 with an array of users
+  - verifyAccessToken has run successfully
 */
-const browse: RequestHandler = (req, res) => {
-  const offset = Number(req.query.start ?? "0");
-
-  const users = userRepository.findAll(10, offset);
-
-  res.json(users);
+const readMe: RequestHandler = (req, res) => {
+  res.json(req.me);
 };
 
 /* ************************************************************************ */
 
 /*
-  Read a single user.
-
-  Preconditions:
-  - `req.user` has been injected by the param converter
-
-  Response:
-  - 200 with the user payload
-*/
-const read: RequestHandler = (req, res) => {
-  res.json(req.user);
-};
-
-/* ************************************************************************ */
-
-/*
-  Edit an existing user.
+  Edit the currently authenticated user.
 
   Preconditions:
   - User is authenticated
-  - User is authorized to access this user
   - req.body has been validated and sanitized
 
   Response:
   - 204 No Content on success
 */
-const edit: RequestHandler = (req, res) => {
-  userRepository.update(req.user.id, req.body);
+const editMe: RequestHandler = (req, res) => {
+  userRepository.update(req.me.id, req.body);
 
   res.sendStatus(204);
 };
@@ -81,17 +58,16 @@ const edit: RequestHandler = (req, res) => {
 /* ************************************************************************ */
 
 /*
-  Soft-delete a user.
+  Soft-delete the currently authenticated user.
 
   Preconditions:
   - User is authenticated
-  - User is authorized to access this user
 
   Response:
   - 204 No Content
 */
-const destroy: RequestHandler = (req, res) => {
-  userRepository.softDelete(req.user.id);
+const destroyMe: RequestHandler = (req, res) => {
+  userRepository.softDelete(req.me.id);
 
   res.sendStatus(204);
 };
@@ -101,8 +77,7 @@ const destroy: RequestHandler = (req, res) => {
 /* ************************************************************************ */
 
 export default {
-  browse,
-  read,
-  edit,
-  destroy,
+  readMe,
+  editMe,
+  destroyMe,
 };

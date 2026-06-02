@@ -33,29 +33,6 @@ export default (<Contract>{
       },
     },
   },
-  me: {
-    method: "get",
-    path: "/api/me",
-    cases: {
-      success: {
-        request: {
-          jwtPayload: { sub: fooUser.id },
-        },
-        response: {
-          status: 200,
-          body: fooUser,
-        },
-      },
-      guest: {
-        request: {},
-        response: { status: 401, body: {} },
-      },
-      unauthorized: {
-        request: { jwtPayload: { sub: NaN } },
-        response: { status: 401, body: {} },
-      },
-    },
-  },
   verify: {
     method: "post",
     path: "/api/auth/verify",

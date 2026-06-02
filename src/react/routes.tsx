@@ -21,8 +21,10 @@
 
 import { type RouteObject, useLoaderData } from "react-router";
 
-import LogoutForm from "./components/auth/LogoutForm";
+import AccountPage from "./components/auth/AccountPage";
+import { AuthProvider } from "./components/auth/AuthContext";
 import VerifyPage from "./components/auth/VerifyPage";
+import { DataRefreshProvider } from "./components/DataRefreshContext";
 import ErrorPage from "./components/ErrorPage";
 import Home from "./components/Home";
 import { itemRoutes } from "./components/item/index";
@@ -34,8 +36,6 @@ import Layout from "./components/Layout";
   across all routes and layouts
 */
 import "./index.css";
-import { AuthProvider } from "./components/auth/AuthContext";
-import { DataRefreshProvider } from "./components/DataRefreshContext";
 
 /* ************************************************************************ */
 /* Routes definition                                                        */
@@ -64,11 +64,11 @@ const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     /*
       Root loader:
-      - Fetches the current user from the /api/me endpoint
+      - Fetches the current user from the /api/users/me endpoint
       - Returns the user to the root component
     */
     loader: async () => {
-      const response = await fetch("/api/me");
+      const response = await fetch("/api/users/me");
 
       const me: User | null = response.ok ? await response.json() : null;
 
@@ -85,8 +85,8 @@ const routes: RouteObject[] = [
         element: <Home />,
       },
       {
-        path: "logout",
-        element: <LogoutForm />,
+        path: "account",
+        element: <AccountPage />,
       },
       {
         path: "verify",
