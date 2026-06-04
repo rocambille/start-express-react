@@ -41,7 +41,7 @@ const port = Number(process.env.APP_PORT ?? 5173);
 const indexHtml = readIndexHtml();
 
 // Server creation is async because it may initialize Vite in dev mode
-createServer().then((server) => {
+createServer("./src/express/routes").then((server) => {
   server.listen(port, () => {
     console.info(`Listening on http://localhost:${port}`);
   });
@@ -94,7 +94,7 @@ globalThis.fetch = (resource, init) => {
   return nodeFetch(url, init);
 };
 
-export async function createServer() {
+export async function createServer(routesPath: string) {
   const app = express();
   const httpServer = http.createServer(app);
 
@@ -138,7 +138,7 @@ export async function createServer() {
 
   // All API routes are mounted here.
   // They are isolated, stateless, and independently testable.
-  app.use((await import("./src/express/routes")).default);
+  app.use((await import(routesPath)).default);
 
   /* ********************************************************************** */
   /* Frontend / SSR configuration                                           */
