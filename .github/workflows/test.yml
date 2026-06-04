@@ -35,5 +35,5 @@ jobs:
     - name: Run tests
       run: npm run test -- --exclude tests/setup/base.test.ts
       env:
-        APP_BASE_URL: dummy_url_for_testing
+        APP_BASE_URL: http://dummy_url_for_testing
         APP_SECRET: dummy_secret_for_testing
