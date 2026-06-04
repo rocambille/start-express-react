@@ -18,7 +18,19 @@
   - Soft delete is the default find behavior
 */
 
+import z from "zod";
+
 import database from "../../../database";
+
+/* ************************************************************************ */
+/* Schemas                                                                  */
+/* ************************************************************************ */
+
+const userSchema: z.ZodType<User> = z.object({
+  id: z.number(),
+  email: z.string(),
+  name: z.string(),
+});
 
 /* ************************************************************************ */
 /* Repository                                                               */
@@ -69,13 +81,7 @@ class UserRepository {
     );
     const row = query.get(byId);
 
-    if (row == null) {
-      return null;
-    }
-
-    const { id, email, name } = row;
-
-    return { id: Number(id), email: String(email), name: String(name) };
+    return row ? userSchema.parse(row) : null;
   }
 
   /*
@@ -95,13 +101,7 @@ class UserRepository {
     );
     const row = query.get(byEmail);
 
-    if (row == null) {
-      return null;
-    }
-
-    const { id, email, name } = row;
-
-    return { id: Number(id), email: String(email), name: String(name) };
+    return row ? userSchema.parse(row) : null;
   }
 
   /*

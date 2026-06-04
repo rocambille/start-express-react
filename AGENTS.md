@@ -171,31 +171,50 @@ const browse: RequestHandler = (req, res) => {
 };
 ```
 
-### Explicit runtime casting — never use `as Type`
+### Zod Output Parsing — never use `as Type`
 
-SQLite returns raw SQL primitives (`string | number | bigint | null`). Always reconstruct objects with explicit primitive converters:
+SQLite returns raw SQL primitives (`string | number | bigint | null`). Always reconstruct objects by parsing them through a Zod schema bound to your TypeScript type (`z.ZodType<Item>`).
+
+> **⚠️ CRITICAL**: Do NOT confuse the **Output Schema** (in `*Repository.ts`) with the **Input Schema** (in `*Validator.ts`). The Repository output schema only casts raw primitives to match the TypeScript type. It does NOT enforce business constraints (like `.email()` or `.min()`).
 
 ```ts
+// In your Repository file
+import { z } from "zod";
+
+const itemSchema: z.ZodType<Item> = z.object({
+  id: z.number(),
+  title: z.string(),
+  user_id: z.number()
+});
+
 // ✅ Correct
-return { id: Number(id), title: String(title), user_id: Number(user_id) };
+return itemSchema.parse(row);
 
 // ❌ Wrong — hides runtime errors
 return row as Item;
 ```
 
-### Synchronous SQLite — no async/await in repositories
+### Synchronous SQLite — no async/await for database calls
 
-`node:sqlite` is synchronous by design. Repositories must not use `async`/`await`. Actions can remain `async` if they need to interact with other async concerns (e.g., `req.body`, external calls).
+`node:sqlite` is synchronous by design. Repository methods must execute SQL queries synchronously and must not wrap database calls in `async`/`await`. 
+
+However, a repository method *may* be marked `async` if it strictly requires interaction with genuinely asynchronous external resources (e.g., third-party APIs, asynchronous file system reads). Actions (in `*Actions.ts`) generally remain `async` to handle `req.body` and orchestrate these calls.
 
 ```ts
-// ✅ Correct repository method
+// ✅ Correct SQLite query
 find(byId: number): Item | null {
   const query = database.prepare("select id, title from item where id = ?");
   const row = query.get(byId);
   // ...
 }
 
-// ❌ Wrong
+// ✅ Correct (Mixed resource query)
+async fetchAndSave(id: number): Promise<Item> {
+  const data = await fetch(`https://api.example.com/data/${id}`);
+  database.prepare("insert into item (title) values (?)").run(data.title);
+}
+
+// ❌ Wrong (Wrapping SQLite in async for no reason)
 async find(byId: number): Promise<Item | null> { ... }
 ```
 

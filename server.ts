@@ -30,6 +30,27 @@ import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import { createServer as createViteServer } from "vite";
 
+/* ************************************************************************ */
+/*                                  Startup                                 */
+/* ************************************************************************ */
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const port = Number(process.env.APP_PORT ?? 5173);
+
+const indexHtml = readIndexHtml();
+
+// Server creation is async because it may initialize Vite in dev mode
+createServer().then((server) => {
+  server.listen(port, () => {
+    console.info(`Listening on http://localhost:${port}`);
+  });
+});
+
+/* ************************************************************************ */
+/*                             Server creation                              */
+/* ************************************************************************ */
+
 /**
  * Patch globalThis.fetch to support relative URLs during SSR.
  *
@@ -72,27 +93,6 @@ globalThis.fetch = (resource, init) => {
 
   return nodeFetch(url, init);
 };
-
-/* ************************************************************************ */
-/*                                  Startup                                 */
-/* ************************************************************************ */
-
-const isProduction = process.env.NODE_ENV === "production";
-
-const port = +(process.env.APP_PORT ?? 5173);
-
-const indexHtml = readIndexHtml();
-
-// Server creation is async because it may initialize Vite in dev mode
-createServer().then((server) => {
-  server.listen(port, () => {
-    console.info(`Listening on http://localhost:${port}`);
-  });
-});
-
-/* ************************************************************************ */
-/*                             Server creation                              */
-/* ************************************************************************ */
 
 export async function createServer() {
   const app = express();
