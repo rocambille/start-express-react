@@ -22,14 +22,6 @@
  * - https://vitejs.dev/guide/ssr
  */
 
-import { AsyncLocalStorage } from "node:async_hooks";
-import fs from "node:fs";
-import http from "node:http";
-import express, { type ErrorRequestHandler, type Express } from "express";
-import { rateLimit } from "express-rate-limit";
-import helmet from "helmet";
-import { createServer as createViteServer } from "vite";
-
 /* ************************************************************************ */
 /*                                  Startup                                 */
 /* ************************************************************************ */
@@ -62,6 +54,8 @@ createServer("./src/express/routes").then((server) => {
  * - Create a storage that holds the base URL for the current request
  * - Patch fetch to resolve relative URLs against this base URL
  */
+import { AsyncLocalStorage } from "node:async_hooks";
+
 const fetchBaseStorage = new AsyncLocalStorage<{
   base: string;
   cookie?: string;
@@ -93,6 +87,15 @@ globalThis.fetch = (resource, init) => {
 
   return nodeFetch(url, init);
 };
+
+/**
+ * Express / Vite integration
+ */
+import http from "node:http";
+import express, { type ErrorRequestHandler } from "express";
+import { rateLimit } from "express-rate-limit";
+import helmet from "helmet";
+import { createServer as createViteServer } from "vite";
 
 export async function createServer(routesPath: string) {
   const app = express();
@@ -252,6 +255,8 @@ export async function createServer(routesPath: string) {
  * - Development: unbuilt index.html
  * - Production: generated dist/client/index.html
  */
+import fs from "node:fs";
+
 function readIndexHtml() {
   return fs.readFileSync(
     isProduction ? "dist/client/index.html" : "index.html",
@@ -270,6 +275,8 @@ function readIndexHtml() {
  *   - Create a Vite dev server in middleware mode
  *   - Let Express control routing
  */
+import type { Express } from "express";
+
 async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
     const compression = (await import("compression")).default;
