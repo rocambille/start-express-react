@@ -26,14 +26,12 @@
 /*                                  Startup                                 */
 /* ************************************************************************ */
 
-const isProduction = process.env.NODE_ENV === "production";
-
 const port = Number(process.env.APP_PORT ?? 5173);
 
 const indexHtml = readIndexHtml();
 
 // Server creation is async because it may initialize Vite in dev mode
-createServer("./src/express/routes").then((server) => {
+createServerWith("./src/express/routes").then((server) => {
   server.listen(port, () => {
     console.info(`Listening on http://localhost:${port}`);
   });
@@ -95,9 +93,10 @@ import http from "node:http";
 import express, { type ErrorRequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
-import { createServer as createViteServer } from "vite";
 
-export async function createServer(routesPath: string) {
+const isProduction = process.env.NODE_ENV === "production";
+
+export async function createServerWith(routesPath: string) {
   const app = express();
   const httpServer = http.createServer(app);
 
@@ -276,6 +275,7 @@ function readIndexHtml() {
  *   - Let Express control routing
  */
 import type { Express } from "express";
+import { createServer as createViteServer } from "vite";
 
 async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
