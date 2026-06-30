@@ -128,8 +128,8 @@ const sendMagicLink: RequestHandler = async (req, res) => {
     return;
   }
 
-  // Find or create user to get an ID
-  const user = userRepository.findOrCreateByEmail(email);
+  // Find or create user ID
+  const userId = userRepository.findOrCreateByEmail(email);
 
   // Generate opaque token
   const rawToken = crypto.randomBytes(32).toString("hex");
@@ -137,7 +137,7 @@ const sendMagicLink: RequestHandler = async (req, res) => {
 
   // Store in DB
   const expiresAt = new Date(Date.now() + magicLinkTimeout);
-  authRepository.insertOrReplaceToken(user.id, tokenHash, expiresAt);
+  authRepository.insertOrReplaceToken(userId, tokenHash, expiresAt);
 
   const magicLink = `${trustedBaseUrl}/verify?token=${rawToken}`;
 
