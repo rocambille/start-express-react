@@ -1,6 +1,8 @@
 import { screen } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 
+vi.mock("react-router", { spy: true });
+
 import ItemDeleteForm from "../../../../src/react/components/item/ItemDeleteForm";
 import { allItems } from "../../../fixtures/items";
 import { fooUser } from "../../../fixtures/users";
@@ -15,9 +17,7 @@ describe("<ItemDeleteForm />", () => {
     setupMocks();
 
     const mockedNavigate = vi.fn();
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
   });
 
   afterEach(() => {

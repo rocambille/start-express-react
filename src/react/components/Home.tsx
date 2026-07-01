@@ -36,7 +36,7 @@ function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Learn more
+            Go to the documentation
           </a>
         </p>
       </hgroup>

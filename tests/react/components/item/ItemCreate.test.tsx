@@ -1,6 +1,8 @@
 import { screen } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 
+vi.mock("react-router", { spy: true });
+
 import ItemCreate from "../../../../src/react/components/item/ItemCreate";
 import { fooUser } from "../../../fixtures/users";
 import {
@@ -16,9 +18,7 @@ describe("<ItemCreate />", () => {
     setupMocks();
 
     const mockedNavigate = vi.fn();
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
   });
 
   afterEach(() => {

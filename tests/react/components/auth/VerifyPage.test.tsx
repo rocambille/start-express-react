@@ -1,6 +1,8 @@
 import { screen } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 
+vi.mock("react-router", { spy: true });
+
 import VerifyPage from "../../../../src/react/components/auth/VerifyPage";
 import {
   expectContractCall,
@@ -21,9 +23,7 @@ describe("<VerifyPage />", () => {
 
   it("should mount successfully", async () => {
     const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
 
     await renderWithStub({
       path: "/verify",
@@ -38,9 +38,7 @@ describe("<VerifyPage />", () => {
   });
   it("should verify token and redirect to dashboard when valid", async () => {
     const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
 
     await renderWithStub({
       path: "/verify",
@@ -57,9 +55,7 @@ describe("<VerifyPage />", () => {
   });
   it("should display error when token is invalid", async () => {
     const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
 
     await renderWithStub({
       path: "/verify",
@@ -77,9 +73,7 @@ describe("<VerifyPage />", () => {
   });
   it("should display error when token is missing", async () => {
     const mockedNavigate = vi.fn().mockImplementation((_to: string) => {});
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
 
     await renderWithStub({
       path: "/verify",
