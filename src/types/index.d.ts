@@ -1,5 +1,18 @@
 declare module "*.css";
 
+type Json =
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | JsonObject
+  | JsonArray;
+
+type JsonObject = { [key: string]: Json };
+type JsonArray = Json[];
+
 type RowId = number | bigint;
 
 type Item = {

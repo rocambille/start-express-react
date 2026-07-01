@@ -133,7 +133,7 @@ async function purgeAuth(rootDir: string) {
   await updateFile(rootDir, "src/react/routes.tsx", (content) =>
     content
       // Remove auth-related imports
-      .replace(`import LogoutForm from "./components/auth/LogoutForm";\n`, "")
+      .replace(`import AccountPage from "./components/auth/AccountPage";\n`, "")
       .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
       .replace(
         `import { AuthProvider } from "./components/auth/AuthContext";\n`,
@@ -151,9 +151,9 @@ async function purgeAuth(rootDir: string) {
       )
       // Remove the loader
       .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
-      // Remove logout and verify routes
+      // Remove account and verify routes
       .replace(
-        / {6}\{\n {8}path: "logout",\n {8}element: <LogoutForm \/>,\n {6}\},\n/m,
+        / {6}\{\n {8}path: "account",\n {8}element: <AccountPage \/>,\n {6}\},\n/m,
         "",
       )
       .replace(
@@ -187,7 +187,7 @@ async function purgeAuth(rootDir: string) {
     content
       .replace(`import { useAuth } from "./auth/AuthContext";\n\n`, "")
       .replace(`  const { check } = useAuth();\n`, "")
-      // After purgeItems, only the logout link remains in the auth block.
+      // After purgeItems, only the account link remains in the auth block.
       // Remove the whole conditional block.
       .replace(/ {8}\{check\(\) && \(\n[\s\S]*?\n {8}\)}\n/m, ""),
   );

@@ -13,7 +13,7 @@
   - Decouples API contract from implementation details
 */
 
-import { contracts } from "../contracts";
+import contracts from "../contracts";
 import { check, setupMocks } from "./test-utils";
 
 describe("API Contracts", () => {

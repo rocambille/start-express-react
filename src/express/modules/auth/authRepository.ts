@@ -3,7 +3,15 @@
   Centralize all persistence logic related to Authentication tokens.
 */
 
+import { z } from "zod";
 import database from "../../../database";
+
+const magicLinkTokenSchema: z.ZodType<MagicLinkToken> = z.object({
+  user_id: z.number(),
+  token_hash: z.string(),
+  expires_at: z.coerce.date(),
+  consumed_at: z.coerce.date().nullable(),
+});
 
 class AuthRepository {
   insertOrReplaceToken(
@@ -25,16 +33,7 @@ class AuthRepository {
     );
     const row = query.get(tokenHash);
 
-    if (row == null) return null;
-
-    const { user_id, token_hash, expires_at, consumed_at } = row;
-
-    return {
-      user_id: Number(user_id),
-      token_hash: String(token_hash),
-      expires_at: new Date(String(expires_at)),
-      consumed_at: consumed_at ? new Date(String(consumed_at)) : null,
-    };
+    return row ? magicLinkTokenSchema.parse(row) : null;
   }
 
   markAsConsumed(userId: RowId): boolean {

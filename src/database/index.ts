@@ -18,7 +18,10 @@ import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import fs from "fs-extra";
 
-const dbPath = path.join(import.meta.dirname, "data/database.sqlite");
+const dbPath = path.join(
+  import.meta.dirname,
+  "../../data/sqlite/database.sqlite",
+);
 
 // Ensure the parent directory exists
 await fs.ensureDir(path.dirname(dbPath));

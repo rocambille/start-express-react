@@ -13,13 +13,14 @@
 
   Security model:
   - Stateless authentication via JWT stored in HttpOnly cookies
-  - Short-lived access tokens
+  - Medium-lived tokens (7 days)
 */
 
 import crypto from "node:crypto";
 import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import { z } from "zod";
 
 import userRepository from "../user/userRepository";
 import authRepository from "./authRepository";
@@ -32,23 +33,21 @@ import authRepository from "./authRepository";
   Environment variables.
   Must be defined at startup; failing fast is intentional.
 */
-const appBaseUrl = process.env.APP_BASE_URL;
-const appSecret = process.env.APP_SECRET;
-const smtpUrl = process.env.SMTP_URL;
+const envSchema = z.object({
+  APP_BASE_URL: z.url(),
+  APP_SECRET: z.string(),
+  SMTP_URL: z
+    .url()
+    .optional()
+    .refine(
+      (smtpUrl) => smtpUrl != null || process.env.NODE_ENV !== "production",
+      {
+        message: "SMTP_URL must be defined in production environment",
+      },
+    ),
+});
 
-if (appBaseUrl == null) {
-  throw new Error("process.env.APP_BASE_URL is not defined");
-}
-
-if (appSecret == null) {
-  throw new Error("process.env.APP_SECRET is not defined");
-}
-
-const isProduction = process.env.NODE_ENV === "production";
-
-if (isProduction && smtpUrl == null) {
-  throw new Error("SMTP_URL must be defined in production environment");
-}
+const env = envSchema.parse(process.env);
 
 /*
   Extend Express Request to carry authenticated user data.
@@ -80,7 +79,7 @@ const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: "strict",
-  maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
 /*
@@ -104,11 +103,13 @@ class Auth<Payload extends JwtPayload | string = JwtPayload> {
   }
 }
 
-const auth = new Auth(appSecret);
+const auth = new Auth(env.APP_SECRET);
 
-const transporter = smtpUrl ? nodemailer.createTransport(smtpUrl) : null;
+const transporter = env.SMTP_URL
+  ? nodemailer.createTransport(env.SMTP_URL)
+  : null;
 
-const trustedBaseUrl = appBaseUrl.replace(/\/+$/, "");
+const trustedBaseUrl = env.APP_BASE_URL.replace(/\/+$/, "");
 
 /* ************************************************************************ */
 /* Actions                                                                  */
@@ -127,8 +128,8 @@ const sendMagicLink: RequestHandler = async (req, res) => {
     return;
   }
 
-  // Find or create user to get an ID
-  const user = userRepository.findOrCreateByEmail(email);
+  // Find or create user ID
+  const userId = userRepository.findOrCreateByEmail(email);
 
   // Generate opaque token
   const rawToken = crypto.randomBytes(32).toString("hex");
@@ -136,7 +137,7 @@ const sendMagicLink: RequestHandler = async (req, res) => {
 
   // Store in DB
   const expiresAt = new Date(Date.now() + magicLinkTimeout);
-  authRepository.insertOrReplaceToken(user.id, tokenHash, expiresAt);
+  authRepository.insertOrReplaceToken(userId, tokenHash, expiresAt);
 
   const magicLink = `${trustedBaseUrl}/verify?token=${rawToken}`;
 
@@ -224,18 +225,6 @@ const destroyAccessToken: RequestHandler = (_req, res) => {
 };
 
 /* ************************************************************************ */
-
-/*
-  Return the currently authenticated user.
-
-  Preconditions:
-  - verifyAccessToken has run successfully
-*/
-const readMe: RequestHandler = (req, res) => {
-  res.json(req.me);
-};
-
-/* ************************************************************************ */
 /* Middleware                                                               */
 /* ************************************************************************ */
 
@@ -264,6 +253,10 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
       throw new Error("User not found");
     }
 
+    // Refresh cookie (extends expiration)
+    const freshToken = auth.signSession({ sub: me.id.toString() });
+    res.cookie("__Host-auth", freshToken, cookieOptions);
+
     req.me = me;
 
     next();
@@ -280,6 +273,5 @@ export default {
   sendMagicLink,
   verifyMagicLink,
   destroyAccessToken,
-  readMe,
   verifyAccessToken,
 };

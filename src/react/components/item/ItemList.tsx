@@ -32,7 +32,7 @@ function ItemList() {
     - Suspends while loading (via `use`)
     - Invalidated after mutations
   */
-  const items = use<Item[]>(cache("/api/items"));
+  const items = use(cache<Item[]>("/api/items"));
 
   return (
     <>

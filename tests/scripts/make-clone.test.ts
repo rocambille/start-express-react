@@ -2,7 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
 
-import { main } from "../../bin/make-clone";
+import { main } from "../../scripts/make-clone";
 
 describe("make-clone.ts", () => {
   let tmpDir: string;

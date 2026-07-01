@@ -1,0 +1,8 @@
+// tsconfig.test.json — extends base, adds test scope
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": ["server.ts", "src/**/*", "scripts/**/*", "tests/**/*"]
+}

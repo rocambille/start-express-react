@@ -76,7 +76,13 @@ export const apiMutate = async (
     init.body = JSON.stringify(body);
   }
 
-  return fetch(url, init);
+  const response = await fetch(url, init);
+
+  if (!response.ok) {
+    throw new Error(`${response.status}: ${response.statusText}`);
+  }
+
+  return response;
 };
 
 /* ************************************************************************ */
@@ -104,12 +110,10 @@ export function useMutate() {
   ) => {
     const response = await apiMutate(url, method, body);
 
-    if (response.ok) {
-      for (const path of invalidatePaths) {
-        invalidateCache(path);
-      }
-      refresh();
+    for (const path of invalidatePaths) {
+      invalidateCache(path);
     }
+    refresh();
 
     return response;
   };

@@ -18,7 +18,19 @@
   - Soft delete is the default find behavior
 */
 
+import z from "zod";
+
 import database from "../../../database";
+
+/* ************************************************************************ */
+/* Schemas                                                                  */
+/* ************************************************************************ */
+
+const userSchema: z.ZodType<User> = z.object({
+  id: z.number(),
+  email: z.string(),
+  name: z.string(),
+});
 
 /* ************************************************************************ */
 /* Repository                                                               */
@@ -69,32 +81,7 @@ class UserRepository {
     );
     const row = query.get(byId);
 
-    if (row == null) {
-      return null;
-    }
-
-    const { id, email, name } = row;
-
-    return { id: Number(id), email: String(email), name: String(name) };
-  }
-
-  /*
-    Find all non-deleted users.
-
-    Notes:
-    - Meant to be composed or extended if needed
-  */
-  findAll(limit: number, offset: number): User[] {
-    const query = database.prepare(
-      "select id, email, name from user where deleted_at is null limit ? offset ?",
-    );
-    const rows = query.all(limit, offset);
-
-    return rows.map<User>(({ id, email, name }) => ({
-      id: Number(id),
-      email: String(email),
-      name: String(name),
-    }));
+    return row ? userSchema.parse(row) : null;
   }
 
   /*
@@ -114,13 +101,7 @@ class UserRepository {
     );
     const row = query.get(byEmail);
 
-    if (row == null) {
-      return null;
-    }
-
-    const { id, email, name } = row;
-
-    return { id: Number(id), email: String(email), name: String(name) };
+    return row ? userSchema.parse(row) : null;
   }
 
   /*
@@ -133,20 +114,16 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  findOrCreateByEmail(email: string, name?: string): User {
+  findOrCreateByEmail(email: string): RowId {
     const user = this.findByEmail(email);
-    if (user) return user;
+    if (user) return user.id;
 
-    const id = this.create({
+    const name = email.split("@")[0];
+
+    return this.create({
       email,
-      name: name ?? email.split("@")[0],
+      name,
     });
-
-    return {
-      id: Number(id),
-      email: String(email),
-      name: String(name ?? email.split("@")[0]),
-    };
   }
 
   /* ********************************************************************** */
@@ -187,31 +164,6 @@ class UserRepository {
     const query = database.prepare(
       "update user set deleted_at = datetime('now') where id = ?",
     );
-    const result = query.run(id);
-
-    return result.changes > 0;
-  }
-
-  /*
-    Restore a soft-deleted user.
-  */
-  softUndelete(id: RowId): boolean {
-    const query = database.prepare(
-      "update user set deleted_at = null where id = ?",
-    );
-    const result = query.run(id);
-
-    return result.changes > 0;
-  }
-
-  /*
-    Hard delete a user.
-
-    Warning:
-    - This permanently removes the row
-  */
-  hardDelete(id: RowId): boolean {
-    const query = database.prepare("delete from user where id = ?");
     const result = query.run(id);
 
     return result.changes > 0;

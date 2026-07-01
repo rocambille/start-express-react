@@ -28,11 +28,9 @@ function ItemCreate() {
         "/api/items",
       ]);
 
-      if (response.ok) {
-        const { insertId } = await response.json();
+      const { insertId } = await response.json();
 
-        navigate(`/items/${insertId}`);
-      }
+      navigate(`/items/${insertId}`);
     },
     [mutate, navigate],
   );

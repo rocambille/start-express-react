@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "starter",
-  "version": "2026.06.01",
+  "version": "2026.07.01",
   "main": "server.ts",
   "engines": {
     "node": ">=22.5.0"
@@ -13,19 +13,19 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
-    "database:schema:load": "tsx --env-file=.env bin/database-sync schema",
-    "database:seeder:load": "tsx --env-file=.env bin/database-sync seeder",
-    "database:sync": "tsx --env-file=.env bin/database-sync both",
+    "database:schema:load": "tsx --env-file=.env scripts/database-sync schema",
+    "database:seeder:load": "tsx --env-file=.env scripts/database-sync seeder",
+    "database:sync": "tsx --env-file=.env scripts/database-sync both",
     "dev": "tsx watch --include .env --env-file=.env server",
     "install:check": "vitest run tests/install",
-    "make:clone": "tsx  --env-file=.env bin/make-clone",
-    "make:purge": "tsx --env-file=.env bin/make-purge",
+    "make:clone": "tsx  --env-file=.env scripts/make-clone",
+    "make:purge": "tsx --env-file=.env scripts/make-purge",
     "start": "tsx --env-file=.env server",
     "test": "vitest run --coverage --exclude tests/install",
     "types:check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
@@ -33,21 +33,21 @@
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/nodemailer": "^8.0.0",
+    "@types/nodemailer": "^8.0.1",
     "@types/pluralize": "^0.0.33",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/supertest": "^7.2.0",
-    "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/coverage-v8": "^4.1.5",
-    "fs-extra": "^11.3.5",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.9",
+    "fs-extra": "^11.3.6",
     "jsdom": "^29.1.1",
     "pluralize": "^8.0.0",
     "supertest": "^7.2.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "vite": "^8.0.15",
-    "vitest": "^4.1.5"
+    "vite": "^8.1.2",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
     "compression": "^1.8.1",
@@ -56,10 +56,10 @@
     "express-rate-limit": "^8.5.2",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
-    "nodemailer": "^8.0.10",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "react-router": "^7.16.0",
+    "nodemailer": "^9.0.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router": "^8.1.0",
     "zod": "^4.4.3"
   }
 }

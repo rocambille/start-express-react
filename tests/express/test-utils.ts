@@ -7,14 +7,15 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import supertest from "supertest";
 
 import database from "../../src/database";
+
+import { allItems } from "../fixtures/items";
 import {
-  allItems,
   allUsers,
   barUser,
   bazUser,
   deletedUser,
   fooUser,
-} from "../data";
+} from "../fixtures/users";
 
 // -------------------------
 // DB mock
@@ -138,7 +139,7 @@ vi.mock("nodemailer", async (importActual) => {
 // Helpers
 // -------------------------
 
-import { type Contract, contracts, type Test } from "../contracts";
+import contracts from "../contracts";
 
 export const setupMocks = () => {
   mockDatabase();

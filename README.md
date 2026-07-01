@@ -22,14 +22,6 @@
 
 </div>
 
-## 🧠 The AI-era starter
-
-Most frameworks are too complex for AI. They hide logic behind "magic" and deep abstractions. This causes AI agents to hallucinate and break things.
-
-**We built StartER to stand out.** It is a "Zero-Magic" foundation designed for **Human-AI co-creation**. By keeping the code readable and explicit, we provide AI agents with a perfect mental model. This makes it the ultimate playground for rapid prototyping and learning.
-
-![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
-
 ## 📚 Simple and readable Express + React project structure example
 
 This project shows a simple and readable way to structure a fullstack app with:
@@ -37,7 +29,15 @@ This project shows a simple and readable way to structure a fullstack app with:
 - React frontend
 - shared contracts for API
 
-If you are looking for a "Express + React starter" or "Node React boilerplate", this repository is a practical example.
+If you are looking for a "Express + React starter" or "Node React boilerplate", this repository is a practical template.
+
+## 🧠 The AI-era starter
+
+Most frameworks are too complex for AI. They hide logic behind "magic" and deep abstractions. This causes AI agents to hallucinate and break things.
+
+**We built StartER to stand out.** It is a "Zero-Magic" foundation designed for **Human-AI co-creation**. By keeping the code readable and explicit, we provide AI agents with a perfect mental model. This makes it the ultimate playground for rapid prototyping and learning.
+
+![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
 ## ⚡ Quick start
 
@@ -66,14 +66,14 @@ npm run make:clone -- src/express/modules/item src/express/modules/task item tas
 This enforces consistency by cloning your *actual* code patterns. This keeps your AI agent focused and accurate.
 
 ### 🧪 Contract-driven verification
-You define API behavior in `tests/contracts.ts`: a central, declarative source of truth.
+You define API behavior in the `tests/contracts/` directory: a central, declarative source of truth.
 *   **For you:** clear, living documentation.
 *   **For AI:** a strict "contract" it must follow when generating endpoints.
 *   **For the app:** instant verification that the AI didn't miss a scenario.
 
 ### 🔍 Zero-magic simplicity
 *   **Sync SQLite:** direct data access that AI can read and write without `async`/`await` confusion.
-*   **Explicit casting:** we verify data at the edge. This prevents the silent bugs AI often introduces.
+*   **Zod Output Parsing:** we verify data at the edge using Zod schemas. This prevents the silent bugs AI often introduces.
 *   **Transparent stack:** Express 5 + React 19. No black boxes. You understand every line.
 
 ## 💻 Tech stack

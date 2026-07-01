@@ -5,9 +5,7 @@ import { createRoutesStub } from "react-router";
 import { AuthProvider } from "../../src/react/components/auth/AuthContext";
 import { DataRefreshProvider } from "../../src/react/components/DataRefreshContext";
 import { invalidateCache } from "../../src/react/helpers/cache";
-import { type Contract, contracts, type Json, type Test } from "../contracts";
-
-export * from "../data";
+import contracts from "../contracts";
 
 // -------------------------
 // Fetch mock (contract-based)
@@ -110,8 +108,12 @@ const mockFetch = (
         }
       }
 
-      if (path === "/api/404" && method === "get") {
+      if (path === "/api/404") {
         return respond(null, 404);
+      }
+
+      if (path === "/api/500") {
+        return respond(null, 500);
       }
 
       throw new Error(
@@ -179,18 +181,13 @@ const mockedRandomUUID = "a-b-c-d-e";
 
 export const setupMocks = ({
   forceCases,
-  force500,
 }: {
   forceCases?: Record<`${string}.${string}`, keyof Test["cases"]>;
-  force500?: { path: string; method: "get" | "post" | "put" | "delete" }[];
 } = {}) => {
   vi.stubGlobal("cookieStore", { get: vi.fn(), set: vi.fn() });
   vi.spyOn(crypto, "randomUUID").mockImplementation(() => mockedRandomUUID);
 
   const customFetch = (path: string, method: string) => {
-    if (force500?.some((f) => f.path === path && f.method === method)) {
-      return respond(null, 500);
-    }
     if (forceCases) {
       for (const [key, caseName] of Object.entries(forceCases)) {
         const [contractName, testName] = key.split(".");

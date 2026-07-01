@@ -43,12 +43,6 @@ router.post("/api/auth/verify", authActions.verifyMagicLink);
 router.post("/api/auth/logout", authActions.destroyAccessToken);
 
 /* ************************************************************************ */
-/* Authenticated routes                                                     */
-/* ************************************************************************ */
-
-router.get("/api/me", authActions.verifyAccessToken, authActions.readMe);
-
-/* ************************************************************************ */
 /* Export                                                                   */
 /* ************************************************************************ */
 

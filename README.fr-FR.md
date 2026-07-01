@@ -22,14 +22,6 @@
 
 </div>
 
-## 🧠 Starter, le framework idéal pour l'IA
-
-La plupart des frameworks sont trop complexes pour l'IA. Ils dissimulent la logique derrière des abstractions complexes et opaques, ce qui peut entraîner des dysfonctionnements et des erreurs de conception chez les agents.
-
-**Nous avons conçu StartER pour nous démarquer.** Il s'agit d'une plateforme "sans magie" conçue pour la **co-création humain-IA**. En conservant un code lisible et explicite, nous fournissons aux agents IA un modèle mental optimal. StartER devient ainsi le terrain de jeu idéal pour le prototypage et l'apprentissage rapides.
-
-![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
-
 ## 📚 Exemple de structure de projet Express + React simple et lisible
 
 Ce projet présente une méthode simple et lisible pour structurer une application fullstack avec :
@@ -38,7 +30,15 @@ Ce projet présente une méthode simple et lisible pour structurer une applicati
 * Frontend React
 * Contrats partagés pour l'API
 
-Si vous recherchez un "starter Express + React" ou un "boilerplate Node React", ce dépôt est un exemple pratique.
+Si vous recherchez un "starter Express + React" ou un "boilerplate Node React", ce dépôt est un template pratique.
+
+## 🧠 Starter, le framework idéal pour l'IA
+
+La plupart des frameworks sont trop complexes pour l'IA. Ils dissimulent la logique derrière des abstractions complexes et opaques, ce qui peut entraîner des dysfonctionnements et des erreurs de conception chez les agents.
+
+**Nous avons conçu StartER pour nous démarquer.** Il s'agit d'une plateforme "sans magie" conçue pour la **co-création humain-IA**. En conservant un code lisible et explicite, nous fournissons aux agents IA un modèle mental optimal. StartER devient ainsi le terrain de jeu idéal pour le prototypage et l'apprentissage rapides.
+
+![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
 ## ⚡ Démarrage Rapide
 
@@ -70,7 +70,7 @@ Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agen
 
 ### 🧪 Vérification basée sur un contrat
 
-Vous définissez le comportement de l'API dans `tests/contracts.ts` : une source de vérité centrale et déclarative.
+Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : une source de vérité centrale et déclarative.
 
 * **Pour vous :** une documentation claire et évolutive.
 
@@ -82,7 +82,7 @@ Vous définissez le comportement de l'API dans `tests/contracts.ts` : une sourc
 
 * **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
 
-* **Conversion explicite :** typage des données aux emplacements clés. Ceci évite les bugs silencieux souvent introduits par l'IA.
+* **Validation de sortie avec Zod :** typage des données aux emplacements clés à l'aide de schémas Zod. Ceci évite les bugs silencieux souvent introduits par l'IA.
 
 * **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
 

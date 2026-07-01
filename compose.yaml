@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     env_file: ./.env
     volumes:
-      - ./src/mailpit/data:/data
+      - ./data/mailpit:/data
     ports:
       - ${MP_UI_PORT-8025}:8025
       - ${MP_SMTP_PORT-1025}:1025

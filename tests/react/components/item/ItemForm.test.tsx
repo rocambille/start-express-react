@@ -1,8 +1,8 @@
 import { fireEvent, screen } from "@testing-library/react";
 
 import ItemForm from "../../../../src/react/components/item/ItemForm";
-
-import { fooUser, renderWithStub, setupMocks } from "../../test-utils";
+import { fooUser } from "../../../fixtures/users";
+import { renderWithStub, setupMocks } from "../../test-utils";
 
 describe("<ItemForm />", () => {
   beforeEach(() => {

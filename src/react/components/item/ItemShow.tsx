@@ -9,7 +9,6 @@
 
 import { use } from "react";
 import { Link, useParams } from "react-router";
-import { NotFoundError } from "../../../errors/HttpError";
 import { cache } from "../../helpers/cache";
 import { useAuth } from "../auth/AuthContext";
 import ItemDeleteForm from "./ItemDeleteForm";
@@ -18,21 +17,7 @@ function ItemShow() {
   const auth = useAuth();
   const { id } = useParams();
 
-  const item = use<Item | null>(cache(`/api/items/${id}`));
-
-  /*
-    Safety guard:
-
-    If the item is missing at this stage, it means:
-    - The route does not exist
-    - OR the user does not have access
-    - OR the data is stale
-
-    Throwing allows the router error boundary to handle the 404.
-  */
-  if (item == null) {
-    throw new NotFoundError();
-  }
+  const item = use(cache<Item>(`/api/items/${id}`));
 
   return (
     <>

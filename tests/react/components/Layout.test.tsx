@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/react";
 import Layout from "../../../src/react/components/Layout";
-import { fooUser, renderWithStub, setupMocks } from "../test-utils";
+import { fooUser } from "../../fixtures/users";
+import { renderWithStub, setupMocks } from "../test-utils";
 
 describe("<Layout />", () => {
   beforeEach(() => {
@@ -34,7 +35,7 @@ describe("<Layout />", () => {
     await screen.findByLabelText(/email/i);
   });
 
-  it("should render logout when authenticated", async () => {
+  it("should render account link when authenticated", async () => {
     await renderWithStub({
       path: "/",
       Component: () => <Layout />,
@@ -42,6 +43,6 @@ describe("<Layout />", () => {
       me: fooUser,
     });
 
-    await screen.findByText(/logout/i);
+    await screen.findByText(/account/i);
   });
 });

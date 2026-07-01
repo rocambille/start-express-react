@@ -43,7 +43,7 @@ function NavBar() {
         {check() && (
           <>
             {link("/items", "Items")}
-            {link("/logout", "Logout")}
+            {link("/account", "Account")}
           </>
         )}
       </ul>

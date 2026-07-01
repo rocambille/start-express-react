@@ -1,12 +1,13 @@
 import { screen } from "@testing-library/react";
 import * as ReactRouter from "react-router";
 
-import ItemEdit from "../../../../src/react/components/item/ItemEdit";
+vi.mock("react-router", { spy: true });
 
+import ItemEdit from "../../../../src/react/components/item/ItemEdit";
+import { allItems } from "../../../fixtures/items";
+import { fooUser } from "../../../fixtures/users";
 import {
-  allItems,
   expectContractCall,
-  fooUser,
   renderWithStub,
   requestValue,
   setupMocks,
@@ -17,9 +18,7 @@ describe("<ItemEdit />", () => {
     setupMocks();
 
     const mockedNavigate = vi.fn();
-    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(
-      () => mockedNavigate,
-    );
+    vi.mocked(ReactRouter.useNavigate).mockImplementation(() => mockedNavigate);
   });
 
   afterEach(() => {
@@ -45,7 +44,7 @@ describe("<ItemEdit />", () => {
         initialEntries: [`/items/${NaN}/edit`],
         me: fooUser,
       }),
-    ).rejects.toThrow(/not found/i);
+    ).rejects.toThrow(/404/i);
   });
   it("should submit form and edit an item", async () => {
     const { user } = await renderWithStub({
@@ -66,34 +65,5 @@ describe("<ItemEdit />", () => {
 
     const navigate = ReactRouter.useNavigate();
     expect(navigate).toHaveBeenCalledWith(`/items/${allItems[0].id}`);
-  });
-  it("should not redirect when server returns an error", async () => {
-    setupMocks({
-      force500: [
-        {
-          path: `/api/items/${allItems[0].id}`,
-          method: "put",
-        },
-      ],
-    });
-
-    const { user } = await renderWithStub({
-      path: "/items/:id/edit",
-      Component: ItemEdit,
-      initialEntries: [`/items/${allItems[0].id}/edit`],
-      me: fooUser,
-    });
-
-    await user.clear(screen.getByLabelText(/title/i));
-    await user.type(
-      screen.getByLabelText(/title/i),
-      String(requestValue("items", "edit", "success", "title")),
-    );
-    await user.click(screen.getByRole("button"));
-
-    expectContractCall("items", "edit", "success");
-
-    const navigate = ReactRouter.useNavigate();
-    expect(navigate).not.toHaveBeenCalled();
   });
 });

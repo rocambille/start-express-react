@@ -1,8 +1,7 @@
 coverage
+data
 dist
 node_modules
-src/database/data
-src/mailpit/data
 .DS_Store
 .env
 *.http
