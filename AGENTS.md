@@ -29,6 +29,7 @@
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
+│   │   ├── migrations/        # Forward-only migration scripts (production)
 │   │   └── seeder.sql         # Test/seed data
 │   ├── express/
 │   │   ├── routes.ts          # Registers all Express modules via importAndUse()
@@ -60,19 +61,17 @@
 ```bash
 npm install
 cp .env.sample .env
-npm run database:sync      # Load schema + seed data into SQLite
+npm run database:reset      # Drop all, replay schema + migrations + seeder
 npm run dev                # Start dev server (Express + Vite together on port 5173)
 ```
 
 ### Database
 
 ```bash
-npm run database:schema:load          # Apply schema.sql to the SQLite file
-npm run database:seeder:load          # Load seeder.sql test data
-npm run database:sync                 # Both above — resets DB to a clean state
-npm run database:sync -- -n           # Non-interactive (CI/CD — skips confirmation prompt)
-npm run database:schema:load -- -n    # Same, schema only
-npm run database:seeder:load -- -n    # Same, seeder only
+npm run database:reset                # Drop all, replay schema + migrations + seeder
+npm run database:reset -- -n          # Non-interactive (CI/CD — skips confirmation prompt)
+npm run database:migrate              # Apply un-applied migrations (production)
+npm run database:migrate -- -n        # Non-interactive (CI/CD)
 ```
 
 > SQLite requires NO Docker, NO connection string, NO async setup. The DB file is created on the fly.

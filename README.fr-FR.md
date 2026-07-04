@@ -50,7 +50,7 @@ cd mon-projet
 # 2. Installer les dépendances et initialiser la base de données
 npm install
 cp .env.sample .env
-npm run database:sync
+npm run database:reset
 
 # 3. Lancer l'application
 npm run dev

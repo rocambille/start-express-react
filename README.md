@@ -49,7 +49,7 @@ cd my-prototype
 # 2. Install dependencies and initialize the database
 npm install
 cp .env.sample .env
-npm run database:sync
+npm run database:reset
 
 # 3. Start co-creating
 npm run dev

@@ -189,9 +189,9 @@ export async function main(argv: string[] = process.argv) {
 
 [ ] Register the new table in src/database/schema.sql
 [ ] (Optional) Add dummy data in src/database/seeder.sql
-[ ] Sync database:
+[ ] Reset database:
 
-      npm run database:sync
+      npm run database:reset
 
 [ ] Define the "${singular}" type in src/types/index.d.ts`);
 

@@ -25,6 +25,8 @@ vi.mock("../../src/database", () => ({
   default: new DatabaseSync(":memory:"),
 }));
 
+import { scanMigrationFiles } from "../../scripts/database-helpers";
+
 const mockDatabase = () => {
   /* drop existing tables */
   const existingTables = database
@@ -44,14 +46,14 @@ const mockDatabase = () => {
   /* re-enable cascade deletion */
   database.exec("PRAGMA foreign_keys = ON");
 
-  /* load schema */
-  const schema = path.join(
-    import.meta.dirname,
-    "../../src/database/schema.sql",
-  );
+  /* load schema + migration files */
+  const rootDir = path.join(import.meta.dirname, "../..");
+  const files = scanMigrationFiles(rootDir);
 
-  const schemaSql = fs.readFileSync(schema, "utf8");
-  database.exec(schemaSql);
+  for (const file of files) {
+    const sql = fs.readFileSync(file, "utf8");
+    database.exec(sql);
+  }
 
   /* insert all users */
   const insertUser = database.prepare(
