@@ -67,8 +67,14 @@ describe("database-reset.ts", () => {
   });
 
   it("fails when given unexpected arguments", async () => {
+    await expect(main(["node", "script", "--unknown-flag"])).rejects.toThrow(
+      /usage/i,
+    );
+  });
+
+  it("fails when given extra arguments", async () => {
     await expect(
-      main(["node", "script", "--unknown-flag"], tempRootDir),
+      main(["node", "script", "--no-interaction", "--extra"]),
     ).rejects.toThrow(/usage/i);
   });
 

@@ -6,8 +6,12 @@ import { main as migrateMain } from "../../scripts/database-migrate";
 import { main as resetMain } from "../../scripts/database-reset";
 import database from "../../src/database";
 
+let mockDb = new DatabaseSync(":memory:");
+
 vi.mock("../../src/database", () => ({
-  default: new DatabaseSync(":memory:"),
+  get default() {
+    return mockDb;
+  },
 }));
 
 describe("database-migrate.ts", () => {
@@ -62,8 +66,32 @@ describe("database-migrate.ts", () => {
 
   it("fails when given unexpected arguments", async () => {
     await expect(
-      migrateMain(["node", "script", "--unknown-flag"], tempRootDir),
+      migrateMain(["node", "script", "--unknown-flag"]),
     ).rejects.toThrow(/usage/i);
+  });
+
+  it("fails when given extra arguments", async () => {
+    await expect(
+      migrateMain(["node", "script", "--no-interaction", "--extra"]),
+    ).rejects.toThrow(/usage/i);
+  });
+
+  it("cancels when user answers no interactively", async () => {
+    // Create a dummy migration
+    const testFile = path.join(migrationsDir, "0000_dummy.sql");
+
+    await fs.promises.mkdir(migrationsDir, { recursive: true });
+    await fs.promises.writeFile(testFile, "SELECT 'hello, world!';\n");
+
+    const readline = await import("node:readline/promises");
+    readline.default.createInterface = vi.fn().mockReturnValue({
+      question: () => "n",
+      close: vi.fn(),
+    });
+
+    await migrateMain(["node", "script"], tempRootDir);
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/cancelled/));
   });
 
   it("reports nothing to migrate when database is up to date", async () => {
@@ -243,5 +271,113 @@ describe("database-migrate.ts", () => {
       await fs.promises.unlink(goodFile);
       await fs.promises.unlink(badFile);
     }
+  });
+
+  describe("File-based Database", () => {
+    let tempDbPath: string;
+
+    beforeEach(async () => {
+      tempDbPath = path.join(tempRootDir, "test-database.sqlite");
+      mockDb = new DatabaseSync(tempDbPath);
+      // Clean reset
+      await resetMain(["node", "script", "-n"], tempRootDir);
+      consoleSpy.mockClear();
+      warnSpy.mockClear();
+    });
+
+    afterEach(async () => {
+      mockDb.close();
+      mockDb = new DatabaseSync(":memory:");
+      await fs.promises.rm(tempDbPath, { force: true });
+      await fs.promises.rm(`${tempDbPath}.bak`, { force: true });
+    });
+
+    it("creates backup, migrates successfully and cleans up backup", async () => {
+      // Create a dummy migration in our isolated temp migrations directory
+      const testFile = path.join(migrationsDir, "0099_file_db_test.sql");
+      await fs.promises.mkdir(migrationsDir, { recursive: true });
+      await fs.promises.writeFile(
+        testFile,
+        "CREATE TABLE file_db_test (id INTEGER PRIMARY KEY);\n",
+      );
+
+      try {
+        await migrateMain(["node", "script", "-n"], tempRootDir);
+
+        // Verify it applied successfully
+        const tables = mockDb
+          .prepare(
+            "select name from sqlite_schema where type = 'table' and name = 'file_db_test'",
+          )
+          .all();
+        expect(tables.length).toBe(1);
+
+        // Verify the backup file was cleaned up (does not exist anymore)
+        expect(fs.existsSync(`${tempDbPath}.bak`)).toBe(false);
+      } finally {
+        await fs.promises.unlink(testFile);
+      }
+    });
+
+    it("reports nothing to migrate and cleans up backup on up-to-date file database", async () => {
+      // Run once to ensure everything is up to date (and since there are no new migrations, pending is 0)
+      await migrateMain(["node", "script", "-n"], tempRootDir);
+
+      // Verify backup was deleted
+      expect(fs.existsSync(`${tempDbPath}.bak`)).toBe(false);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/nothing to migrate/i),
+      );
+    });
+
+    it("removes backup when interactive migration is cancelled", async () => {
+      // Create a dummy migration in our isolated temp migrations directory
+      const testFile = path.join(migrationsDir, "0099_cancel_test.sql");
+      await fs.promises.mkdir(migrationsDir, { recursive: true });
+      await fs.promises.writeFile(
+        testFile,
+        "CREATE TABLE cancel_test (id INTEGER PRIMARY KEY);\n",
+      );
+
+      try {
+        const readline = await import("node:readline/promises");
+        readline.default.createInterface = vi.fn().mockReturnValue({
+          question: () => "n",
+          close: vi.fn(),
+        });
+
+        await migrateMain(["node", "script"], tempRootDir);
+
+        // Verify backup was deleted
+        expect(fs.existsSync(`${tempDbPath}.bak`)).toBe(false);
+      } finally {
+        await fs.promises.unlink(testFile);
+      }
+    });
+
+    it("restores database from backup and removes backup on migration failure", async () => {
+      // Create a bad migration
+      const testFile = path.join(migrationsDir, "0099_fail_test.sql");
+      await fs.promises.mkdir(migrationsDir, { recursive: true });
+      await fs.promises.writeFile(testFile, "INVALID SQL STATEMENT;\n");
+
+      try {
+        await expect(
+          migrateMain(["node", "script", "-n"], tempRootDir),
+        ).rejects.toThrow();
+
+        // Verify backup was deleted
+        expect(fs.existsSync(`${tempDbPath}.bak`)).toBe(false);
+        // Verify database is still queryable (restored and unlocked)
+        const tables = mockDb
+          .prepare(
+            "select name from sqlite_schema where type = 'table' and name not like 'sqlite_%'",
+          )
+          .all();
+        expect(tables.length).toBeGreaterThan(0);
+      } finally {
+        await fs.promises.unlink(testFile);
+      }
+    });
   });
 });
