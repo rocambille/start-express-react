@@ -1,13 +1,17 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
 import { main } from "../../scripts/database-reset";
 import database from "../../src/database";
+import { createDbTestFixture, type DbTestFixture } from "./test-utils";
+
+let mockDb = new DatabaseSync(":memory:");
 
 vi.mock("../../src/database", () => ({
-  default: new DatabaseSync(":memory:"),
+  get default() {
+    return mockDb;
+  },
 }));
 
 const checkSchema = () => {
@@ -15,7 +19,7 @@ const checkSchema = () => {
     .prepare(
       "select name from sqlite_schema where type = 'table' and name not like 'sqlite_%'",
     )
-    .all() as { name: string }[];
+    .all();
 
   const tableNames = tables.map((t) => t.name);
 
@@ -26,44 +30,22 @@ const checkSchema = () => {
 
 describe("database-reset.ts", () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
-  let tempRootDir: string;
-  let tempDatabaseDir: string;
-  let migrationsDir: string;
+  let dbTestFixture: DbTestFixture;
 
-  const rootDir = path.join(import.meta.dirname, "../..");
-
-  beforeAll(async () => {
-    // Create a unique temporary directory for this test file
-    tempRootDir = await fs.promises.mkdtemp(
-      path.join(os.tmpdir(), "db-reset-test-"),
-    );
-    tempDatabaseDir = path.join(tempRootDir, "src/database");
-    migrationsDir = path.join(tempDatabaseDir, "migrations");
-
-    await fs.promises.mkdir(tempDatabaseDir, { recursive: true });
-    // Copy real schema.sql and seeder.sql
-    const realDatabaseDir = path.join(rootDir, "src/database");
-    await fs.promises.copyFile(
-      path.join(realDatabaseDir, "schema.sql"),
-      path.join(tempDatabaseDir, "schema.sql"),
-    );
-    await fs.promises.copyFile(
-      path.join(realDatabaseDir, "seeder.sql"),
-      path.join(tempDatabaseDir, "seeder.sql"),
-    );
-  });
-
-  beforeEach(() => {
+  beforeEach(async () => {
     consoleSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+
+    // Create a unique temporary directory sandbox for each test case
+    const fixture = await createDbTestFixture("db-reset-test-");
+    dbTestFixture = fixture;
+
+    // Reset database state by instantiating a fresh in-memory database
+    mockDb = new DatabaseSync(":memory:");
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     consoleSpy.mockRestore();
-  });
-
-  afterAll(async () => {
-    // Clean up temporary directory
-    await fs.promises.rm(tempRootDir, { recursive: true, force: true });
+    await dbTestFixture.cleanup();
   });
 
   it("fails when given unexpected arguments", async () => {
@@ -85,13 +67,19 @@ describe("database-reset.ts", () => {
       close: vi.fn(),
     });
 
-    await main(["node", "script"], tempRootDir);
+    await main(["node", "script"], dbTestFixture.rootDir);
 
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/cancelled/));
   });
 
   it("loads schema, migrations and seeder in non-interactive mode", async () => {
-    await main(["node", "script", "-n"], tempRootDir);
+    // Run once to create tables
+    await main(["node", "script", "-n"], dbTestFixture.rootDir);
+
+    checkSchema();
+
+    // Run a second time: tables now exist and should be dropped successfully
+    await main(["node", "script", "-n"], dbTestFixture.rootDir);
 
     checkSchema();
 
@@ -111,7 +99,7 @@ describe("database-reset.ts", () => {
       close: vi.fn(),
     });
 
-    await main(["node", "script"], tempRootDir);
+    await main(["node", "script"], dbTestFixture.rootDir);
 
     checkSchema();
 
@@ -125,7 +113,7 @@ describe("database-reset.ts", () => {
   });
 
   it("populates _migrations table with all executed files", async () => {
-    await main(["node", "script", "-n"], tempRootDir);
+    await main(["node", "script", "-n"], dbTestFixture.rootDir);
 
     const migrations = database
       .prepare("select filename, checksum from _migrations")
@@ -144,27 +132,41 @@ describe("database-reset.ts", () => {
   });
 
   it("includes migration files when present", async () => {
-    // Create a temporary migration file
+    // Create a temporary migration file in our sandbox
     const testMigration = path.join(
-      migrationsDir,
+      dbTestFixture.migrationsDir,
       "0000_test_reset_migration.sql",
     );
 
-    await fs.promises.mkdir(migrationsDir, { recursive: true });
+    await fs.promises.mkdir(dbTestFixture.migrationsDir, { recursive: true });
     await fs.promises.writeFile(testMigration, "-- test migration for reset\n");
 
-    try {
-      await main(["node", "script", "-n"], tempRootDir);
+    await main(["node", "script", "-n"], dbTestFixture.rootDir);
 
-      const migrations = database
-        .prepare("select filename from _migrations")
-        .all() as { filename: string }[];
+    const migrations = database
+      .prepare("select filename from _migrations")
+      .all();
 
-      const filenames = migrations.map((m) => m.filename);
-      expect(filenames).toContain("0000_test_reset_migration.sql");
-    } finally {
-      // Clean up
-      await fs.promises.unlink(testMigration);
-    }
+    const filenames = migrations.map((m) => m.filename);
+    expect(filenames).toContain("0000_test_reset_migration.sql");
+  });
+
+  it("skips seeder.sql gracefully if it is missing", async () => {
+    // Delete seeder.sql from this sandbox
+    await fs.promises.unlink(
+      path.join(dbTestFixture.databaseDir, "seeder.sql"),
+    );
+
+    await main(["node", "script", "-n"], dbTestFixture.rootDir);
+
+    checkSchema();
+
+    // Verify seeder.sql was not tracked in _migrations
+    const migrations = database
+      .prepare("select filename from _migrations")
+      .all();
+    const filenames = migrations.map((m) => m.filename);
+    expect(filenames).toContain("schema.sql");
+    expect(filenames).not.toContain("seeder.sql");
   });
 });

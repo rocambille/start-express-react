@@ -69,7 +69,7 @@ export function dropAllTables(database: DatabaseSync): void {
     .prepare(
       "select name from sqlite_schema where type ='table' and name not like 'sqlite_%'",
     )
-    .all() as { name: string }[];
+    .all();
 
   // Prevent errors because of cascade deletion
   database.exec("PRAGMA foreign_keys = OFF");

@@ -62,7 +62,7 @@ export async function main(
     const currentChecksum = computeChecksum(sql);
 
     if (applied.has(filename)) {
-      const storedChecksum = applied.get(filename) as string;
+      const storedChecksum = applied.get(filename);
 
       if (storedChecksum !== currentChecksum) {
         console.warn(
