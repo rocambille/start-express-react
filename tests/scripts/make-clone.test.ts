@@ -149,4 +149,36 @@ describe("make-clone.ts", () => {
 
     expect(unrelatedContent).toBe("export class Unrelated { apple = 10; }\n");
   });
+
+  it("clones to src/express/modules and logs checklist instructions", async () => {
+    const src = path.join(tmpDir, "src", "cherry.ts");
+    const dest = path.join(tmpDir, "src", "express", "modules", "berry.ts");
+
+    await fs.ensureDir(path.dirname(src));
+    await fs.writeFile(src, "export const cherry = 'sweet';\n");
+
+    await main(["node", "script", src, dest, "cherry", "berry"]);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /Register the Express module in src\/express\/routes.ts/,
+      ),
+    );
+  });
+
+  it("clones to src/react/components and logs checklist instructions", async () => {
+    const src = path.join(tmpDir, "src", "cherry.ts");
+    const dest = path.join(tmpDir, "src", "react", "components", "berry.ts");
+
+    await fs.ensureDir(path.dirname(src));
+    await fs.writeFile(src, "export const cherry = 'sweet';\n");
+
+    await main(["node", "script", src, dest, "cherry", "berry"]);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /Register the React routes in src\/react\/routes.tsx/,
+      ),
+    );
+  });
 });

@@ -70,6 +70,33 @@ describe("database-migrate.ts", () => {
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringMatching(/cancelled/));
   });
 
+  it("proceeds when user answers yes interactively", async () => {
+    // Create a dummy migration
+    const testFile = path.join(dbTestFixture.migrationsDir, "0000_dummy.sql");
+
+    await fs.promises.mkdir(dbTestFixture.migrationsDir, { recursive: true });
+    await fs.promises.writeFile(
+      testFile,
+      "CREATE TABLE interactive_test (id INTEGER PRIMARY KEY);\n",
+    );
+
+    const readline = await import("node:readline/promises");
+    readline.default.createInterface = vi.fn().mockReturnValue({
+      question: () => "y",
+      close: vi.fn(),
+    });
+
+    await migrateMain(["node", "script"], dbTestFixture.rootDir);
+
+    // Verify it migrated successfully
+    const tables = database
+      .prepare(
+        "select name from sqlite_schema where type = 'table' and name = 'interactive_test'",
+      )
+      .all();
+    expect(tables.length).toBe(1);
+  });
+
   it("reports nothing to migrate when database is up to date", async () => {
     await migrateMain(["node", "script", "-n"], dbTestFixture.rootDir);
 

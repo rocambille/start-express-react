@@ -4,6 +4,10 @@ import fs from "fs-extra";
 
 import { main } from "../../scripts/make-purge";
 
+class TestError extends Error {
+  code?: string;
+}
+
 const projectRoot = path.join(import.meta.dirname, "../..");
 
 /**
@@ -68,6 +72,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/auth")),
       ).toBe(false);
+
+      // Run second time to ensure idempotency and cover unmodified files path
+      await main(["node", "script", "-n"], tmpDir);
     });
 
     it("runs purge for items only with --keep-auth", async () => {
@@ -403,6 +410,67 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("authRoutes");
       expect(result).not.toContain("userRoutes");
       expect(result).toContain("itemRoutes");
+    });
+  });
+
+  describe("error handling in remove", () => {
+    let errorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it("logs console error when fs.remove fails with non-ENOENT error", async () => {
+      const mockError = new TestError("Permission denied");
+      mockError.code = "EACCES";
+      const removeSpy = vi.spyOn(fs, "remove").mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).toHaveBeenCalled();
+      removeSpy.mockRestore();
+    });
+
+    it("silently ignores ENOENT error in remove", async () => {
+      const mockError = new TestError("File not found");
+      mockError.code = "ENOENT";
+      const removeSpy = vi.spyOn(fs, "remove").mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      removeSpy.mockRestore();
+    });
+  });
+
+  describe("error handling in updateFile", () => {
+    let errorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it("logs console error when fs.readFile fails with non-ENOENT error", async () => {
+      await scaffoldProject(tmpDir);
+
+      const mockError = new TestError("Permission denied");
+      mockError.code = "EACCES";
+      const readFileSpy = vi
+        .spyOn(fs, "readFile")
+        .mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).toHaveBeenCalled();
+      readFileSpy.mockRestore();
     });
   });
 });
