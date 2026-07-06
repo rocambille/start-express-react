@@ -1,7 +1,13 @@
 /**
- * BEGINNERS:
- * You don't need to understand or edit this file to build your app.
- * This file contains advanced Vite SSR and backend wiring.
+ * BEGINNERS: See the wiki page "One server" for a guided walkthrough.
+ *
+ * https://github.com/rocambille/start-express-react/wiki/One-server
+ *
+ * (en français ici:
+ *
+ * https://github.com/rocambille/start-express-react/wiki/Un-serveur-unique-fr-FR)
+ *
+ * NOTE: you don't need to understand or edit this file to build your app.
  *
  * Purpose:
  * Main application entry point.
