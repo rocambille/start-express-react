@@ -47,10 +47,10 @@ export async function main(
   const applied = new Map<string, string>();
   const rows = database
     .prepare("select filename, checksum from _migrations")
-    .all() as { filename: string; checksum: string }[];
+    .all();
 
   for (const row of rows) {
-    applied.set(row.filename, row.checksum);
+    applied.set(String(row.filename), String(row.checksum));
   }
 
   // Determine which files need to be applied

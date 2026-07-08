@@ -117,7 +117,7 @@ describe("database-reset.ts", () => {
 
     const migrations = database
       .prepare("select filename, checksum from _migrations")
-      .all() as { filename: string; checksum: string }[];
+      .all();
 
     // Should have at least schema.sql and seeder.sql
     const filenames = migrations.map((m) => m.filename);
@@ -127,7 +127,7 @@ describe("database-reset.ts", () => {
     // All entries should have a checksum
     for (const m of migrations) {
       expect(m.checksum).toBeTruthy();
-      expect(m.checksum.length).toBe(64); // SHA-256 hex
+      expect(String(m.checksum).length).toBe(64); // SHA-256 hex
     }
   });
 
