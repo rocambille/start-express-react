@@ -21,7 +21,7 @@
     "make:purge": "tsx --env-file=.env scripts/make-purge",
     "start": "tsx --env-file=.env server",
     "test": "vitest run --coverage --exclude tests/install",
-    "types:check": "tsc --noEmit"
+    "types:check": "tsc --noEmit -p tsconfig.test.json"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.1",

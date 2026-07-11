@@ -33,7 +33,7 @@ jobs:
       run: npm run types:check
 
     - name: Run tests
-      run: npm run test -- --exclude tests/setup/base.test.ts
+      run: npm run test
       env:
         APP_BASE_URL: http://dummy_url_for_testing
         APP_SECRET: dummy_secret_for_testing
