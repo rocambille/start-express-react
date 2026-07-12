@@ -24,7 +24,7 @@
     "types:check": "tsc --noEmit -p tsconfig.test.json"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.1",
+    "@biomejs/biome": "2.5.3",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
@@ -38,27 +38,27 @@
     "@types/react-dom": "^19.2.3",
     "@types/supertest": "^7.2.0",
     "@vitejs/plugin-react": "^6.0.3",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.10",
     "fs-extra": "^11.3.6",
     "jsdom": "^29.1.1",
     "pluralize": "^8.0.0",
     "supertest": "^7.2.2",
-    "tsx": "^4.22.4",
-    "typescript": "^6.0.3",
-    "vite": "^8.1.2",
-    "vitest": "^4.1.9"
+    "tsx": "^4.23.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
-    "helmet": "^8.2.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^9.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router": "^8.1.0",
+    "react-router": "^8.2.0",
     "zod": "^4.4.3"
   }
 }
