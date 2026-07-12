@@ -15,13 +15,8 @@
     // JSX
     "jsx": "react-jsx",
 
-    // Interop
-    "isolatedModules": true,
-    "skipLibCheck": true,
-
     // Lib
     "target": "ES2024",
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
 
     // Types (framework scope only)
     "types": ["vite/client"]
