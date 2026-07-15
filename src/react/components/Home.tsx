@@ -32,7 +32,7 @@ function Home() {
         <h1>StartER</h1>
         <p>
           <a
-            href="https://github.com/rocambille/start-express-react/wiki/home-en-US"
+            href="https://github.com/rocambille/start-express-react/wiki/"
             target="_blank"
             rel="noopener noreferrer"
           >
