@@ -68,7 +68,7 @@ function AccountDetailsForm() {
           aria-invalid={hasError(errors, "name") || undefined}
           aria-describedby={`${nameId}-error`}
         />
-        <FormError issues={errors} name="name" id="name-error" />
+        <FormError issues={errors} name="name" id={`${nameId}-error`} />
       </fieldset>
 
       <button type="submit">Save</button>
