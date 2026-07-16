@@ -10,7 +10,10 @@
   - https://react.dev/reference/react-dom/components/form
 */
 
+import { useId, useState } from "react";
 import z from "zod";
+import type { $ZodIssue as ZodIssue } from "zod/v4/core";
+import { FormError, hasError } from "../FormError";
 import { useAuth } from "./AuthContext";
 
 const schema = z.object({
@@ -20,6 +23,9 @@ const schema = z.object({
 
 function AccountDetailsForm() {
   const { me, updateMe } = useAuth();
+  const emailId = useId();
+  const nameId = useId();
+  const [errors, setErrors] = useState<ZodIssue[]>([]);
 
   return (
     <form
@@ -30,32 +36,39 @@ function AccountDetailsForm() {
 
         const parsed = schema.safeParse({ email, name });
         if (!parsed.success) {
-          alert(z.prettifyError(parsed.error));
+          setErrors(parsed.error.issues);
           return;
         }
 
+        setErrors([]);
         updateMe(parsed.data);
       }}
     >
       <fieldset>
-        <label htmlFor="email">Email</label>
+        <label htmlFor={emailId}>Email</label>
         <input
           type="email"
-          id="email"
+          id={emailId}
           name="email"
           required
           defaultValue={me?.email}
+          aria-invalid={hasError(errors, "email") || undefined}
+          aria-describedby={`${emailId}-error`}
         />
+        <FormError issues={errors} name="email" id={`${emailId}-error`} />
       </fieldset>
       <fieldset>
-        <label htmlFor="name">Name</label>
+        <label htmlFor={nameId}>Name</label>
         <input
           type="text"
-          id="name"
+          id={nameId}
           name="name"
           required
           defaultValue={me?.name}
+          aria-invalid={hasError(errors, "name") || undefined}
+          aria-describedby={`${nameId}-error`}
         />
+        <FormError issues={errors} name="name" id="name-error" />
       </fieldset>
 
       <button type="submit">Save</button>

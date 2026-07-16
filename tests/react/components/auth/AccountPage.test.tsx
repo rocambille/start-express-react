@@ -53,9 +53,7 @@ describe("<AccountPage />", () => {
     expectContractCall("users", "edit_me", "as_me");
   });
 
-  it("should alert when submitted data is invalid", async () => {
-    vi.spyOn(window, "alert").mockImplementationOnce(() => {});
-
+  it("should display inline errors when submitted data is invalid", async () => {
     const { user } = await renderWithStub({
       path: "/",
       Component: AccountPage,
@@ -69,7 +67,7 @@ describe("<AccountPage />", () => {
       await fireEvent.submit(screen.getByRole("form"));
     });
 
-    expect(alert).toHaveBeenCalled();
+    await screen.findByText("Nom requis");
   });
 
   it("should submit logout form", async () => {

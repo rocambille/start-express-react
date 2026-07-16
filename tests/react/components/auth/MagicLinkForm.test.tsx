@@ -43,9 +43,7 @@ describe("<MagicLinkForm />", () => {
 
     expectContractCall("auth", "magic_link", "success");
   });
-  it("should fail when email is invalid", async () => {
-    vi.spyOn(globalThis, "alert").mockImplementationOnce(() => {});
-
+  it("should display inline errors when email is invalid", async () => {
     await renderWithStub({
       path: "/",
       Component: MagicLinkForm,
@@ -55,6 +53,6 @@ describe("<MagicLinkForm />", () => {
 
     await fireEvent.submit(screen.getByRole("form"));
 
-    expect(alert).toHaveBeenCalled();
+    await screen.findByText(/invalid/i);
   });
 });

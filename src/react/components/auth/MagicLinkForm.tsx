@@ -3,8 +3,10 @@
   Magic Link login form - email input only.
 */
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { z } from "zod";
+import type { $ZodIssue as ZodIssue } from "zod/v4/core";
+import { FormError, hasError } from "../FormError";
 import { useAuth } from "./AuthContext";
 
 const emailSchema = z.object({
@@ -14,6 +16,8 @@ const emailSchema = z.object({
 function MagicLinkForm() {
   const { sendMagicLink } = useAuth();
   const [sent, setSent] = useState(false);
+  const emailId = useId();
+  const [errors, setErrors] = useState<ZodIssue[]>([]);
 
   return sent ? (
     <p>
@@ -30,10 +34,11 @@ function MagicLinkForm() {
         const parsed = emailSchema.safeParse({ email });
 
         if (!parsed.success) {
-          alert(z.prettifyError(parsed.error));
+          setErrors(parsed.error.issues);
           return;
         }
 
+        setErrors([]);
         sendMagicLink(parsed.data.email);
         setSent(true);
       }}
@@ -44,13 +49,17 @@ function MagicLinkForm() {
       </hgroup>
 
       <input
+        id={emailId}
         aria-label="Email"
         type="email"
         name="email"
         defaultValue=""
         placeholder="your.address@mail.com"
         required
+        aria-invalid={hasError(errors, "email") || undefined}
+        aria-describedby={`${emailId}-error`}
       />
+      <FormError issues={errors} name="email" id={`${emailId}-error`} />
       <button type="submit">Receive my login link</button>
     </form>
   );
