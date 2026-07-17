@@ -213,7 +213,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
 
       const result = content
         .replace(`import { itemRoutes } from "./components/item/index";\n`, "")
-        .replace(`      ...itemRoutes,\n`, "");
+        .replace(`          ...itemRoutes,\n`, "");
 
       expect(result).not.toContain("itemRoutes");
       expect(result).toContain("AccountPage");
@@ -319,11 +319,11 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
         .replace(
-          / {6}\{\n {8}path: "account",\n {8}element: <AccountPage \/>,\n {6}\},\n/m,
+          / {10}\{\n {12}path: "account",\n {12}element: <AccountPage \/>,\n {10}\},\n/m,
           "",
         )
         .replace(
-          / {6}\{\n {8}path: "verify",\n {8}element: <VerifyPage \/>,\n {6}\},\n/m,
+          / {10}\{\n {12}path: "verify",\n {12}element: <VerifyPage \/>,\n {10}\},\n/m,
           "",
         );
 
@@ -356,8 +356,8 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         .replace(`  const { check } = useAuth();\n`, "")
         .replace(`  const location = useLocation();\n\n`, "")
         .replace(
-          `        {check() || location.pathname === "/verify" ? (\n          <Outlet />\n        ) : (\n          <MagicLinkForm />\n        )}`,
-          `        <Outlet />`,
+          / {8}\{check\(\) \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
+          `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
         );
 
       expect(result).not.toContain("useAuth");
@@ -365,6 +365,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("useLocation");
       expect(result).not.toContain("check()");
       expect(result).toContain("<Outlet />");
+      expect(result).toContain("Suspense");
       expect(result).toContain("NavBar");
     });
 
