@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!coverage", "!dist", "!src/database/data"]
+    "includes": ["**", "!coverage", "!dist", "!data"]
   },
   "formatter": {
     "enabled": true,
