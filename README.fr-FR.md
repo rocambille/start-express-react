@@ -8,7 +8,7 @@
 
 # StartER 🚀
 
-## L'environnement pour le prototypage rapide à l'ère de l'IA
+## Apprenez le développement fullstack. Livrez vite.
 
 [![GitHub tag](https://img.shields.io/github/tag/rocambille/start-express-react?include_prereleases=&sort=semver&color=white)](https://github.com/rocambille/start-express-react/tags/)
 [![License](https://img.shields.io/badge/license-MIT-white)](https://github.com/rocambille/start-express-react/blob/main/LICENSE.md)
@@ -18,25 +18,26 @@
 [![Use this template](https://img.shields.io/badge/Démarrer-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/rocambille/start-express-react/generate)
 [![Read the manual](https://img.shields.io/badge/Apprendre-Read_the_manual-blue?style=for-the-badge)](https://github.com/rocambille/start-express-react/wiki/home-fr-FR)
 
-**Apprenez le développement fullstack. Créez des prototypes avec l'IA. Gardez le contrôle.**
+**Un framework pédagogique Express + React conçu pour la clarté, le prototypage et la co-création avec l'IA.**
 
 </div>
 
-## 📚 Exemple de structure de projet Express + React simple et lisible
+## 📚 Pourquoi StartER ?
 
-Ce projet présente une méthode simple et lisible pour structurer une application fullstack avec :
+StartER est un framework open-source pour **apprendre** et **construire** des applications web fullstack. Il fournit :
 
 * Backend Express
 * Frontend React
-* Contrats partagés pour l'API
+* Types et contrats partagés pour la vérification de l'API
+* Une architecture « sans magie » où vous comprenez chaque ligne
+
+Que vous soyez étudiant·e, en reconversion, ou développeur·se expérimenté·e qui prototype une nouvelle idée, StartER vous offre une base solide et lisible.
 
 Si vous recherchez un "starter Express + React" ou un "boilerplate Node React", ce dépôt est un template pratique.
 
-## 🧠 Starter, le framework idéal pour l'IA
+## 🧠 Conçu pour l'ère de l'IA
 
-La plupart des frameworks sont trop complexes pour l'IA. Ils dissimulent la logique derrière des abstractions complexes et opaques, ce qui peut entraîner des dysfonctionnements et des erreurs de conception chez les agents.
-
-**Nous avons conçu StartER pour nous démarquer.** Il s'agit d'une plateforme "sans magie" conçue pour la **co-création humain-IA**. En conservant un code lisible et explicite, nous fournissons aux agents IA un modèle mental optimal. StartER devient ainsi le terrain de jeu idéal pour le prototypage et l'apprentissage rapides.
+Le code lisible et explicite de StartER le rend particulièrement adapté à la **co-création humain-IA**. La plupart des frameworks masquent leur logique derrière des abstractions opaques, provoquant des hallucinations chez les agents IA. La transparence de StartER leur offre un modèle mental optimal, ce qui en fait l'outil idéal pour le prototypage rapide.
 
 ![](https://raw.githubusercontent.com/rocambille/start-express-react/refs/heads/main/src/react/assets/images/architecture.png)
 
@@ -95,9 +96,9 @@ Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : u
 
 ## 📖 Documentation
 
-StartER est un projet pédagogique. Si cette architecture vous aide à prototyper plus rapidement avec l'IA, **laissez-nous une ⭐ sur GitHub !**
+StartER est un projet pédagogique. Si ce framework vous aide à apprendre ou à prototyper plus vite, **laissez-nous une ⭐ sur GitHub !**
 
-👉 **[Consultez le wiki et le modèle mental de l'IA](https://github.com/rocambille/start-express-react/wiki)**
+👉 **[Consultez le wiki](https://github.com/rocambille/start-express-react/wiki)**
 
 ## 📄 Licence
 
