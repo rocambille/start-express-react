@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "noEmit": true,
 
     // Strictness
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
     // Module
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "resolveJsonModule": true,
@@ -15,8 +18,14 @@
     // JSX
     "jsx": "react-jsx",
 
+    // Interop
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+
     // Lib
     "target": "ES2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
 
     // Types (framework scope only)
     "types": ["vite/client"]
