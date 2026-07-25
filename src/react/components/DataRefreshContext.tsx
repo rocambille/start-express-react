@@ -3,8 +3,8 @@
   Provide a minimal mechanism to trigger re-renders after data mutations.
 
   Why this exists:
-  - The cache layer stores Promises, not reactive state
-  - After invalidateCache(), React does not know data has changed
+  - Our cache layer stores Promises, not reactive state
+  - After a call to forget(), React does not know data has changed
   - This context bridges cache invalidation with React re-rendering
 
   Design notes:
@@ -51,7 +51,7 @@ export function DataRefreshProvider({ children }: { children: ReactNode }) {
   useRefresh():
   - Returns { tick, refresh }
   - tick: include in dependency arrays to re-suspend after mutations
-  - refresh: call after invalidateCache() to trigger re-render
+  - refresh: call after forget() to trigger re-render
 */
 export function useRefresh() {
   const context = useContext(DataRefreshContext);

@@ -54,8 +54,8 @@ describe("React Helpers: mutate", () => {
       expectTypeOf(mutate).toBeFunction();
     });
 
-    it("should return a mutate function that sends a mutation request and invalidates the cache", async () => {
-      const invalidateCacheMock = vi.spyOn(cache, "invalidateCache");
+    it("should return a mutate function that sends a mutation request and forgets matching cache entries", async () => {
+      const forgetMock = vi.spyOn(cache, "forget");
       const { result } = await renderHookAsync(() => useMutate(), {
         wrapper: DataRefreshProvider,
       });
@@ -65,11 +65,11 @@ describe("React Helpers: mutate", () => {
       await act(() => mutate("/api/health", "delete", null, ["/api/health"]));
 
       expectContractCall("health", "delete", "success");
-      expect(invalidateCacheMock).toHaveBeenCalledWith("/api/health");
+      expect(forgetMock).toHaveBeenCalledWith("/api/health");
     });
 
-    it("should return a mutate function that does not invalidate the cache when the request fails", async () => {
-      const invalidateCacheMock = vi.spyOn(cache, "invalidateCache");
+    it("should return a mutate function that does not forget cache entries when the request fails", async () => {
+      const forgetMock = vi.spyOn(cache, "forget");
       const { result } = await renderHookAsync(() => useMutate(), {
         wrapper: DataRefreshProvider,
       });
@@ -78,7 +78,7 @@ describe("React Helpers: mutate", () => {
 
       await expect(() => mutate("/api/500", "post")).rejects.toThrow(/500/i);
 
-      expect(invalidateCacheMock).not.toHaveBeenCalled();
+      expect(forgetMock).not.toHaveBeenCalled();
     });
   });
 });

@@ -50,7 +50,7 @@ function Layout() {
         {check() || location.pathname === "/verify" ? (
           /*
             Suspense boundary:
-            - Catches React suspensions from use(cache(...)) in child components
+            - Catches React suspensions from use(getOrFetch(...)) in child components
             - Shows a plain loading message while data is being fetched
             - The header stays visible during loading
           */

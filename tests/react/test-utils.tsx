@@ -4,7 +4,7 @@ import { createRoutesStub } from "react-router";
 
 import { AuthProvider } from "../../src/react/components/auth/AuthContext";
 import { DataRefreshProvider } from "../../src/react/components/DataRefreshContext";
-import { invalidateCache } from "../../src/react/helpers/cache";
+import { forget } from "../../src/react/helpers/cache";
 import contracts from "../contracts";
 
 // -------------------------
@@ -241,7 +241,7 @@ export const setupMocks = ({
 
   mockFetch(customFetch);
 
-  invalidateCache("*");
+  forget("*");
 };
 
 export const requestValue = (

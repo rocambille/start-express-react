@@ -15,7 +15,7 @@
 
 import { use, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
-import { cache } from "../../helpers/cache";
+import { getOrFetch } from "../../helpers/cache";
 import { useMutate } from "../../helpers/mutate";
 import ItemForm from "./ItemForm";
 
@@ -36,7 +36,7 @@ function ItemEdit() {
     [id, mutate, navigate],
   );
 
-  const item = use(cache<Item>(`/api/items/${id}`));
+  const item = use(getOrFetch<Item>(`/api/items/${id}`));
 
   return (
     /*

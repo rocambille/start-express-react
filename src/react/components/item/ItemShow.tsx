@@ -9,7 +9,7 @@
 
 import { use } from "react";
 import { Link, useParams } from "react-router";
-import { cache } from "../../helpers/cache";
+import { getOrFetch } from "../../helpers/cache";
 import { useAuth } from "../auth/AuthContext";
 import ItemDeleteForm from "./ItemDeleteForm";
 
@@ -17,7 +17,7 @@ function ItemShow() {
   const auth = useAuth();
   const { id } = useParams();
 
-  const item = use(cache<Item>(`/api/items/${id}`));
+  const item = use(getOrFetch<Item>(`/api/items/${id}`));
 
   return (
     <>

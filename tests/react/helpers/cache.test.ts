@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cache, invalidateCache } from "../../../src/react/helpers/cache";
+import { forget, getOrFetch } from "../../../src/react/helpers/cache";
 import { setupMocks } from "../test-utils";
 
 describe("React Helpers: cache", () => {
@@ -13,9 +13,9 @@ describe("React Helpers: cache", () => {
     vi.unstubAllGlobals();
   });
 
-  describe("cache()", () => {
+  describe("getOrFetch()", () => {
     it("should return cached data", async () => {
-      const data = await cache("/api/health");
+      const data = await getOrFetch("/api/health");
       expect(data).toEqual({ hello: "world" });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -23,40 +23,40 @@ describe("React Helpers: cache", () => {
     });
 
     it("should not fetch again when data is cached", async () => {
-      const data = await cache(`/api/health`);
-      const data2 = await cache(`/api/health`);
+      const data = await getOrFetch(`/api/health`);
+      const data2 = await getOrFetch(`/api/health`);
       expect(data2).toEqual(data);
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
     it("should throw error when data is not available", async () => {
-      await expect(() => cache("/api/404")).rejects.toThrow(/404/i);
+      await expect(() => getOrFetch("/api/404")).rejects.toThrow(/404/i);
     });
   });
 
-  describe("invalidateCache()", () => {
-    it("should invalidate cache", async () => {
-      const data = await cache("/api/health");
+  describe("forget()", () => {
+    it("should forget cached entries", async () => {
+      const data = await getOrFetch("/api/health");
 
-      invalidateCache("/api/health");
+      forget("/api/health");
 
-      const data2 = await cache(`/api/health`);
+      const data2 = await getOrFetch(`/api/health`);
       expect(data2).toEqual(data);
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
       expect(global.fetch).toHaveBeenNthCalledWith(2, `/api/health`);
     });
 
-    it("should invalidate all cache when '*' is provided", async () => {
-      const data = await cache("/api/health");
-      const data2 = await cache("/api/users/me");
+    it("should forget all cached entries when '*' is provided", async () => {
+      const data = await getOrFetch("/api/health");
+      const data2 = await getOrFetch("/api/users/me");
 
-      invalidateCache("*");
+      forget("*");
 
-      const data3 = await cache(`/api/health`);
+      const data3 = await getOrFetch(`/api/health`);
       expect(data3).toEqual(data);
-      const data4 = await cache(`/api/users/me`);
+      const data4 = await getOrFetch(`/api/users/me`);
       expect(data4).toEqual(data2);
 
       expect(global.fetch).toHaveBeenCalledTimes(4);
@@ -66,13 +66,13 @@ describe("React Helpers: cache", () => {
       expect(global.fetch).toHaveBeenNthCalledWith(4, `/api/users/me`);
     });
 
-    it("should not invalidate cache for paths that do not match", async () => {
-      await cache("/api/health");
-      await cache("/api/users/me");
+    it("should not forget cached entries for paths that do not match", async () => {
+      await getOrFetch("/api/health");
+      await getOrFetch("/api/users/me");
 
-      invalidateCache("/api/users/me");
+      forget("/api/users/me");
 
-      const data = await cache(`/api/health`);
+      const data = await getOrFetch(`/api/health`);
       expect(data).toEqual({ hello: "world" });
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
