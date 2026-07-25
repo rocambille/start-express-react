@@ -198,7 +198,9 @@ export async function main(argv: string[] = process.argv) {
   if (isExpress) {
     console.info(`[ ] Register the Express module in src/express/routes.ts:
 
-      await importAndUse("./modules/${newName.toLowerCase()}/${newName.toLowerCase()}Routes");
+      import ${newName.toLowerCase()}Routes from "./modules/${newName.toLowerCase()}/${newName.toLowerCase()}Routes";
+
+      router.use(${newName.toLowerCase()}Routes);
 `);
   }
 

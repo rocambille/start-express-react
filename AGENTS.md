@@ -32,7 +32,7 @@
 │   │   ├── migrations/        # Forward-only migration scripts (production)
 │   │   └── seeder.sql         # Test/seed data
 │   ├── express/
-│   │   ├── routes.ts          # Registers all Express modules via importAndUse()
+│   │   ├── routes.ts          # Registers all Express modules
 │   │   ├── helpers/           # Infrastructure: cache, validation, converters
 │   │   └── modules/           # Business modules (item/, user/, auth/, ...)
 │   │       └── <name>/
@@ -100,7 +100,9 @@ npm run make:clone -- src/express/modules/item src/express/modules/post Item Pos
 After cloning an express module, register the new routes in src/express/routes.ts:
 
 ```typescript
-await importAndUse("./modules/post/postRoutes");
+import postRoutes from "./modules/post/postRoutes";
+
+router.use(postRoutes);
 ```
 
 After cloning a react module, register the new routes in src/react/routes.tsx:
@@ -300,4 +302,3 @@ Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.g
 | **Soft delete** | Setting `deleted_at` timestamp instead of removing a row — default delete strategy |
 | **Hard delete** | Permanently removing a row — use only when explicitly required |
 | **`make:clone`** | CLI script to duplicate a module with automatic name replacement |
-| **`importAndUse`** | Helper in `src/express/routes.ts` that dynamically imports and registers a module router |

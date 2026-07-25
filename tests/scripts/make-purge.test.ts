@@ -227,10 +227,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         "utf8",
       );
 
-      const result = content.replace(
-        `await importAndUse("./modules/item/itemRoutes");\n`,
-        "",
-      );
+      const result = content
+        .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+        .replace(`router.use(itemRoutes);\n`, "");
 
       expect(result).not.toContain("itemRoutes");
       expect(result).toContain("authRoutes");
@@ -405,8 +404,10 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       );
 
       const result = content
-        .replace(`await importAndUse("./modules/auth/authRoutes");\n`, "")
-        .replace(`await importAndUse("./modules/user/userRoutes");\n`, "");
+        .replace(`import authRoutes from "./modules/auth/authRoutes";\n`, "")
+        .replace(`router.use(authRoutes);\n`, "")
+        .replace(`import userRoutes from "./modules/user/userRoutes";\n`, "")
+        .replace(`router.use(userRoutes);\n`, "");
 
       expect(result).not.toContain("authRoutes");
       expect(result).not.toContain("userRoutes");

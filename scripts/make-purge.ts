@@ -59,7 +59,9 @@ async function purgeItems(rootDir: string) {
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
-    content.replace(`await importAndUse("./modules/item/itemRoutes");\n`, ""),
+    content
+      .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+      .replace(`router.use(itemRoutes);\n`, ""),
   );
 
   // Remove item routes and import from React.
@@ -105,8 +107,10 @@ async function purgeAuth(rootDir: string) {
   // Remove auth/user routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
     content
-      .replace(`await importAndUse("./modules/auth/authRoutes");\n`, "")
-      .replace(`await importAndUse("./modules/user/userRoutes");\n`, ""),
+      .replace(`import authRoutes from "./modules/auth/authRoutes";\n`, "")
+      .replace(`router.use(authRoutes);\n`, "")
+      .replace(`import userRoutes from "./modules/user/userRoutes";\n`, "")
+      .replace(`router.use(userRoutes);\n`, ""),
   );
 
   // Remove user and magic_link_token tables from schema.
