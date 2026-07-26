@@ -21,10 +21,10 @@ import type { ZodObject } from "zod";
 */
 export const createValidator = (
   schema: ZodObject,
-  extract: (req: Request) => unknown = (req) => req.body,
+  options: { inject?: (req: Request) => Record<string, unknown> } = {},
 ): { validate: RequestHandler } => ({
   validate: (req, res, next) => {
-    const parsed = schema.safeParse(extract(req));
+    const parsed = schema.safeParse(req.body);
 
     if (!parsed.success) {
       const { issues } = parsed.error;
@@ -34,7 +34,13 @@ export const createValidator = (
       return;
     }
 
-    req.body = parsed.data;
+    const { inject } = options;
+
+    if (inject) {
+      req.body = { ...parsed.data, ...inject(req) };
+    } else {
+      req.body = parsed.data;
+    }
 
     next();
   },
