@@ -57,7 +57,7 @@ class ItemRepository {
       .prepare("insert into item (title, user_id) values (?, ?)")
       .run(item.title, item.user_id);
 
-    return result.lastInsertRowid;
+    return Number(result.lastInsertRowid);
   }
 
   /* ********************************************************************** */

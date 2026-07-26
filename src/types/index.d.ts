@@ -5,7 +5,7 @@ type Json = string | number | bigint | boolean | null | JsonObject | JsonArray;
 type JsonObject = { [key: string]: Json };
 type JsonArray = Json[];
 
-type RowId = number | bigint;
+type RowId = number;
 
 type Item = {
   id: RowId;
