@@ -123,6 +123,7 @@ const trustedBaseUrl = env.APP_BASE_URL.replace(/\/+$/, "");
 */
 const sendMagicLink: RequestHandler = async (req, res) => {
   const { email } = req.body;
+
   if (!email || typeof email !== "string") {
     res.sendStatus(400);
     return;
