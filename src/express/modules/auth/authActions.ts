@@ -106,7 +106,7 @@ const sendMagicLink: RequestHandler = async (req, res) => {
   }
 
   // Find or create user ID
-  const userId = userRepository.findOrCreateByEmail(email);
+  const userId = userRepository.findByEmailOrCreate(email);
 
   // Generate opaque token
   const rawToken = crypto.randomBytes(32).toString("hex");

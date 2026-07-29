@@ -105,7 +105,7 @@ class UserRepository {
   }
 
   /*
-    Find or create a single user by email.
+    Find a single user by email or create a new one.
 
     Behavior:
     - Ignores soft-deleted rows (`deleted_at is null`)
@@ -114,7 +114,7 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  findOrCreateByEmail(email: string): RowId {
+  findByEmailOrCreate(email: string): RowId {
     const user = this.findByEmail(email);
     if (user) return user.id;
 
