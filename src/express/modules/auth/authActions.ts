@@ -61,9 +61,9 @@ const cookieOptions: CookieOptions = {
 /*
   Minimal JWT wrapper to:
   - Encapsulate signing and verification
-  - Enforce payload typing between methods
+  - Enforce payload typing between sign and verify methods
 */
-class Auth<Payload extends JwtPayload | string = JwtPayload> {
+class TokenSigner<Payload extends JwtPayload | string = JwtPayload> {
   #secret: string;
 
   constructor(secret: string) {
@@ -79,7 +79,7 @@ class Auth<Payload extends JwtPayload | string = JwtPayload> {
   }
 }
 
-const auth = new Auth(env.APP_SECRET);
+const tokenSigner = new TokenSigner(env.APP_SECRET);
 
 const transporter = env.SMTP_URL
   ? nodemailer.createTransport(env.SMTP_URL)
@@ -177,7 +177,7 @@ const verifyMagicLink: RequestHandler = (req, res) => {
       throw new Error("User not found");
     }
 
-    const sessionToken = auth.signSession({ sub: user.id.toString() });
+    const sessionToken = tokenSigner.signSession({ sub: user.id.toString() });
 
     res.cookie("__Host-auth", sessionToken, cookieOptions);
 
@@ -222,7 +222,7 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
       throw new Error("Access token is missing in cookies");
     }
 
-    const payload = auth.verify(token);
+    const payload = tokenSigner.verify(token);
 
     const me = userRepository.find(Number(payload.sub));
 
@@ -231,7 +231,7 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
     }
 
     // Refresh cookie (extends expiration)
-    const freshToken = auth.signSession({ sub: me.id.toString() });
+    const freshToken = tokenSigner.signSession({ sub: me.id.toString() });
     res.cookie("__Host-auth", freshToken, cookieOptions);
 
     req.me = me;

@@ -75,11 +75,11 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  find(byId: RowId): User | null {
+  find(id: RowId): User | null {
     const query = database.prepare(
       "select id, email, name from user where id = ? and deleted_at is null",
     );
-    const row = query.get(byId);
+    const row = query.get(id);
 
     return row ? userSchema.parse(row) : null;
   }
@@ -95,11 +95,11 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  findByEmail(byEmail: string): User | null {
+  findByEmail(email: string): User | null {
     const query = database.prepare(
       "select id, email, name from user where email = ? and deleted_at is null",
     );
-    const row = query.get(byEmail);
+    const row = query.get(email);
 
     return row ? userSchema.parse(row) : null;
   }

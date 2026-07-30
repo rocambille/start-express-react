@@ -203,9 +203,9 @@ However, a repository method *may* be marked `async` if it strictly requires int
 
 ```ts
 // ✅ Correct SQLite query
-find(byId: number): Item | null {
+find(id: number): Item | null {
   const query = database.prepare("select id, title from item where id = ?");
-  const row = query.get(byId);
+  const row = query.get(id);
   // ...
 }
 
@@ -216,7 +216,7 @@ async fetchAndSave(id: number): Promise<Item> {
 }
 
 // ❌ Wrong (Wrapping SQLite in async for no reason)
-async find(byId: number): Promise<Item | null> { ... }
+async find(id: number): Promise<Item | null> { ... }
 ```
 
 ### Soft delete by default

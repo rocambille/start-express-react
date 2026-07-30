@@ -34,6 +34,21 @@ describe("React Helpers: mutate", () => {
 
       expectContractCall("health", "delete", "success");
     });
+
+    it("should reuse CSRF token", async () => {
+      const storedValue = {
+        value: "csrf-token-value",
+      };
+      const getMock = vi.fn().mockReturnValue(storedValue);
+      vi.stubGlobal("cookieStore", { get: getMock, set: vi.fn() });
+
+      // first call sets expiration time + 30 seconds
+      await apiMutate("/api/health", "delete");
+      // second call should reuse CSRF token
+      await apiMutate("/api/health", "delete");
+
+      expect(getMock).toHaveBeenCalledWith("__Host-x-csrf-token");
+    });
   });
 
   describe("useMutate()", () => {
