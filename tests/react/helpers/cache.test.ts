@@ -15,17 +15,17 @@ describe("React Helpers: cache", () => {
 
   describe("getOrFetch()", () => {
     it("should return cached data", async () => {
-      const data = await getOrFetch("/api/health");
-      expect(data).toEqual({ hello: "world" });
+      const firstFetchResult = await getOrFetch("/api/health");
+      expect(firstFetchResult).toEqual({ hello: "world" });
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenNthCalledWith(1, `/api/health`);
     });
 
     it("should not fetch again when data is cached", async () => {
-      const data = await getOrFetch(`/api/health`);
-      const data2 = await getOrFetch(`/api/health`);
-      expect(data2).toEqual(data);
+      const firstFetchResult = await getOrFetch(`/api/health`);
+      const refetchResult = await getOrFetch(`/api/health`);
+      expect(refetchResult).toEqual(firstFetchResult);
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
@@ -37,27 +37,28 @@ describe("React Helpers: cache", () => {
 
   describe("forget()", () => {
     it("should forget cached entries", async () => {
-      const data = await getOrFetch("/api/health");
+      const firstFetchResult = await getOrFetch("/api/health");
 
       forget("/api/health");
 
-      const data2 = await getOrFetch(`/api/health`);
-      expect(data2).toEqual(data);
+      const refetchResult = await getOrFetch(`/api/health`);
+      expect(refetchResult).toEqual(firstFetchResult);
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
       expect(global.fetch).toHaveBeenNthCalledWith(2, `/api/health`);
     });
 
     it("should forget all cached entries when '*' is provided", async () => {
-      const data = await getOrFetch("/api/health");
-      const data2 = await getOrFetch("/api/users/me");
+      const healthFirstFetchResult = await getOrFetch("/api/health");
+      const usersFirstFetchResult = await getOrFetch("/api/users/me");
 
       forget("*");
 
-      const data3 = await getOrFetch(`/api/health`);
-      expect(data3).toEqual(data);
-      const data4 = await getOrFetch(`/api/users/me`);
-      expect(data4).toEqual(data2);
+      const healthRefetchResult = await getOrFetch(`/api/health`);
+      expect(healthRefetchResult).toEqual(healthFirstFetchResult);
+
+      const usersRefetchResult = await getOrFetch(`/api/users/me`);
+      expect(usersRefetchResult).toEqual(usersFirstFetchResult);
 
       expect(global.fetch).toHaveBeenCalledTimes(4);
       expect(global.fetch).toHaveBeenNthCalledWith(1, `/api/health`);
@@ -72,8 +73,8 @@ describe("React Helpers: cache", () => {
 
       forget("/api/users/me");
 
-      const data = await getOrFetch(`/api/health`);
-      expect(data).toEqual({ hello: "world" });
+      const refetchResult = await getOrFetch(`/api/health`);
+      expect(refetchResult).toEqual({ hello: "world" });
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });

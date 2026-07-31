@@ -184,40 +184,40 @@ const api = supertest(app);
 
 // Helper to check a test case
 export const check = async (test: Test, caseName: keyof Test["cases"]) => {
-  const c = test.cases[caseName];
+  const caseDetails = test.cases[caseName];
 
-  const apiCall = api[test.method](c.specialPath ?? test.path);
+  const apiCall = api[test.method](caseDetails.specialPath ?? test.path);
 
-  if (c.request.body != null) {
-    apiCall.send(c.request.body);
+  if (caseDetails.request.body != null) {
+    apiCall.send(caseDetails.request.body);
   }
 
   const cookies = [];
 
-  if (c.request.jwtPayload !== undefined) {
+  if (caseDetails.request.jwtPayload !== undefined) {
     cookies.push("__Host-auth=jwt");
 
     vi.spyOn(jwt, "verify").mockImplementation((): JwtPayload => {
-      if (c.request.jwtPayload == null) {
+      if (caseDetails.request.jwtPayload == null) {
         throw new Error("Invalid token");
       }
 
-      return { sub: c.request.jwtPayload.sub.toString() };
+      return { sub: caseDetails.request.jwtPayload.sub.toString() };
     });
   }
 
-  if (apiCall.method !== "GET" && !c.request.withoutCsrfProtection) {
+  if (apiCall.method !== "GET" && !caseDetails.request.withoutCsrfProtection) {
     apiCall.set("X-CSRF-Token", "a-b-c-d-e");
     cookies.push("__Host-x-csrf-token=a-b-c-d-e");
   }
 
   const response = await apiCall.set("Cookie", cookies);
 
-  expect(response.status).toBe(c.response.status);
-  expect(response.body).toEqual(c.response.body);
+  expect(response.status).toBe(caseDetails.response.status);
+  expect(response.body).toEqual(caseDetails.response.body);
 
-  if (c.response.and) {
-    c.response.and(response);
+  if (caseDetails.response.and) {
+    caseDetails.response.and(response);
   }
 
   return response;

@@ -37,8 +37,8 @@ describe("API Contracts", () => {
     describe(contractName, () => {
       for (const [testName, test] of Object.entries(contract)) {
         describe(testName, () => {
-          for (const [caseName, c] of Object.entries(test.cases)) {
-            (c.only ? it.only : it)(caseName, async () => {
+          for (const [caseName, caseDetails] of Object.entries(test.cases)) {
+            (caseDetails.only ? it.only : it)(caseName, async () => {
               await check(test, caseName);
             });
           }
