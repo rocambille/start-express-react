@@ -27,6 +27,7 @@
 ├── src/
 │   ├── entry-client.tsx       # Client-side hydration (hydrateRoot)
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
+│   ├── env.ts                 # Environment schemas & validation (clientEnv / serverEnv)
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
 │   │   ├── migrations/        # Forward-only migration scripts (production)
@@ -283,6 +284,8 @@ Backend errors must be concise: `400`, `401`, `403`, `404`, `500`. Never expose 
 StartER has no file upload handling. If adding one, store files outside the document root, validate MIME type and size, and never serve them with an executable Content-Type.
 
 ### Environment variables
+
+Environment variables are defined and validated in `src/env.ts` using separate Zod schemas: `clientEnv` (browser-accessible via `import.meta.env`) and `serverEnv` (server-only via `process.env`). Import `serverEnv` for Node.js server code and `clientEnv` for frontend/shared helpers.
 
 Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
 
