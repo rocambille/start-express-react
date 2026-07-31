@@ -21,7 +21,7 @@ import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
-import { env } from "../../../env";
+import { serverEnv } from "../../../env";
 import userRepository from "../user/userRepository";
 import authRepository from "./authRepository";
 
@@ -79,13 +79,13 @@ class TokenSigner<Payload extends JwtPayload | string = JwtPayload> {
   }
 }
 
-const tokenSigner = new TokenSigner(env.APP_SECRET);
+const tokenSigner = new TokenSigner(serverEnv.APP_SECRET);
 
-const transporter = env.SMTP_URL
-  ? nodemailer.createTransport(env.SMTP_URL)
+const transporter = serverEnv.SMTP_URL
+  ? nodemailer.createTransport(serverEnv.SMTP_URL)
   : null;
 
-const trustedBaseUrl = env.APP_BASE_URL.replace(/\/+$/, "");
+const trustedBaseUrl = serverEnv.APP_BASE_URL.replace(/\/+$/, "");
 
 /* ************************************************************************ */
 /* Actions                                                                  */

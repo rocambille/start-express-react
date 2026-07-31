@@ -1,6 +1,6 @@
-import { envSchema } from "../src/env";
+import { serverEnvSchema } from "../src/env";
 
-describe("envSchema", () => {
+describe("serverEnvSchema", () => {
   it("should validate valid environment variables", () => {
     const validEnv = {
       APP_PORT: "5173",
@@ -9,7 +9,7 @@ describe("envSchema", () => {
       VITE_TIMEZONE: "Europe/Paris",
     };
 
-    const parsed = envSchema.parse(validEnv);
+    const parsed = serverEnvSchema.parse(validEnv);
     expect(parsed.APP_PORT).toBe(5173);
     expect(parsed.APP_SECRET).toBe("my-secret-key");
     expect(parsed.VITE_TIMEZONE).toBe("Europe/Paris");
@@ -23,7 +23,7 @@ describe("envSchema", () => {
       VITE_TIMEZONE: "Invalid/Timezone_Name",
     };
 
-    expect(() => envSchema.parse(invalidEnv)).toThrow();
+    expect(() => serverEnvSchema.parse(invalidEnv)).toThrow();
   });
 
   it("should reject invalid APP_PORT", () => {
@@ -32,6 +32,6 @@ describe("envSchema", () => {
       APP_SECRET: "my-secret-key",
     };
 
-    expect(() => envSchema.parse(invalidEnv)).toThrow();
+    expect(() => serverEnvSchema.parse(invalidEnv)).toThrow();
   });
 });

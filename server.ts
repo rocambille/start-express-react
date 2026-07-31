@@ -28,15 +28,15 @@
  * - https://vitejs.dev/guide/ssr
  */
 
-import { env } from "./src/env";
+import { serverEnv } from "./src/env";
 
 /* ************************************************************************ */
 /*                                  Startup                                 */
 /* ************************************************************************ */
 
-const isProduction = env.NODE_ENV === "production";
+const isProduction = serverEnv.NODE_ENV === "production";
 
-const port = env.APP_PORT;
+const port = serverEnv.APP_PORT;
 
 const indexHtml = readIndexHtml();
 
