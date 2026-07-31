@@ -238,7 +238,7 @@ Repository `findAll` methods take `(limit: number, offset: number)` arguments. A
 
 ### API contract tests
 
-`tests/contracts.ts` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
+`tests/contracts/` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
 
 ---
 
@@ -296,7 +296,7 @@ Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.g
 | **Action** | An Express `RequestHandler` — thin, delegates to repository, sends HTTP response |
 | **Repository** | Class encapsulating all SQL for one table — the only place raw SQL is allowed |
 | **Validator** | Zod schema + Express middleware that validates `req.body` before the action runs |
-| **Contract** | A test declaration in `tests/contracts.ts` describing expected API behavior |
+| **Contract** | A test declaration in `tests/contracts/` describing expected API behavior |
 | **SSR outlet** | The `<!--ssr-outlet-->` placeholder in `index.html` where server-rendered HTML is injected |
 | **Hydration** | Client-side React taking over the server-rendered DOM via `hydrateRoot` in `entry-client.tsx` |
 | **Soft delete** | Setting `deleted_at` timestamp instead of removing a row — default delete strategy |

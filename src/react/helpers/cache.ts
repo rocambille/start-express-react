@@ -29,10 +29,10 @@ const promisesByUrl = new Map<string, Promise<Json>>();
 export const getOrFetch = <T extends Json>(url: string): Promise<T> => {
   // Try to get a cached Promise
 
-  const maybePromise = promisesByUrl.get(url);
+  const cachedPromise = promisesByUrl.get(url);
 
-  if (maybePromise) {
-    return maybePromise as Promise<T>;
+  if (cachedPromise) {
+    return cachedPromise as Promise<T>;
   }
 
   // Or fetch a new one and cache it
