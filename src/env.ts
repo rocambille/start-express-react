@@ -18,6 +18,9 @@
 
 import { z } from "zod";
 
+/**
+ * Resolve env sources (server & client)
+ */
 const processEnv = typeof process !== "undefined" ? process.env : {};
 const metaEnv =
   typeof import.meta !== "undefined" && import.meta.env ? import.meta.env : {};
@@ -25,9 +28,9 @@ const metaEnv =
 /**
  * Helper: validates whether a string is a valid IANA timezone name.
  */
-function isValidTimezone(tz: string): boolean {
+function isValidTimezone(timeZone: string): boolean {
   try {
-    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    Intl.DateTimeFormat(undefined, { timeZone });
     return true;
   } catch {
     return false;
