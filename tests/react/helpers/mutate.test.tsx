@@ -34,6 +34,21 @@ describe("React Helpers: mutate", () => {
 
       expectContractCall("health", "delete", "success");
     });
+
+    it("should reuse CSRF token", async () => {
+      const storedValue = {
+        value: "csrf-token-value",
+      };
+      const getMock = vi.fn().mockReturnValue(storedValue);
+      vi.stubGlobal("cookieStore", { get: getMock, set: vi.fn() });
+
+      // first call sets expiration time + 30 seconds
+      await apiMutate("/api/health", "delete");
+      // second call should reuse CSRF token
+      await apiMutate("/api/health", "delete");
+
+      expect(getMock).toHaveBeenCalledWith("__Host-x-csrf-token");
+    });
   });
 
   describe("useMutate()", () => {
@@ -54,8 +69,8 @@ describe("React Helpers: mutate", () => {
       expectTypeOf(mutate).toBeFunction();
     });
 
-    it("should return a mutate function that sends a mutation request and invalidates the cache", async () => {
-      const invalidateCacheMock = vi.spyOn(cache, "invalidateCache");
+    it("should return a mutate function that sends a mutation request and forgets matching cache entries", async () => {
+      const forgetMock = vi.spyOn(cache, "forget");
       const { result } = await renderHookAsync(() => useMutate(), {
         wrapper: DataRefreshProvider,
       });
@@ -65,11 +80,11 @@ describe("React Helpers: mutate", () => {
       await act(() => mutate("/api/health", "delete", null, ["/api/health"]));
 
       expectContractCall("health", "delete", "success");
-      expect(invalidateCacheMock).toHaveBeenCalledWith("/api/health");
+      expect(forgetMock).toHaveBeenCalledWith("/api/health");
     });
 
-    it("should return a mutate function that does not invalidate the cache when the request fails", async () => {
-      const invalidateCacheMock = vi.spyOn(cache, "invalidateCache");
+    it("should return a mutate function that does not forget cache entries when the request fails", async () => {
+      const forgetMock = vi.spyOn(cache, "forget");
       const { result } = await renderHookAsync(() => useMutate(), {
         wrapper: DataRefreshProvider,
       });
@@ -78,7 +93,7 @@ describe("React Helpers: mutate", () => {
 
       await expect(() => mutate("/api/500", "post")).rejects.toThrow(/500/i);
 
-      expect(invalidateCacheMock).not.toHaveBeenCalled();
+      expect(forgetMock).not.toHaveBeenCalled();
     });
   });
 });

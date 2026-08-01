@@ -4,6 +4,10 @@ import fs from "fs-extra";
 
 import { main } from "../../scripts/make-purge";
 
+class TestError extends Error {
+  code?: string;
+}
+
 const projectRoot = path.join(import.meta.dirname, "../..");
 
 /**
@@ -68,6 +72,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/auth")),
       ).toBe(false);
+
+      // Run second time to ensure idempotency and cover unmodified files path
+      await main(["node", "script", "-n"], tmpDir);
     });
 
     it("runs purge for items only with --keep-auth", async () => {
@@ -206,7 +213,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
 
       const result = content
         .replace(`import { itemRoutes } from "./components/item/index";\n`, "")
-        .replace(`      ...itemRoutes,\n`, "");
+        .replace(`          ...itemRoutes,\n`, "");
 
       expect(result).not.toContain("itemRoutes");
       expect(result).toContain("AccountPage");
@@ -220,10 +227,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         "utf8",
       );
 
-      const result = content.replace(
-        `await importAndUse("./modules/item/itemRoutes");\n`,
-        "",
-      );
+      const result = content
+        .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+        .replace(`router.use(itemRoutes);\n`, "");
 
       expect(result).not.toContain("itemRoutes");
       expect(result).toContain("authRoutes");
@@ -312,11 +318,11 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
         .replace(
-          / {6}\{\n {8}path: "account",\n {8}element: <AccountPage \/>,\n {6}\},\n/m,
+          / {10}\{\n {12}path: "account",\n {12}element: <AccountPage \/>,\n {10}\},\n/m,
           "",
         )
         .replace(
-          / {6}\{\n {8}path: "verify",\n {8}element: <VerifyPage \/>,\n {6}\},\n/m,
+          / {10}\{\n {12}path: "verify",\n {12}element: <VerifyPage \/>,\n {10}\},\n/m,
           "",
         );
 
@@ -349,8 +355,8 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         .replace(`  const { check } = useAuth();\n`, "")
         .replace(`  const location = useLocation();\n\n`, "")
         .replace(
-          `        {check() || location.pathname === "/verify" ? (\n          <Outlet />\n        ) : (\n          <MagicLinkForm />\n        )}`,
-          `        <Outlet />`,
+          / {8}\{check\(\) \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
+          `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
         );
 
       expect(result).not.toContain("useAuth");
@@ -358,6 +364,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("useLocation");
       expect(result).not.toContain("check()");
       expect(result).toContain("<Outlet />");
+      expect(result).toContain("Suspense");
       expect(result).toContain("NavBar");
     });
 
@@ -397,12 +404,75 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       );
 
       const result = content
-        .replace(`await importAndUse("./modules/auth/authRoutes");\n`, "")
-        .replace(`await importAndUse("./modules/user/userRoutes");\n`, "");
+        .replace(`import authRoutes from "./modules/auth/authRoutes";\n`, "")
+        .replace(`router.use(authRoutes);\n`, "")
+        .replace(`import userRoutes from "./modules/user/userRoutes";\n`, "")
+        .replace(`router.use(userRoutes);\n`, "");
 
       expect(result).not.toContain("authRoutes");
       expect(result).not.toContain("userRoutes");
       expect(result).toContain("itemRoutes");
+    });
+  });
+
+  describe("error handling in remove", () => {
+    let errorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it("logs console error when fs.remove fails with non-ENOENT error", async () => {
+      const mockError = new TestError("Permission denied");
+      mockError.code = "EACCES";
+      const removeSpy = vi.spyOn(fs, "remove").mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).toHaveBeenCalled();
+      removeSpy.mockRestore();
+    });
+
+    it("silently ignores ENOENT error in remove", async () => {
+      const mockError = new TestError("File not found");
+      mockError.code = "ENOENT";
+      const removeSpy = vi.spyOn(fs, "remove").mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      removeSpy.mockRestore();
+    });
+  });
+
+  describe("error handling in updateFile", () => {
+    let errorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it("logs console error when fs.readFile fails with non-ENOENT error", async () => {
+      await scaffoldProject(tmpDir);
+
+      const mockError = new TestError("Permission denied");
+      mockError.code = "EACCES";
+      const readFileSpy = vi
+        .spyOn(fs, "readFile")
+        .mockRejectedValueOnce(mockError);
+
+      await main(["node", "script", "-n"], tmpDir);
+
+      expect(errorSpy).toHaveBeenCalled();
+      readFileSpy.mockRestore();
     });
   });
 });

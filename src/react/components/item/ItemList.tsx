@@ -15,7 +15,7 @@
 
 import { use } from "react";
 import { Link } from "react-router";
-import { cache } from "../../helpers/cache";
+import { getOrFetch } from "../../helpers/cache";
 import { useAuth } from "../auth/AuthContext";
 
 function ItemList() {
@@ -30,9 +30,9 @@ function ItemList() {
     Items collection:
     - Retrieved through the shared cache layer
     - Suspends while loading (via `use`)
-    - Invalidated after mutations
+    - Forgotten after mutations
   */
-  const items = use(cache<Item[]>("/api/items"));
+  const items = use(getOrFetch<Item[]>("/api/items"));
 
   return (
     <>

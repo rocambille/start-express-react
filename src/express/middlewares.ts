@@ -86,8 +86,11 @@ export const csrf =
       - the CSRF header is missing
       - or the header and cookie do not match
 
-      A 401 is used here to signal an authentication-related failure
-      without leaking details about the cause.
+      Why 401 and not 403?
+      Using 401 makes CSRF failures indistinguishable from JWT
+      authentication failures. An attacker receiving 403 would know
+      their JWT is valid and only the CSRF token is wrong.
+      A uniform 401 reveals nothing about what specifically failed.
     */
     if (tokenFromRequest == null || tokenFromRequest !== tokenFromCookie) {
       res.sendStatus(401);

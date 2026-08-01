@@ -57,7 +57,7 @@ class ItemRepository {
       .prepare("insert into item (title, user_id) values (?, ?)")
       .run(item.title, item.user_id);
 
-    return result.lastInsertRowid;
+    return Number(result.lastInsertRowid);
   }
 
   /* ********************************************************************** */
@@ -74,12 +74,12 @@ class ItemRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  find(byId: RowId): Item | null {
+  find(id: RowId): Item | null {
     const row = database
       .prepare(
         "select id, title, user_id from item where id = ? and deleted_at is null",
       )
-      .get(byId);
+      .get(id);
 
     return row ? itemSchema.parse(row) : null;
   }

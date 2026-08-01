@@ -26,8 +26,8 @@ export const createParamConverter = <T>(
   requestKey: string,
 ): { convert: RequestParamHandler } => {
   return {
-    convert: (req, res, next, rawId) => {
-      const entity = repository.find(+rawId);
+    convert: (req, res, next, stringId) => {
+      const entity = repository.find(Number(stringId));
 
       if (entity == null) {
         res.sendStatus(req.method === "DELETE" ? 204 : 404);

@@ -32,7 +32,6 @@ import { z } from "zod";
 */
 const itemDTOSchema = z.object({
   title: z.string().max(255),
-  user_id: z.number(),
 });
 
 /*
@@ -40,8 +39,8 @@ const itemDTOSchema = z.object({
 */
 import { createValidator } from "../../helpers/validation";
 
-export default createValidator(itemDTOSchema, (req) => ({
-  ...req.body,
-  // user_id is derived from the authenticated user, not from req.body
-  user_id: req.me.id,
-}));
+export default createValidator(itemDTOSchema, {
+  inject: (req) => ({
+    user_id: req.me.id, // Trusted server-side injection
+  }),
+});

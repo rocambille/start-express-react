@@ -6,6 +6,7 @@
   - Uses a native <form> to keep semantics explicit
   - Uses uncontrolled inputs for simplicity (stateless aside from DOM state)
   - Reusable across create/edit use cases
+  - Validation errors are displayed inline via FormError
 
   Related docs:
   - https://react.dev/reference/react/useId
@@ -13,8 +14,10 @@
   - https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components
 */
 
-import { type PropsWithChildren, useId } from "react";
+import { type PropsWithChildren, useId, useState } from "react";
 import { z } from "zod";
+import type { $ZodIssue as ZodIssue } from "zod/v4/core";
+import { FormError, hasError } from "../FormError";
 
 const itemSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -44,6 +47,7 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
     - No collision when multiple forms are rendered
   */
   const titleId = useId();
+  const [errors, setErrors] = useState<ZodIssue[]>([]);
 
   return (
     <form
@@ -66,10 +70,11 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
         const parsed = itemSchema.safeParse({ title });
 
         if (!parsed.success) {
-          alert(z.prettifyError(parsed.error));
+          setErrors(parsed.error.issues);
           return;
         }
 
+        setErrors([]);
         action(parsed.data);
       }}
     >
@@ -80,7 +85,10 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
           type="text"
           name="title"
           defaultValue={defaultValue.title}
+          aria-invalid={hasError(errors, "title") || undefined}
+          aria-describedby={`${titleId}-error`}
         />
+        <FormError issues={errors} name="title" id={`${titleId}-error`} />
       </p>
 
       {/* Action buttons (submit, cancel…) are injected by the caller */}

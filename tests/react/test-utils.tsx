@@ -4,14 +4,83 @@ import { createRoutesStub } from "react-router";
 
 import { AuthProvider } from "../../src/react/components/auth/AuthContext";
 import { DataRefreshProvider } from "../../src/react/components/DataRefreshContext";
-import { invalidateCache } from "../../src/react/helpers/cache";
+import { forget } from "../../src/react/helpers/cache";
 import contracts from "../contracts";
+
+// -------------------------
+// Deep equal helper
+// -------------------------
+
+const isDeepEqual = (a: Json | undefined, b: Json | undefined): boolean => {
+  // a and b may be string | number | boolean | null | undefined
+  // or reference the same object or array
+
+  // check strict equality first (covers primitives and same object/array)
+  if (a === b) return true;
+
+  // not strictly equal, so they must both be objects to be equal
+  if (typeof a !== "object" || typeof b !== "object") {
+    return false;
+  }
+
+  // at this point, a and b are both objects, they can be:
+  // - null (which is of type object in javascript)
+  // - arrays
+  // - plain objects
+
+  if (a === null || b === null) {
+    // one of them is null, so they are unequal
+    // (strict equality check failed)
+
+    return false;
+  }
+
+  if (Array.isArray(a) && Array.isArray(b)) {
+    // both are arrays, their values must be deeply equal
+
+    if (a.length !== b.length) return false;
+
+    for (let i = 0; i < a.length; i++) {
+      if (!isDeepEqual(a[i], b[i])) return false;
+    }
+    return true;
+  }
+
+  if (!Array.isArray(a) && !Array.isArray(b)) {
+    // both are plain objects, their values must be deeply equal
+
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    if (keysA.length !== keysB.length) return false;
+
+    for (const key of keysA) {
+      // check key exists in b to cover edge cases like
+      // a = { x: undefined }
+      // b = { y: undefined }
+      // a["x"] is undefined because it was explicitly set to undefined
+      // b["x"] is undefined because it was never set
+      // a["x"] === b["x"] is true
+      // but ("x" in b) is false
+      // so we must check ("x" in b) to return false
+
+      if (!(key in b) || !isDeepEqual(a[key], b[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // one is an array, the other is a plain object, so they are unequal
+
+  return false;
+};
 
 // -------------------------
 // Fetch mock (contract-based)
 // -------------------------
 
-const respond = (body: unknown, status: number) => {
+const mockResponse = (body: unknown, status: number) => {
   const json = JSON.stringify(body);
 
   if (json === "{}") {
@@ -24,38 +93,6 @@ const respond = (body: unknown, status: number) => {
       headers: { "Content-Type": "application/json" },
     }),
   );
-};
-
-const isDeepEqual = (a: Json, b: Json): boolean => {
-  if (a === b) return true;
-  if (
-    typeof a !== "object" ||
-    typeof b !== "object" ||
-    a === null ||
-    b === null
-  )
-    return false;
-
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!isDeepEqual(a[i], b[i])) return false;
-    }
-    return true;
-  }
-
-  if (!Array.isArray(a) && !Array.isArray(b)) {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    if (keysA.length !== keysB.length) return false;
-
-    for (const key of keysA) {
-      if (!keysB.includes(key) || !isDeepEqual(a[key], b[key])) return false;
-    }
-    return true;
-  }
-
-  return false;
 };
 
 const mockFetch = (
@@ -85,7 +122,7 @@ const mockFetch = (
 
       const parseBody = (body?: RequestInit["body"]): Json | undefined => {
         if (body == null) {
-          return;
+          return body;
         }
         return JSON.parse(body.toString());
       };
@@ -95,13 +132,16 @@ const mockFetch = (
       // --- From contracts ---
       for (const [_contractName, contract] of Object.entries(contracts)) {
         for (const [_testName, test] of Object.entries(contract)) {
-          for (const [_caseName, c] of Object.entries(test.cases)) {
+          for (const [_caseName, caseDetails] of Object.entries(test.cases)) {
             if (
-              path === (c.specialPath ?? test.path) &&
+              path === (caseDetails.specialPath ?? test.path) &&
               method === test.method
             ) {
-              if (isDeepEqual(parsedBody, c.request.body)) {
-                return respond(c.response.body, c.response.status);
+              if (isDeepEqual(parsedBody, caseDetails.request.body)) {
+                return mockResponse(
+                  caseDetails.response.body,
+                  caseDetails.response.status,
+                );
               }
             }
           }
@@ -109,11 +149,11 @@ const mockFetch = (
       }
 
       if (path === "/api/404") {
-        return respond(null, 404);
+        return mockResponse(null, 404);
       }
 
       if (path === "/api/500") {
-        return respond(null, 500);
+        return mockResponse(null, 500);
       }
 
       throw new Error(
@@ -193,13 +233,16 @@ export const setupMocks = ({
         const [contractName, testName] = key.split(".");
         if (contractName in contracts && testName in contracts[contractName]) {
           const test = contracts[contractName][testName];
-          const c = test.cases[caseName];
+          const caseDetails = test.cases[caseName];
           if (
-            c &&
-            path === (c.specialPath ?? test.path) &&
+            caseDetails &&
+            path === (caseDetails.specialPath ?? test.path) &&
             method === test.method
           ) {
-            return respond(c.response.body, c.response.status);
+            return mockResponse(
+              caseDetails.response.body,
+              caseDetails.response.status,
+            );
           }
         }
       }
@@ -208,7 +251,7 @@ export const setupMocks = ({
 
   mockFetch(customFetch);
 
-  invalidateCache("*");
+  forget("*");
 };
 
 export const requestValue = (
@@ -243,7 +286,7 @@ export const expectContractCall = (
   caseName: keyof Test["cases"],
 ) => {
   const test = contracts[contractName][testName];
-  const c = test.cases[caseName];
+  const caseDetails = test.cases[caseName];
 
   const headers: Record<string, string> = {};
 
@@ -258,18 +301,20 @@ export const expectContractCall = (
 
     headers["X-CSRF-Token"] = mockedRandomUUID;
   }
-  if (c.request.body) {
+  if (caseDetails.request.body) {
     headers["Content-Type"] = "application/json";
   }
 
   const init = {
     ...(test.method !== "get" ? { method: test.method } : {}),
     ...(Object.keys(headers).length > 0 ? { headers } : {}),
-    ...(c.request.body ? { body: JSON.stringify(c.request.body) } : {}),
+    ...(caseDetails.request.body
+      ? { body: JSON.stringify(caseDetails.request.body) }
+      : {}),
   };
 
   const fetchArgs: Parameters<typeof globalThis.fetch> = [
-    c.specialPath ?? test.path,
+    caseDetails.specialPath ?? test.path,
   ];
 
   if (Object.keys(init).length > 0) {

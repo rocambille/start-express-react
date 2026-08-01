@@ -20,10 +20,12 @@
   ```
 */
 
+import { clientEnv } from "../../env";
+
 /**
  * The default timezone to use for date and time operations.
  */
-export const DEFAULT_TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "Europe/Paris";
+export const DEFAULT_TIMEZONE = clientEnv.VITE_TIMEZONE;
 
 function toParts(
   date: Date,

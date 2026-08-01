@@ -6,7 +6,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [react()],
   test: {
     globals: true,
-    env: loadEnv(mode, process.cwd(), ""),
     typecheck: { tsconfig: "./tsconfig.test.json" },
     projects: [
       {
@@ -15,6 +14,7 @@ export default defineConfig(({ mode }) => ({
           include: ["**/*.test.ts"],
           environment: "node",
           name: "node",
+          env: loadEnv(mode, process.cwd(), ""),
         },
       },
       {

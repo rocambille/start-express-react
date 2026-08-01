@@ -12,46 +12,58 @@
 /* ************************************************************************ */
 
 /*
-  In-memory cache used by React `use`.
+  In-memory cache compatible with React `use`.
+
+  Notes:
+  - Stores Promises, not resolved values
+  - React `use` relies on Promise identity for correct suspension
 */
-const cacheData = new Map<string, Promise<Json>>();
+const promisesByUrl = new Map<string, Promise<Json>>();
 
 /*
-  cache(url):
+  getOrFetch(url):
   - Returns a cached Promise for the given URL
   - Fetch is triggered only once per URL
-  - Subsequent calls reuse the same Promise
+  - Subsequent calls reuse the same Promise unless `forget` is called for the given base path
 */
-export const cache = <T extends Json>(url: string): Promise<T> => {
-  if (!cacheData.has(url)) {
-    cacheData.set(
-      url,
-      fetch(url).then<T>((response) => {
-        if (!response.ok) {
-          throw new Error(`${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-      }),
-    );
+export const getOrFetch = <T extends Json>(url: string): Promise<T> => {
+  // Try to get a cached Promise
+
+  const cachedPromise = promisesByUrl.get(url);
+
+  if (cachedPromise) {
+    return cachedPromise as Promise<T>;
   }
 
-  return cacheData.get(url) as Promise<T>;
+  // Or fetch a new one and cache it
+
+  const promise: Promise<T> = fetch(url).then((response) => {
+    if (!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  });
+
+  promisesByUrl.set(url, promise);
+
+  return promise;
 };
 
 /*
-  invalidateCache(basePath):
+  forget(basePath):
   - Removes all cached entries matching a path prefix
   - Used after mutations to force refetch on next render
 */
-export const invalidateCache = (basePath: string) => {
+export const forget = (basePath: string) => {
   if (basePath === "*") {
-    cacheData.clear();
+    promisesByUrl.clear();
     return;
   }
 
-  cacheData.forEach((_value, key) => {
-    if (key.startsWith(basePath)) {
-      cacheData.delete(key);
+  promisesByUrl.forEach((_, url) => {
+    if (url.startsWith(basePath)) {
+      promisesByUrl.delete(url);
     }
   });
 };

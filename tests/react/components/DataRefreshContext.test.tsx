@@ -29,7 +29,7 @@ describe("React Components: DataRefreshContext", () => {
         wrapper: DataRefreshProvider,
       });
 
-      const { refresh, tick: initialTick } = result.current;
+      const { refresh, refreshCounter: initialRefreshCounter } = result.current;
 
       act(() => refresh());
 
@@ -37,9 +37,9 @@ describe("React Components: DataRefreshContext", () => {
         wrapper: DataRefreshProvider,
       });
 
-      const { tick } = result.current;
+      const { refreshCounter: nextRefreshCounter } = result.current;
 
-      expect(tick).toBe(initialTick + 1);
+      expect(nextRefreshCounter).toBe(initialRefreshCounter + 1);
     });
   });
 });

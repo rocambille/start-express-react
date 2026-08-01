@@ -59,14 +59,16 @@ async function purgeItems(rootDir: string) {
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
-    content.replace(`await importAndUse("./modules/item/itemRoutes");\n`, ""),
+    content
+      .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+      .replace(`router.use(itemRoutes);\n`, ""),
   );
 
   // Remove item routes and import from React.
   await updateFile(rootDir, "src/react/routes.tsx", (content) =>
     content
       .replace(`import { itemRoutes } from "./components/item/index";\n`, "")
-      .replace(`      ...itemRoutes,\n`, ""),
+      .replace(`          ...itemRoutes,\n`, ""),
   );
 
   // Remove item table from schema.
@@ -105,8 +107,10 @@ async function purgeAuth(rootDir: string) {
   // Remove auth/user routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
     content
-      .replace(`await importAndUse("./modules/auth/authRoutes");\n`, "")
-      .replace(`await importAndUse("./modules/user/userRoutes");\n`, ""),
+      .replace(`import authRoutes from "./modules/auth/authRoutes";\n`, "")
+      .replace(`router.use(authRoutes);\n`, "")
+      .replace(`import userRoutes from "./modules/user/userRoutes";\n`, "")
+      .replace(`router.use(userRoutes);\n`, ""),
   );
 
   // Remove user and magic_link_token tables from schema.
@@ -151,13 +155,13 @@ async function purgeAuth(rootDir: string) {
       )
       // Remove the loader
       .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
-      // Remove account and verify routes
+      // Remove account and verify routes (inside pathless wrapper)
       .replace(
-        / {6}\{\n {8}path: "account",\n {8}element: <AccountPage \/>,\n {6}\},\n/m,
+        / {10}\{\n {12}path: "account",\n {12}element: <AccountPage \/>,\n {10}\},\n/m,
         "",
       )
       .replace(
-        / {6}\{\n {8}path: "verify",\n {8}element: <VerifyPage \/>,\n {6}\},\n/m,
+        / {10}\{\n {12}path: "verify",\n {12}element: <VerifyPage \/>,\n {10}\},\n/m,
         "",
       ),
   );
@@ -175,10 +179,10 @@ async function purgeAuth(rootDir: string) {
       // Remove auth hooks
       .replace(`  const { check } = useAuth();\n`, "")
       .replace(`  const location = useLocation();\n\n`, "")
-      // Replace conditional rendering with simple Outlet
+      // Replace conditional rendering with simple Suspense + Outlet
       .replace(
-        `        {check() || location.pathname === "/verify" ? (\n          <Outlet />\n        ) : (\n          <MagicLinkForm />\n        )}`,
-        `        <Outlet />`,
+        / {8}\{check\(\) \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
+        `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
       ),
   );
 

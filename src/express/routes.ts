@@ -83,27 +83,24 @@ router.delete("/api/health", (_req, res) => {
 });
 
 /* ************************************************************************ */
-/* Module composition                                                       */
+/* API modules                                                       */
 /* ************************************************************************ */
 
 /*
-  Feature modules are imported dynamically to:
-  - Keep the root router lightweight
-  - Allow easy cloning / replacement of modules
-  - Avoid a monolithic routes file
-
-  Each module exports a Router instance as default.
-*/
-const importAndUse = async (path: string) =>
-  router.use((await import(path)).default);
-
-/*
-  Registered API modules.
   The order does not matter as long as routes do not conflict.
 */
-await importAndUse("./modules/auth/authRoutes");
-await importAndUse("./modules/item/itemRoutes");
-await importAndUse("./modules/user/userRoutes");
+
+import authRoutes from "./modules/auth/authRoutes";
+
+router.use(authRoutes);
+
+import itemRoutes from "./modules/item/itemRoutes";
+
+router.use(itemRoutes);
+
+import userRoutes from "./modules/user/userRoutes";
+
+router.use(userRoutes);
 
 /* ************************************************************************ */
 /* Export                                                                   */

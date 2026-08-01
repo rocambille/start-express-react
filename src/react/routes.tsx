@@ -78,21 +78,31 @@ const routes: RouteObject[] = [
       Nested routes:
       - index route: Home page
       - feature routes: imported and spread from modules
+
+      The pathless wrapper route acts as an error boundary:
+      - Catches errors from all child routes (fetch failures, etc.)
+      - Renders ErrorPage inside the Layout (NavBar stays visible)
+      - No per-route errorElement needed
     */
     children: [
       {
-        index: true,
-        element: <Home />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            element: <Home />,
+          },
+          {
+            path: "account",
+            element: <AccountPage />,
+          },
+          {
+            path: "verify",
+            element: <VerifyPage />,
+          },
+          ...itemRoutes,
+        ],
       },
-      {
-        path: "account",
-        element: <AccountPage />,
-      },
-      {
-        path: "verify",
-        element: <VerifyPage />,
-      },
-      ...itemRoutes,
     ],
   },
 ];

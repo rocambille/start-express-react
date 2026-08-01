@@ -28,9 +28,7 @@ describe("<ItemForm />", () => {
 
     await screen.findByRole("form", { name: /item form/i });
   });
-  it("should raise validation errors when submitting", async () => {
-    vi.spyOn(globalThis, "alert").mockImplementation(() => {});
-
+  it("should display inline errors when submitting invalid data", async () => {
     await renderWithStub({
       path: "/items/new",
       Component: () => (
@@ -44,6 +42,6 @@ describe("<ItemForm />", () => {
 
     await fireEvent.submit(screen.getByRole("form", { name: /item form/i }));
 
-    expect(alert).toHaveBeenCalled();
+    await screen.findByText("Title is required");
   });
 });

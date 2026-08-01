@@ -1,7 +1,13 @@
 /**
- * BEGINNERS:
- * You don't need to understand or edit this file to build your app.
- * This file contains advanced Vite SSR and backend wiring.
+ * BEGINNERS: See the wiki page "One server" for a guided walkthrough.
+ *
+ * https://github.com/rocambille/start-express-react/wiki/One-server
+ *
+ * (en français ici:
+ *
+ * https://github.com/rocambille/start-express-react/wiki/Un-serveur-unique-fr-FR)
+ *
+ * NOTE: you don't need to understand or edit this file to build your app.
  *
  * Purpose:
  * Main application entry point.
@@ -22,13 +28,15 @@
  * - https://vitejs.dev/guide/ssr
  */
 
+import { serverEnv } from "./src/env";
+
 /* ************************************************************************ */
 /*                                  Startup                                 */
 /* ************************************************************************ */
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = serverEnv.NODE_ENV === "production";
 
-const port = Number(process.env.APP_PORT ?? 5173);
+const port = serverEnv.APP_PORT;
 
 const indexHtml = readIndexHtml();
 

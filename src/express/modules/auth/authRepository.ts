@@ -24,7 +24,7 @@ class AuthRepository {
     );
     const result = query.run(userId, tokenHash, expiresAt.toISOString());
 
-    return result.lastInsertRowid;
+    return Number(result.lastInsertRowid);
   }
 
   findByHash(tokenHash: string): MagicLinkToken | null {

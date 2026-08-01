@@ -8,14 +8,14 @@
 */
 
 import { useRefresh } from "../components/DataRefreshContext";
-import { invalidateCache } from "./cache";
+import { forget } from "./cache";
 
 /* ************************************************************************ */
 /* CSRF Token                                                               */
 /* ************************************************************************ */
 
 const csrfTokenExpiresIn = 30 * 1000;
-let expires = Date.now();
+let csrfTokenExpiresAt = Date.now();
 
 /*
   csrfToken():
@@ -25,26 +25,35 @@ let expires = Date.now();
 */
 export const csrfToken = async () => {
   const getToken = async () => {
-    if (Date.now() > expires) {
+    // Return a new token if expiration date is reached
+    if (Date.now() > csrfTokenExpiresAt) {
       return crypto.randomUUID();
     }
 
-    return (
-      (await cookieStore.get("__Host-x-csrf-token"))?.value ??
-      crypto.randomUUID()
-    );
+    // Get the stored token if it exists
+    const token = (await cookieStore.get("__Host-x-csrf-token"))?.value;
+
+    // Return a new token if not found in cookies
+    if (token == null) {
+      return crypto.randomUUID();
+    }
+
+    // Return the stored unexpired token otherwise
+    return token;
   };
 
   const token = await getToken();
 
-  expires = Date.now() + csrfTokenExpiresIn;
+  // Update the expiration date for the token
+  csrfTokenExpiresAt = Date.now() + csrfTokenExpiresIn;
 
+  // Set/update the token in a secure cookie
   await cookieStore.set({
     name: "__Host-x-csrf-token",
     value: token,
     path: "/",
     sameSite: "strict",
-    expires,
+    expires: csrfTokenExpiresAt,
   });
 
   return token;
@@ -92,7 +101,7 @@ export const apiMutate = async (
 /*
   useMutate():
   - Returns a function that performs a mutation and refreshes the UI
-  - Combines apiMutate() + invalidateCache() + refresh()
+  - Combines apiMutate() + forget() + refresh()
   - Keeps components declarative
 
   Usage:
@@ -106,12 +115,12 @@ export function useMutate() {
     url: string,
     method: "post" | "put" | "delete",
     body?: unknown,
-    invalidatePaths: string[] = [],
+    pathsToForget: string[] = [],
   ) => {
     const response = await apiMutate(url, method, body);
 
-    for (const path of invalidatePaths) {
-      invalidateCache(path);
+    for (const path of pathsToForget) {
+      forget(path);
     }
     refresh();
 

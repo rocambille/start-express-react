@@ -3,13 +3,13 @@
   Provide a minimal mechanism to trigger re-renders after data mutations.
 
   Why this exists:
-  - The cache layer stores Promises, not reactive state
-  - After invalidateCache(), React does not know data has changed
+  - Our cache layer stores Promises, not reactive state
+  - After a call to forget(), React does not know data has changed
   - This context bridges cache invalidation with React re-rendering
 
   Design notes:
-  - tick is an opaque counter, not meaningful data
-  - Consumers should depend on tick to re-suspend after invalidation
+  - refreshCounter is an opaque counter, not meaningful data
+  - Consumers should depend on refreshCounter to re-suspend after invalidation
 */
 
 import { createContext, type ReactNode, useContext, useState } from "react";
@@ -19,8 +19,8 @@ import { createContext, type ReactNode, useContext, useState } from "react";
 /* ************************************************************************ */
 
 type DataRefreshContextType = {
-  tick: number;
   refresh: () => void;
+  refreshCounter: number;
 };
 
 const DataRefreshContext = createContext<DataRefreshContextType | undefined>(
@@ -32,12 +32,12 @@ const DataRefreshContext = createContext<DataRefreshContextType | undefined>(
 /* ************************************************************************ */
 
 export function DataRefreshProvider({ children }: { children: ReactNode }) {
-  const [tick, setTick] = useState(0);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
-  const refresh = () => setTick((t) => t + 1);
+  const refresh = () => setRefreshCounter((counter) => counter + 1);
 
   return (
-    <DataRefreshContext.Provider value={{ tick, refresh }}>
+    <DataRefreshContext.Provider value={{ refresh, refreshCounter }}>
       {children}
     </DataRefreshContext.Provider>
   );
@@ -49,9 +49,9 @@ export function DataRefreshProvider({ children }: { children: ReactNode }) {
 
 /*
   useRefresh():
-  - Returns { tick, refresh }
-  - tick: include in dependency arrays to re-suspend after mutations
-  - refresh: call after invalidateCache() to trigger re-render
+  - Returns { refreshCounter, refresh }
+  - refreshCounter: include in dependency arrays to re-suspend after mutations
+  - refresh: call after forget() to trigger re-render
 */
 export function useRefresh() {
   const context = useContext(DataRefreshContext);

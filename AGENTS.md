@@ -27,11 +27,13 @@
 ├── src/
 │   ├── entry-client.tsx       # Client-side hydration (hydrateRoot)
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
+│   ├── env.ts                 # Environment schemas & validation (clientEnv / serverEnv)
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
+│   │   ├── migrations/        # Forward-only migration scripts (production)
 │   │   └── seeder.sql         # Test/seed data
 │   ├── express/
-│   │   ├── routes.ts          # Registers all Express modules via importAndUse()
+│   │   ├── routes.ts          # Registers all Express modules
 │   │   ├── helpers/           # Infrastructure: cache, validation, converters
 │   │   └── modules/           # Business modules (item/, user/, auth/, ...)
 │   │       └── <name>/
@@ -60,19 +62,17 @@
 ```bash
 npm install
 cp .env.sample .env
-npm run database:sync      # Load schema + seed data into SQLite
+npm run database:reset      # Drop all, replay schema + migrations + seeder
 npm run dev                # Start dev server (Express + Vite together on port 5173)
 ```
 
 ### Database
 
 ```bash
-npm run database:schema:load          # Apply schema.sql to the SQLite file
-npm run database:seeder:load          # Load seeder.sql test data
-npm run database:sync                 # Both above — resets DB to a clean state
-npm run database:sync -- -n           # Non-interactive (CI/CD — skips confirmation prompt)
-npm run database:schema:load -- -n    # Same, schema only
-npm run database:seeder:load -- -n    # Same, seeder only
+npm run database:reset                # Drop all, replay schema + migrations + seeder
+npm run database:reset -- -n          # Non-interactive (CI/CD — skips confirmation prompt)
+npm run database:migrate              # Apply un-applied migrations (production)
+npm run database:migrate -- -n        # Non-interactive (CI/CD)
 ```
 
 > SQLite requires NO Docker, NO connection string, NO async setup. The DB file is created on the fly.
@@ -101,7 +101,9 @@ npm run make:clone -- src/express/modules/item src/express/modules/post Item Pos
 After cloning an express module, register the new routes in src/express/routes.ts:
 
 ```typescript
-await importAndUse("./modules/post/postRoutes");
+import postRoutes from "./modules/post/postRoutes";
+
+router.use(postRoutes);
 ```
 
 After cloning a react module, register the new routes in src/react/routes.tsx:
@@ -202,9 +204,9 @@ However, a repository method *may* be marked `async` if it strictly requires int
 
 ```ts
 // ✅ Correct SQLite query
-find(byId: number): Item | null {
+find(id: number): Item | null {
   const query = database.prepare("select id, title from item where id = ?");
-  const row = query.get(byId);
+  const row = query.get(id);
   // ...
 }
 
@@ -215,7 +217,7 @@ async fetchAndSave(id: number): Promise<Item> {
 }
 
 // ❌ Wrong (Wrapping SQLite in async for no reason)
-async find(byId: number): Promise<Item | null> { ... }
+async find(id: number): Promise<Item | null> { ... }
 ```
 
 ### Soft delete by default
@@ -237,7 +239,7 @@ Repository `findAll` methods take `(limit: number, offset: number)` arguments. A
 
 ### API contract tests
 
-`tests/contracts.ts` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
+`tests/contracts/` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
 
 ---
 
@@ -283,6 +285,8 @@ StartER has no file upload handling. If adding one, store files outside the docu
 
 ### Environment variables
 
+Environment variables are defined and validated in `src/env.ts` using separate Zod schemas: `clientEnv` (browser-accessible via `import.meta.env`) and `serverEnv` (server-only via `process.env`). Import `serverEnv` for Node.js server code and `clientEnv` for frontend/shared helpers.
+
 Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
 
 ---
@@ -295,10 +299,9 @@ Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.g
 | **Action** | An Express `RequestHandler` — thin, delegates to repository, sends HTTP response |
 | **Repository** | Class encapsulating all SQL for one table — the only place raw SQL is allowed |
 | **Validator** | Zod schema + Express middleware that validates `req.body` before the action runs |
-| **Contract** | A test declaration in `tests/contracts.ts` describing expected API behavior |
+| **Contract** | A test declaration in `tests/contracts/` describing expected API behavior |
 | **SSR outlet** | The `<!--ssr-outlet-->` placeholder in `index.html` where server-rendered HTML is injected |
 | **Hydration** | Client-side React taking over the server-rendered DOM via `hydrateRoot` in `entry-client.tsx` |
 | **Soft delete** | Setting `deleted_at` timestamp instead of removing a row — default delete strategy |
 | **Hard delete** | Permanently removing a row — use only when explicitly required |
 | **`make:clone`** | CLI script to duplicate a module with automatic name replacement |
-| **`importAndUse`** | Helper in `src/express/routes.ts` that dynamically imports and registers a module router |

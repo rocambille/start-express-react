@@ -19,7 +19,7 @@ import {
   useContext,
   useState,
 } from "react";
-import { cache } from "../../helpers/cache";
+import { getOrFetch } from "../../helpers/cache";
 import { apiMutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
@@ -82,7 +82,7 @@ export function AuthProvider({
     async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
       await apiMutate("/api/users/me", "put", newMe);
 
-      setUser(await cache<User | null>("/api/users/me"));
+      setUser(await getOrFetch<User | null>("/api/users/me"));
     },
     [],
   );

@@ -20,34 +20,10 @@ import crypto from "node:crypto";
 import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { z } from "zod";
 
+import { serverEnv } from "../../../env";
 import userRepository from "../user/userRepository";
 import authRepository from "./authRepository";
-
-/* ************************************************************************ */
-/* Configuration & primitives                                               */
-/* ************************************************************************ */
-
-/*
-  Environment variables.
-  Must be defined at startup; failing fast is intentional.
-*/
-const envSchema = z.object({
-  APP_BASE_URL: z.url(),
-  APP_SECRET: z.string(),
-  SMTP_URL: z
-    .url()
-    .optional()
-    .refine(
-      (smtpUrl) => smtpUrl != null || process.env.NODE_ENV !== "production",
-      {
-        message: "SMTP_URL must be defined in production environment",
-      },
-    ),
-});
-
-const env = envSchema.parse(process.env);
 
 /*
   Extend Express Request to carry authenticated user data.
@@ -85,9 +61,9 @@ const cookieOptions: CookieOptions = {
 /*
   Minimal JWT wrapper to:
   - Encapsulate signing and verification
-  - Enforce payload typing between methods
+  - Enforce payload typing between sign and verify methods
 */
-class Auth<Payload extends JwtPayload | string = JwtPayload> {
+class TokenSigner<Payload extends JwtPayload | string = JwtPayload> {
   #secret: string;
 
   constructor(secret: string) {
@@ -103,13 +79,13 @@ class Auth<Payload extends JwtPayload | string = JwtPayload> {
   }
 }
 
-const auth = new Auth(env.APP_SECRET);
+const tokenSigner = new TokenSigner(serverEnv.APP_SECRET);
 
-const transporter = env.SMTP_URL
-  ? nodemailer.createTransport(env.SMTP_URL)
+const transporter = serverEnv.SMTP_URL
+  ? nodemailer.createTransport(serverEnv.SMTP_URL)
   : null;
 
-const trustedBaseUrl = env.APP_BASE_URL.replace(/\/+$/, "");
+const trustedBaseUrl = serverEnv.APP_BASE_URL.replace(/\/+$/, "");
 
 /* ************************************************************************ */
 /* Actions                                                                  */
@@ -123,13 +99,14 @@ const trustedBaseUrl = env.APP_BASE_URL.replace(/\/+$/, "");
 */
 const sendMagicLink: RequestHandler = async (req, res) => {
   const { email } = req.body;
+
   if (!email || typeof email !== "string") {
     res.sendStatus(400);
     return;
   }
 
   // Find or create user ID
-  const userId = userRepository.findOrCreateByEmail(email);
+  const userId = userRepository.findByEmailOrCreate(email);
 
   // Generate opaque token
   const rawToken = crypto.randomBytes(32).toString("hex");
@@ -200,7 +177,7 @@ const verifyMagicLink: RequestHandler = (req, res) => {
       throw new Error("User not found");
     }
 
-    const sessionToken = auth.signSession({ sub: user.id.toString() });
+    const sessionToken = tokenSigner.signSession({ sub: user.id.toString() });
 
     res.cookie("__Host-auth", sessionToken, cookieOptions);
 
@@ -245,7 +222,7 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
       throw new Error("Access token is missing in cookies");
     }
 
-    const payload = auth.verify(token);
+    const payload = tokenSigner.verify(token);
 
     const me = userRepository.find(Number(payload.sub));
 
@@ -254,7 +231,7 @@ const verifyAccessToken: RequestHandler = (req, res, next) => {
     }
 
     // Refresh cookie (extends expiration)
-    const freshToken = auth.signSession({ sub: me.id.toString() });
+    const freshToken = tokenSigner.signSession({ sub: me.id.toString() });
     res.cookie("__Host-auth", freshToken, cookieOptions);
 
     req.me = me;

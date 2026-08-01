@@ -14,6 +14,8 @@
 
 import { useState } from "react";
 
+import { toDisplayString } from "../helpers/datetime";
+
 function Home() {
   /*
     Local state:
@@ -30,9 +32,10 @@ function Home() {
 
       <hgroup>
         <h1>StartER</h1>
+        <p>Today is {toDisplayString(new Date().toISOString())}</p>
         <p>
           <a
-            href="https://github.com/rocambille/start-express-react/wiki/home-en-US"
+            href="https://github.com/rocambille/start-express-react/wiki/"
             target="_blank"
             rel="noopener noreferrer"
           >

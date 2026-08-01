@@ -16,6 +16,7 @@
     regardless of the active route.
 */
 
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router";
 
 import { useAuth } from "./auth/AuthContext";
@@ -47,7 +48,15 @@ function Layout() {
 
       <main>
         {check() || location.pathname === "/verify" ? (
-          <Outlet />
+          /*
+            Suspense boundary:
+            - Catches React suspensions from use(getOrFetch(...)) in child components
+            - Shows a plain loading message while data is being fetched
+            - The header stays visible during loading
+          */
+          <Suspense fallback={<p>Loading…</p>}>
+            <Outlet />
+          </Suspense>
         ) : (
           <MagicLinkForm />
         )}
