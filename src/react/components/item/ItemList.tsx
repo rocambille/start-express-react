@@ -16,7 +16,7 @@
 import { use } from "react";
 import { Link } from "react-router";
 import { getOrFetch } from "../../helpers/cache";
-import { useAuth } from "../auth/AuthContext";
+import { useMe } from "../auth/MeContext";
 
 function ItemList() {
   /*
@@ -24,7 +24,7 @@ function ItemList() {
     - Used only to decide what actions are visible
     - No redirects or side effects here
   */
-  const auth = useAuth();
+  const { isAuthenticated } = useMe();
 
   /*
     Items collection:
@@ -39,7 +39,7 @@ function ItemList() {
       <h1>Items</h1>
 
       {/* Entry point for authenticated users */}
-      {auth.check() && (
+      {isAuthenticated && (
         <Link to="/items/new" data-testid="items-new">
           Add
         </Link>

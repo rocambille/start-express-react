@@ -1,15 +1,15 @@
 /*
   Purpose:
-  Centralize authentication state and actions for the React application.
+  Centralize current user (me) session state and actions for the React application.
 
   This context:
   - Stores the currently authenticated user (or null)
-  - Exposes high-level auth actions (sendMagicLink, verifyMagicLink, logout)
-  - Performs an initial session check on mount (/api/users/me)
+  - Exposes authentication actions (sendMagicLink, verifyMagicLink, logout)
+  - Exposes profile management actions (updateMe, deleteMe)
 
   Usage:
-  - Wrap the app with <AuthProvider>
-  - Access auth state and actions via the useAuth() hook
+  - Wrap the app with <MeProvider>
+  - Access user state and actions via the useMe() hook
 */
 
 import {
@@ -26,9 +26,9 @@ import { apiMutate } from "../../helpers/mutate";
 /* Types                                                                    */
 /* ************************************************************************ */
 
-type AuthContextType = {
-  me: User | null;
-  check: () => boolean;
+type MeContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
   sendMagicLink: (email: string) => Promise<void>;
   verifyMagicLink: (token: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -42,13 +42,13 @@ type AuthContextType = {
 /* Context                                                                  */
 /* ************************************************************************ */
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const MeContext = createContext<MeContextType | null>(null);
 
 /* ************************************************************************ */
 /* Provider                                                                 */
 /* ************************************************************************ */
 
-export function AuthProvider({
+export function MeProvider({
   children,
   initialUser,
 }: PropsWithChildren<{ initialUser?: User | null }>) {
@@ -79,7 +79,9 @@ export function AuthProvider({
   }, []);
 
   const updateMe = useCallback(
-    async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
+    async (
+      newMe: Omit<User, "id" | "created_at" | "deleted_at">,
+    ) => {
       await apiMutate("/api/users/me", "put", newMe);
 
       setUser(await getOrFetch<User | null>("/api/users/me"));
@@ -98,10 +100,10 @@ export function AuthProvider({
   /* ********************************************************************** */
 
   return (
-    <AuthContext
+    <MeContext
       value={{
-        me: user,
-        check: () => user != null,
+        user,
+        isAuthenticated: user != null,
         sendMagicLink,
         verifyMagicLink,
         logout,
@@ -110,7 +112,7 @@ export function AuthProvider({
       }}
     >
       {children}
-    </AuthContext>
+    </MeContext>
   );
 }
 
@@ -118,11 +120,11 @@ export function AuthProvider({
 /* Consumer hook                                                            */
 /* ************************************************************************ */
 
-export const useAuth = () => {
-  const value = useContext(AuthContext);
+export const useMe = () => {
+  const value = useContext(MeContext);
 
   if (value == null) {
-    throw new Error("useAuth has to be used within <AuthProvider />");
+    throw new Error("useMe has to be used within <MeProvider />");
   }
 
   return value;

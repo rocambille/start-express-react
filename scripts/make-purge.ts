@@ -140,7 +140,7 @@ async function purgeAuth(rootDir: string) {
       .replace(`import AccountPage from "./components/auth/AccountPage";\n`, "")
       .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
       .replace(
-        `import { AuthProvider } from "./components/auth/AuthContext";\n`,
+        `import { AuthProvider } from "./components/auth/MeContext";\n`,
         "",
       )
       // Simplify RouteObject import (remove useLoaderData)
@@ -174,10 +174,10 @@ async function purgeAuth(rootDir: string) {
         `import { Outlet, useLocation } from "react-router";`,
         `import { Outlet } from "react-router";`,
       )
-      .replace(`import { useAuth } from "./auth/AuthContext";\n`, "")
+      .replace(`import { useMe } from "./auth/MeContext";\n`, "")
       .replace(`import MagicLinkForm from "./auth/MagicLinkForm";\n`, "")
       // Remove auth hooks
-      .replace(`  const { check } = useAuth();\n`, "")
+      .replace(`  const { isAuthenticated } = useMe();\n`, "")
       .replace(`  const location = useLocation();\n\n`, "")
       // Replace conditional rendering with simple Suspense + Outlet
       .replace(
@@ -189,8 +189,8 @@ async function purgeAuth(rootDir: string) {
   // Remove auth-related code from NavBar.tsx.
   await updateFile(rootDir, "src/react/components/NavBar.tsx", (content) =>
     content
-      .replace(`import { useAuth } from "./auth/AuthContext";\n\n`, "")
-      .replace(`  const { check } = useAuth();\n`, "")
+      .replace(`import { useMe } from "./auth/MeContext";\n\n`, "")
+      .replace(`  const { isAuthenticated } = useMe();\n`, "")
       // After purgeItems, only the account link remains in the auth block.
       // Remove the whole conditional block.
       .replace(/ {8}\{check\(\) && \(\n[\s\S]*?\n {8}\)}\n/m, ""),

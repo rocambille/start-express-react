@@ -2,7 +2,7 @@ import { act, render, renderHook } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRoutesStub } from "react-router";
 
-import { AuthProvider } from "../../src/react/components/auth/AuthContext";
+import { MeProvider } from "../../src/react/components/auth/MeContext";
 import { DataRefreshProvider } from "../../src/react/components/DataRefreshContext";
 import { forget } from "../../src/react/helpers/cache";
 import contracts from "../contracts";
@@ -197,11 +197,11 @@ export const renderWithStub = async ({
       path,
       HydrateFallback: () => null,
       Component: () => (
-        <AuthProvider initialUser={me}>
+        <MeProvider initialUser={me}>
           <DataRefreshProvider>
             <Component />
           </DataRefreshProvider>
-        </AuthProvider>
+        </MeProvider>
       ),
       ErrorBoundary:
         ErrorBoundary ??

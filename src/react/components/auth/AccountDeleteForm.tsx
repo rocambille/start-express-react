@@ -4,16 +4,16 @@
 
   Design notes:
   - Use a native <form> to keep semantics explicit
-  - Delegates all side effects to the useAuth hook
+  - Delegates all side effects to the useMe hook
 
   Related docs:
   - https://react.dev/reference/react-dom/components/form
 */
 
-import { useAuth } from "./AuthContext";
+import { useMe } from "./MeContext";
 
 function AccountDeleteForm() {
-  const { deleteMe } = useAuth();
+  const { deleteMe } = useMe();
 
   return (
     <form

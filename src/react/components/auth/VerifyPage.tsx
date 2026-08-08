@@ -4,18 +4,18 @@
 
   Route: /verify?token=...
   - Reads the token from the query string
-  - Calls verifyMagicLink from AuthContext
+  - Calls verifyMagicLink from MeContext
   - Redirects to Dashboard on success
   - Shows an error message on failure
 */
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useAuth } from "./AuthContext";
+import { useMe } from "./MeContext";
 
 function VerifyPage() {
   const [searchParams] = useSearchParams();
-  const { verifyMagicLink } = useAuth();
+  const { verifyMagicLink } = useMe();
   const navigate = useNavigate();
   const [error, setError] = useState(false);
 

@@ -7,14 +7,14 @@ import { useId, useState } from "react";
 import { z } from "zod";
 import type { $ZodIssue as ZodIssue } from "zod/v4/core";
 import { FormError, hasError } from "../FormError";
-import { useAuth } from "./AuthContext";
+import { useMe } from "./MeContext";
 
 const emailSchema = z.object({
   email: z.email(),
 });
 
 function MagicLinkForm() {
-  const { sendMagicLink } = useAuth();
+  const { sendMagicLink } = useMe();
   const [sent, setSent] = useState(false);
   const emailId = useId();
   const [errors, setErrors] = useState<ZodIssue[]>([]);
@@ -29,9 +29,9 @@ function MagicLinkForm() {
     <form
       aria-label="login form"
       action={(formData) => {
-        const email = formData.get("email")?.toString();
-
-        const parsed = emailSchema.safeParse({ email });
+        const parsed = emailSchema.safeParse(
+          Object.fromEntries(formData.entries()),
+        );
 
         if (!parsed.success) {
           setErrors(parsed.error.issues);

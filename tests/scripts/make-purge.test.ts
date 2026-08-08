@@ -305,7 +305,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
         .replace(
-          `import { AuthProvider } from "./components/auth/AuthContext";\n`,
+          `import { AuthProvider } from "./components/auth/MeContext";\n`,
           "",
         )
         .replace(
@@ -350,19 +350,19 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
           `import { Outlet, useLocation } from "react-router";`,
           `import { Outlet } from "react-router";`,
         )
-        .replace(`import { useAuth } from "./auth/AuthContext";\n`, "")
+        .replace(`import { useMe } from "./auth/MeContext";\n`, "")
         .replace(`import MagicLinkForm from "./auth/MagicLinkForm";\n`, "")
-        .replace(`  const { check } = useAuth();\n`, "")
+        .replace(`  const { isAuthenticated } = useMe();\n`, "")
         .replace(`  const location = useLocation();\n\n`, "")
         .replace(
-          / {8}\{check\(\) \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
+          / {8}\{isAuthenticated \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
           `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
         );
 
-      expect(result).not.toContain("useAuth");
+      expect(result).not.toContain("useMe");
       expect(result).not.toContain("MagicLinkForm");
       expect(result).not.toContain("useLocation");
-      expect(result).not.toContain("check()");
+      expect(result).not.toContain("isAuthenticated");
       expect(result).toContain("<Outlet />");
       expect(result).toContain("Suspense");
       expect(result).toContain("NavBar");
@@ -384,12 +384,12 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
 
       // Then simulate purgeAuth
       const result = afterItems
-        .replace(`import { useAuth } from "./auth/AuthContext";\n\n`, "")
-        .replace(`  const { check } = useAuth();\n`, "")
-        .replace(/ {8}\{check\(\) && \(\n[\s\S]*?\n {8}\)}\n/m, "");
+        .replace(`import { useMe } from "./auth/MeContext";\n\n`, "")
+        .replace(`  const { user, isAuthenticated } = useMe();\n`, "")
+        .replace(/ {8}\{isAuthenticated && \(\n[\s\S]*?\n {8}\)}\n/m, "");
 
-      expect(result).not.toContain("useAuth");
-      expect(result).not.toContain("check()");
+      expect(result).not.toContain("useMe");
+      expect(result).not.toContain("isAuthenticated");
       expect(result).not.toContain("/items");
       expect(result).not.toContain("/account");
       expect(result).toContain("Home");

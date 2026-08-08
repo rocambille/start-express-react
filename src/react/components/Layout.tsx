@@ -18,13 +18,12 @@
 
 import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router";
-
-import { useAuth } from "./auth/AuthContext";
 import MagicLinkForm from "./auth/MagicLinkForm";
+import { useMe } from "./auth/MeContext";
 import NavBar from "./NavBar";
 
 function Layout() {
-  const { check } = useAuth();
+  const { isAuthenticated } = useMe();
   const location = useLocation();
 
   return (
@@ -47,7 +46,7 @@ function Layout() {
       {/* **************************************************************** */}
 
       <main>
-        {check() || location.pathname === "/verify" ? (
+        {isAuthenticated || location.pathname === "/verify" ? (
           /*
             Suspense boundary:
             - Catches React suspensions from use(getOrFetch(...)) in child components

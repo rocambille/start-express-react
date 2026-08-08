@@ -22,7 +22,7 @@
 import { type RouteObject, useLoaderData } from "react-router";
 
 import AccountPage from "./components/auth/AccountPage";
-import { AuthProvider } from "./components/auth/AuthContext";
+import { MeProvider } from "./components/auth/MeContext";
 import VerifyPage from "./components/auth/VerifyPage";
 import { DataRefreshProvider } from "./components/DataRefreshContext";
 import ErrorPage from "./components/ErrorPage";
@@ -51,11 +51,11 @@ const routes: RouteObject[] = [
       const { me } = useLoaderData<{ me: User | null }>();
 
       return (
-        <AuthProvider initialUser={me}>
+        <MeProvider initialUser={me}>
           <DataRefreshProvider>
             <Layout />
           </DataRefreshProvider>
-        </AuthProvider>
+        </MeProvider>
       );
     },
     /*

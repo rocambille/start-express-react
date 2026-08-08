@@ -56,18 +56,17 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
         /*
           Form submission flow:
 
-          1. Read raw values from FormData
-          2. Perform minimal synchronous validation
-          3. Delegate side effects to the caller
+          1. Perform minimal synchronous validation
+          2. Delegate side effects to the caller
         */
-
-        const title = formData.get("title")?.toString();
 
         /*
           Client-side validation can be done here for better UX.
           The API remains the source of truth for data integrity.
         */
-        const parsed = itemSchema.safeParse({ title });
+        const parsed = itemSchema.safeParse(
+          Object.fromEntries(formData.entries()),
+        );
 
         if (!parsed.success) {
           setErrors(parsed.error.issues);
