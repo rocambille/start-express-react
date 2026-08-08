@@ -18,7 +18,7 @@ export default (<Contract>{
     cases: {
       success: {
         request: {
-          body: { title: "new item" },
+          body: { title: "new title" },
           jwtPayload: { sub: fooUser.id },
         },
         response: { status: 201, body: { insertId: expect.any(Number) } },
@@ -28,7 +28,7 @@ export default (<Contract>{
         response: { status: 400, body: expect.any(Array) },
       },
       unauthorized: {
-        request: { body: { title: "new item" }, jwtPayload: null },
+        request: { body: { title: "new title" }, jwtPayload: null },
         response: { status: 401, body: {} },
       },
     },
@@ -62,14 +62,14 @@ export default (<Contract>{
     cases: {
       success: {
         request: {
-          body: { title: "updated" },
+          body: { title: "updated title" },
           jwtPayload: { sub: allItems[0].user_id },
         },
         response: { status: 204, body: {} },
       },
       forbidden: {
         request: {
-          body: { title: "updated" },
+          body: { title: "updated title" },
           jwtPayload: { sub: barUser.id },
         },
         response: { status: 403, body: {} },
@@ -77,7 +77,7 @@ export default (<Contract>{
       not_found: {
         specialPath: `/api/items/${NaN}`,
         request: {
-          body: { title: "updated" },
+          body: { title: "updated title" },
           jwtPayload: { sub: fooUser.id },
         },
         response: { status: 404, body: {} },
