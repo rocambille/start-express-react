@@ -79,9 +79,7 @@ export function MeProvider({
   }, []);
 
   const updateMe = useCallback(
-    async (
-      newMe: Omit<User, "id" | "created_at" | "deleted_at">,
-    ) => {
+    async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
       await apiMutate("/api/users/me", "put", newMe);
 
       setUser(await getOrFetch<User | null>("/api/users/me"));
