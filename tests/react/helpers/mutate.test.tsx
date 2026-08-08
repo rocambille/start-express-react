@@ -29,6 +29,15 @@ describe("React Helpers: mutate", () => {
       expectContractCall("health", "post", "success");
     });
 
+    it("should send a mutation request with a FormData body", async () => {
+      const formData = new FormData();
+      formData.append("avatar", "test");
+
+      await apiMutate(`/api/users/me/avatar`, "post", formData);
+
+      expectContractCall("users", "upload_me_avatar", "as_me");
+    });
+
     it("should send a mutation request without a body", async () => {
       await apiMutate("/api/health", "delete");
 

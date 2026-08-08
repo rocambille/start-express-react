@@ -12,21 +12,25 @@ export const allUsers: User[] = [
     id: 1,
     email: "foo@mail.com",
     name: "foo",
+    avatar_url: null,
   },
   {
     id: 2,
     email: "bar@mail.com",
     name: "bar",
+    avatar_url: null,
   },
   {
     id: 3,
     email: "baz@mail.com",
     name: "baz",
+    avatar_url: null,
   },
   {
     id: 4,
     email: "deleted@mail.com",
     name: "deleted",
+    avatar_url: null,
   },
 ];
 

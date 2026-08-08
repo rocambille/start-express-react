@@ -5,7 +5,7 @@
   This context:
   - Stores the currently authenticated user (or null)
   - Exposes authentication actions (sendMagicLink, verifyMagicLink, logout)
-  - Exposes profile management actions (updateMe, deleteMe)
+  - Exposes profile management actions (updateMe, deleteMe, uploadMeAvatar)
 
   Usage:
   - Wrap the app with <MeProvider>
@@ -33,8 +33,9 @@ type MeContextType = {
   verifyMagicLink: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   updateMe: (
-    newMe: Omit<User, "id" | "created_at" | "deleted_at">,
+    newMe: Omit<User, "id" | "created_at" | "deleted_at" | "avatar_url">,
   ) => Promise<void>;
+  updateMeAvatar: (fileOrNull: File | null) => Promise<void>;
   deleteMe: () => Promise<void>;
 };
 
@@ -79,13 +80,28 @@ export function MeProvider({
   }, []);
 
   const updateMe = useCallback(
-    async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
+    async (
+      newMe: Omit<User, "id" | "created_at" | "deleted_at" | "avatar_url">,
+    ) => {
       await apiMutate("/api/users/me", "put", newMe);
 
       setUser(await getOrFetch<User | null>("/api/users/me"));
     },
     [],
   );
+
+  const updateMeAvatar = useCallback(async (fileOrNull: File | null) => {
+    if (fileOrNull == null) {
+      await apiMutate("/api/users/me/avatar", "delete");
+    } else {
+      const formData = new FormData();
+      formData.append("avatar", fileOrNull);
+
+      await apiMutate("/api/users/me/avatar", "post", formData);
+    }
+
+    setUser(await getOrFetch<User | null>("/api/users/me"));
+  }, []);
 
   const deleteMe = useCallback(async () => {
     await apiMutate("/api/users/me", "delete");
@@ -106,6 +122,7 @@ export function MeProvider({
         verifyMagicLink,
         logout,
         updateMe,
+        updateMeAvatar,
         deleteMe,
       }}
     >

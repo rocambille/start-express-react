@@ -21,6 +21,7 @@
 
 import type { RequestHandler } from "express";
 
+import { deleteUploadedFile } from "../../helpers/upload";
 import userRepository from "./userRepository";
 
 /* ************************************************************************ */
@@ -73,6 +74,41 @@ const destroyMe: RequestHandler = (req, res) => {
 };
 
 /* ************************************************************************ */
+
+/*
+  Upload avatar image for the currently authenticated user.
+
+  Preconditions:
+  - User is authenticated
+  - Multer middleware has processed and attached req.file
+*/
+const uploadMeAvatar: RequestHandler = (req, res) => {
+  // Delete previous avatar file from disk if present
+  deleteUploadedFile(req.me.avatar_url);
+
+  const avatarUrl = `/uploads/avatars/${req.file?.filename}`;
+  userRepository.updateAvatar(req.me.id, avatarUrl);
+
+  res.status(201).json({ avatar_url: avatarUrl });
+};
+
+/* ************************************************************************ */
+
+/*
+  Delete avatar image for the currently authenticated user.
+
+  Preconditions:
+  - User is authenticated
+*/
+const deleteMeAvatar: RequestHandler = (req, res) => {
+  deleteUploadedFile(req.me.avatar_url);
+
+  userRepository.updateAvatar(req.me.id, null);
+
+  res.sendStatus(204);
+};
+
+/* ************************************************************************ */
 /* Export                                                                   */
 /* ************************************************************************ */
 
@@ -80,4 +116,6 @@ export default {
   readMe,
   editMe,
   destroyMe,
+  uploadMeAvatar,
+  deleteMeAvatar,
 };

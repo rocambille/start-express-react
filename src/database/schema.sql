@@ -2,6 +2,7 @@ create table user (
   id integer primary key not null,
   email varchar(255) not null unique,
   name varchar(255) not null,
+  avatar_url text default null,
   created_at datetime default current_timestamp,
   deleted_at datetime default null
 );

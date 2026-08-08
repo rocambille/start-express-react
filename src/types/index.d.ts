@@ -17,6 +17,7 @@ type User = {
   id: RowId;
   email: string;
   name: string;
+  avatar_url: string | null;
 };
 
 type MagicLinkToken = {

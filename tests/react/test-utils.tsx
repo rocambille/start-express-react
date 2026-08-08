@@ -121,10 +121,12 @@ const mockFetch = (
       }
 
       const parseBody = (body?: RequestInit["body"]): Json | undefined => {
-        if (body == null) {
-          return body;
+        if (body == null || typeof body !== "string") {
+          return;
         }
-        return JSON.parse(body.toString());
+        try {
+          return JSON.parse(body);
+        } catch {}
       };
 
       const parsedBody = parseBody(init?.body);
@@ -311,6 +313,7 @@ export const expectContractCall = (
     ...(caseDetails.request.body
       ? { body: JSON.stringify(caseDetails.request.body) }
       : {}),
+    ...(caseDetails.request.attach ? { body: expect.any(FormData) } : {}),
   };
 
   const fetchArgs: Parameters<typeof globalThis.fetch> = [

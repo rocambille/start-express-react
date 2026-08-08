@@ -13,6 +13,7 @@
 
 import AccountDeleteForm from "./AccountDeleteForm";
 import AccountDetailsForm from "./AccountDetailsForm";
+import AvatarUploadForm from "./AvatarUploadForm";
 import LogoutForm from "./LogoutForm";
 
 function AccountPage() {
@@ -24,6 +25,8 @@ function AccountPage() {
       </hgroup>
 
       <AccountDetailsForm />
+
+      <AvatarUploadForm />
 
       <LogoutForm />
 

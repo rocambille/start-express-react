@@ -14,6 +14,7 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 
+import Avatar from "./auth/Avatar";
 import { useMe } from "./auth/MeContext";
 
 /*
@@ -29,7 +30,7 @@ const link = (to: string, children: ReactNode) => (
 );
 
 function NavBar() {
-  const { isAuthenticated } = useMe();
+  const { user, isAuthenticated } = useMe();
   return (
     /*
       Semantic navigation container.
@@ -44,6 +45,10 @@ function NavBar() {
           <>
             {link("/items", "Items")}
             {link("/account", "Account")}
+            {link(
+              "/account",
+              <Avatar url={user?.avatar_url} name={user?.name} size="1.2rlh" />,
+            )}
           </>
         )}
       </ul>

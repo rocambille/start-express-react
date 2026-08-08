@@ -30,6 +30,7 @@ const userSchema: z.ZodType<User> = z.object({
   id: z.number(),
   email: z.string(),
   name: z.string(),
+  avatar_url: z.string().nullable(),
 });
 
 /* ************************************************************************ */
@@ -52,11 +53,13 @@ class UserRepository {
     - No validation here (done earlier in the pipeline)
     - Assumes referential integrity (user_id exists)
   */
-  create(user: Omit<User, "id">): RowId {
+  create(
+    user: Omit<User, "id" | "avatar_url"> & { avatar_url?: string | null },
+  ): RowId {
     const query = database.prepare(
-      "insert into user (email, name) values (?, ?)",
+      "insert into user (email, name, avatar_url) values (?, ?, ?)",
     );
-    const result = query.run(user.email, user.name);
+    const result = query.run(user.email, user.name, user.avatar_url ?? null);
 
     return Number(result.lastInsertRowid);
   }
@@ -77,7 +80,7 @@ class UserRepository {
   */
   find(id: RowId): User | null {
     const query = database.prepare(
-      "select id, email, name from user where id = ? and deleted_at is null",
+      "select id, email, name, avatar_url from user where id = ? and deleted_at is null",
     );
     const row = query.get(id);
 
@@ -97,7 +100,7 @@ class UserRepository {
   */
   findByEmail(email: string): User | null {
     const query = database.prepare(
-      "select id, email, name from user where email = ? and deleted_at is null",
+      "select id, email, name, avatar_url from user where email = ? and deleted_at is null",
     );
     const row = query.get(email);
 
@@ -140,11 +143,23 @@ class UserRepository {
     Why:
     - Allows callers to decide how to interpret "0 rows affected"
   */
-  update(id: RowId, user: Omit<User, "id">): boolean {
+  update(id: RowId, user: Omit<User, "id" | "avatar_url">): boolean {
     const query = database.prepare(
       "update user set email = ?, name = ? where id = ? and deleted_at is null",
     );
     const result = query.run(user.email, user.name, id);
+
+    return result.changes > 0;
+  }
+
+  /*
+    Update user avatar URL.
+  */
+  updateAvatar(id: RowId, avatarUrl: string | null): boolean {
+    const query = database.prepare(
+      "update user set avatar_url = ? where id = ? and deleted_at is null",
+    );
+    const result = query.run(avatarUrl, id);
 
     return result.changes > 0;
   }
