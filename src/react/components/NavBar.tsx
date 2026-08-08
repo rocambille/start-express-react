@@ -29,7 +29,7 @@ const link = (to: string, children: ReactNode) => (
 );
 
 function NavBar() {
-  const { user, isAuthenticated } = useMe();
+  const { isAuthenticated } = useMe();
   return (
     /*
       Semantic navigation container.
