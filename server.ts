@@ -28,7 +28,7 @@
  * - https://vitejs.dev/guide/ssr
  */
 
-import { serverEnv } from "./src/env";
+import { serverEnv } from "./src/env/server";
 
 /* ************************************************************************ */
 /*                                  Startup                                 */

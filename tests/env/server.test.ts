@@ -1,4 +1,4 @@
-import { serverEnvSchema } from "../src/env";
+import { serverEnvSchema } from "../../src/env/server";
 
 describe("serverEnvSchema", () => {
   it("should validate valid environment variables", () => {

@@ -27,7 +27,9 @@
 ├── src/
 │   ├── entry-client.tsx       # Client-side hydration (hydrateRoot)
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
-│   ├── env.ts                 # Environment schemas & validation (clientEnv / serverEnv)
+│   ├── env/                   # Environment schemas & validation
+│   │   ├── client.ts          # Client-side environment variables from import.meta.env
+│   │   └── server.ts          # Server-side environment variables from process.env
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
 │   │   ├── migrations/        # Forward-only migration scripts (production)
@@ -285,7 +287,7 @@ StartER has no file upload handling. If adding one, store files outside the docu
 
 ### Environment variables
 
-Environment variables are defined and validated in `src/env.ts` using separate Zod schemas: `clientEnv` (browser-accessible via `import.meta.env`) and `serverEnv` (server-only via `process.env`). Import `serverEnv` for Node.js server code and `clientEnv` for frontend/shared helpers.
+Environment variables are defined and validated in `src/env/client.ts` (client) and `src/env/server.ts` (server). Import `{ serverEnv }` from `env/server` (if you are in server code) or `{ clientEnv }` from `env/client` (if you are in frontend code).
 
 Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
 

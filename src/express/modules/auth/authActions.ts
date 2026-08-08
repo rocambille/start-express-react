@@ -21,7 +21,7 @@ import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
-import { serverEnv } from "../../../env";
+import { serverEnv } from "../../../env/server";
 import userRepository from "../user/userRepository";
 import authRepository from "./authRepository";
 
