@@ -32,9 +32,7 @@ export const serverEnvSchema = clientEnvSchema.extend({
     .url()
     .optional()
     .refine(
-      (smtpUrl) => {
-        return smtpUrl != null || process.env.NODE_ENV !== "production";
-      },
+      (smtpUrl) => process.env.NODE_ENV !== "production" || smtpUrl != null,
       {
         message: "SMTP_URL must be defined in production environment",
       },
