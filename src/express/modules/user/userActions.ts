@@ -83,13 +83,18 @@ const destroyMe: RequestHandler = (req, res) => {
   - Multer middleware has processed and attached req.file
 */
 const uploadMeAvatar: RequestHandler = (req, res) => {
-  // Delete previous avatar file from disk if present
-  deleteUploadedFile(req.me.avatar_url);
+  if (!req.file) {
+    res.status(400).json({ message: "No file attached" });
+    return;
+  }
 
-  const avatarUrl = `/uploads/avatars/${req.file?.filename}`;
-  userRepository.updateAvatar(req.me.id, avatarUrl);
+  const oldAvatarUrl = req.me.avatar_url;
+  const newAvatarUrl = `/uploads/avatars/${req.file.filename}`;
 
-  res.status(201).json({ avatar_url: avatarUrl });
+  userRepository.updateAvatar(req.me.id, newAvatarUrl);
+  deleteUploadedFile(oldAvatarUrl);
+
+  res.status(201).json({ avatar_url: newAvatarUrl });
 };
 
 /* ************************************************************************ */
@@ -101,9 +106,10 @@ const uploadMeAvatar: RequestHandler = (req, res) => {
   - User is authenticated
 */
 const deleteMeAvatar: RequestHandler = (req, res) => {
-  deleteUploadedFile(req.me.avatar_url);
+  const oldAvatarUrl = req.me.avatar_url;
 
   userRepository.updateAvatar(req.me.id, null);
+  deleteUploadedFile(oldAvatarUrl);
 
   res.sendStatus(204);
 };

@@ -24,19 +24,21 @@ import { clientEnvSchema } from "./client";
  * Server-side environment variables schema.
  * Validates all server and client environment variables.
  */
-export const serverEnvSchema = clientEnvSchema.extend({
-  APP_PORT: z.coerce.number().int().min(1).max(65535).default(5173),
-  APP_BASE_URL: z.url().default("http://localhost:5173"),
-  APP_SECRET: z.string().min(1, "APP_SECRET is required"),
-  SMTP_URL: z
-    .url()
-    .optional()
-    .refine(
-      (smtpUrl) => process.env.NODE_ENV !== "production" || smtpUrl != null,
-      {
+export const serverEnvSchema = clientEnvSchema
+  .extend({
+    APP_PORT: z.coerce.number().int().min(1).max(65535).default(5173),
+    APP_BASE_URL: z.url().default("http://localhost:5173"),
+    APP_SECRET: z.string().min(1, "APP_SECRET is required"),
+    SMTP_URL: z.url().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.NODE_ENV === "production" && data.SMTP_URL == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["SMTP_URL"],
         message: "SMTP_URL must be defined in production environment",
-      },
-    ),
-});
+      });
+    }
+  });
 
-export const serverEnv = serverEnvSchema.parse(process.env ?? {});
+export const serverEnv = serverEnvSchema.parse(process.env);

@@ -21,4 +21,27 @@ describe("serverEnvSchema", () => {
 
     expect(() => serverEnvSchema.parse(invalidEnv)).toThrow();
   });
+
+  it("should reject missing SMTP_URL in production", () => {
+    const env = {
+      APP_SECRET: "my-secret-key",
+      NODE_ENV: "production",
+      // SMTP_URL intentionally absent
+    };
+
+    expect(() => serverEnvSchema.parse(env)).toThrow(
+      /SMTP_URL must be defined in production environment/,
+    );
+  });
+
+  it("should accept a defined SMTP_URL in production", () => {
+    const env = {
+      APP_SECRET: "my-secret-key",
+      NODE_ENV: "production",
+      SMTP_URL: "smtp://mail.example.com",
+    };
+
+    const parsed = serverEnvSchema.parse(env);
+    expect(parsed.SMTP_URL).toBe("smtp://mail.example.com");
+  });
 });

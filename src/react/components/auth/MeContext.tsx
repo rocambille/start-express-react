@@ -19,7 +19,7 @@ import {
   useContext,
   useState,
 } from "react";
-import { getOrFetch } from "../../helpers/cache";
+import { forget, getOrFetch } from "../../helpers/cache";
 import { apiMutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
@@ -85,6 +85,7 @@ export function MeProvider({
     ) => {
       await apiMutate("/api/users/me", "put", newMe);
 
+      forget("/api/users/me");
       setUser(await getOrFetch<User | null>("/api/users/me"));
     },
     [],
@@ -100,6 +101,7 @@ export function MeProvider({
       await apiMutate("/api/users/me/avatar", "post", formData);
     }
 
+    forget("/api/users/me");
     setUser(await getOrFetch<User | null>("/api/users/me"));
   }, []);
 

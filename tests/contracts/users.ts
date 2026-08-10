@@ -87,9 +87,14 @@ export default (<Contract>{
         },
         response: {
           status: 400,
-          body: expect.objectContaining({
-            message: expect.stringMatching(/Invalid file type/),
-          }),
+          body: { message: expect.stringMatching(/Invalid file type/i) },
+        },
+      },
+      no_attached_file: {
+        request: { jwtPayload: { sub: fooUser.id } },
+        response: {
+          status: 400,
+          body: { message: expect.stringMatching(/No file attached/i) },
         },
       },
       unauthorized: {
