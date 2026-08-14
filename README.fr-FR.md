@@ -29,7 +29,7 @@ StartER est un framework open-source pour **apprendre** et **construire** des ap
 * Backend Express
 * Frontend React
 * Types et contrats partagés pour la vérification de l'API
-* Une architecture « sans magie » où vous comprenez chaque ligne
+* Une architecture "sans magie" où vous comprenez chaque ligne
 
 Que vous soyez étudiant·e, en reconversion, ou développeur·se expérimenté·e qui prototype une nouvelle idée, StartER vous offre une base solide et lisible.
 
