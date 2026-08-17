@@ -5,7 +5,7 @@ import { FormError, hasError } from "../FormError";
 import Avatar from "./Avatar";
 import { useMe } from "./MeContext";
 
-const schema = z.object({
+const AvatarUploadFormSchema = z.object({
   avatar: z
     .file()
     .min(1, "Image is required")
@@ -25,7 +25,9 @@ function AvatarUploadForm() {
   const [errors, setErrors] = useState<ZodIssue[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const parsed = schema.safeParse({ avatar: e.target.files?.[0] });
+    const parsed = AvatarUploadFormSchema.safeParse({
+      avatar: e.target.files?.[0],
+    });
 
     if (!parsed.success) {
       setErrors(parsed.error.issues);

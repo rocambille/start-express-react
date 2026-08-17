@@ -16,7 +16,9 @@ import type { $ZodIssue as ZodIssue } from "zod/v4/core";
 import { FormError, hasError } from "../FormError";
 import { useMe } from "./MeContext";
 
-const schema = z.object({
+type AccountDetailsFormValues = Pick<User, "email" | "name">;
+
+const AccountDetailsFormSchema: z.ZodType<AccountDetailsFormValues> = z.object({
   email: z.email("Email invalide"),
   name: z.string().min(1, "Nom requis"),
 });
@@ -31,7 +33,9 @@ function AccountDetailsForm() {
     <form
       aria-label="account details form"
       action={(formData: FormData) => {
-        const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
+        const parsed = AccountDetailsFormSchema.safeParse(
+          Object.fromEntries(formData.entries()),
+        );
 
         if (!parsed.success) {
           setErrors(parsed.error.issues);

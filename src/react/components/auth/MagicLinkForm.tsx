@@ -9,7 +9,9 @@ import type { $ZodIssue as ZodIssue } from "zod/v4/core";
 import { FormError, hasError } from "../FormError";
 import { useMe } from "./MeContext";
 
-const emailSchema = z.object({
+type MagicLinkFormValues = Pick<User, "email">;
+
+const MagicLinkFormSchema: z.ZodType<MagicLinkFormValues> = z.object({
   email: z.email(),
 });
 
@@ -29,7 +31,7 @@ function MagicLinkForm() {
     <form
       aria-label="login form"
       action={(formData) => {
-        const parsed = emailSchema.safeParse(
+        const parsed = MagicLinkFormSchema.safeParse(
           Object.fromEntries(formData.entries()),
         );
 
