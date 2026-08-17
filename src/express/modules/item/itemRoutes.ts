@@ -53,11 +53,11 @@ import itemActions from "./itemActions";
 import itemParamConverter from "./itemParamConverter";
 
 /*
-  itemValidator:
+  itemValidators:
   - Validates request payloads
   - Prevents invalid data from reaching actions
 */
-import itemValidator from "./itemValidator";
+import itemValidators from "./itemValidators";
 
 /* ************************************************************************ */
 /* Route constants                                                          */
@@ -143,7 +143,7 @@ router.use(BASE_PATH, authActions.verifyAccessToken);
   - Requires authentication
   - Validates payload before processing
 */
-router.post(BASE_PATH, itemValidator.validate, itemActions.add);
+router.post(BASE_PATH, itemValidators.add, itemActions.add);
 
 /*
   Item-specific mutations.
@@ -153,7 +153,7 @@ router.post(BASE_PATH, itemValidator.validate, itemActions.add);
 router
   .route(ITEM_PATH)
   .all(checkAccess)
-  .put(itemValidator.validate, itemActions.edit)
+  .put(itemValidators.edit, itemActions.edit)
   .delete(itemActions.destroy);
 
 /* ************************************************************************ */

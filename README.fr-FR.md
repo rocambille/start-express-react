@@ -83,7 +83,7 @@ Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : u
 
 * **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
 
-* **Validation de sortie avec Zod :** typage des données aux emplacements clés à l'aide de schémas Zod. Ceci évite les bugs silencieux souvent introduits par l'IA.
+* **Schémas comme cource unique de Vvrité :** des schémas Zod centralisés dans `*Schemas.ts` qui valident les entrées HTTP et analysent les sorties de la base de données pour éviter les bugs silencieux.
 
 * **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
 

@@ -21,19 +21,18 @@
   - https://zod.dev/
 */
 
-import { z } from "zod";
-
-/*
-  User Data Transfer Object (DTO)
-*/
-const userDTOSchema = z.object({
-  email: z.email().max(255),
-  name: z.string().max(255),
-});
-
-/*
-  Export validator
-*/
 import { createValidator } from "../../helpers/validation";
+import { UserDTOSchema } from "./userSchemas";
 
-export default createValidator(userDTOSchema);
+const editMe = createValidator(
+  { body: UserDTOSchema },
+  {
+    inject: (req) => ({
+      id: req.me.id, // Trusted from auth middleware
+    }),
+  },
+);
+
+export default {
+  editMe,
+};

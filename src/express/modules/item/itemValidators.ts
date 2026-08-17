@@ -21,26 +21,29 @@
   - https://zod.dev/
 */
 
-import { z } from "zod";
-
-/*
-  Item Data Transfer Object (DTO)
-
-  Notes:
-  - `user_id` is NOT trusted from the client:
-    it will always be overridden with the authenticated user id
-*/
-const itemDTOSchema = z.object({
-  title: z.string().max(255),
-});
-
-/*
-  Export validator
-*/
 import { createValidator } from "../../helpers/validation";
+import { ItemDTOSchema } from "./itemSchemas";
 
-export default createValidator(itemDTOSchema, {
-  inject: (req) => ({
-    user_id: req.me.id, // Trusted server-side injection
-  }),
-});
+const add = createValidator(
+  { body: ItemDTOSchema },
+  {
+    inject: (req) => ({
+      user_id: req.me.id, // Trusted from auth middleware
+    }),
+  },
+);
+
+const edit = createValidator(
+  { body: ItemDTOSchema },
+  {
+    inject: (req) => ({
+      id: req.item.id, // Trusted from param converter
+      user_id: req.me.id, // Trusted from auth middleware
+    }),
+  },
+);
+
+export default {
+  add,
+  edit,
+};

@@ -21,8 +21,11 @@ import type { RequestParamHandler } from "express";
   Contract:
   - repository must expose a `find(id: number)` method returning T | null
 */
-export const createParamConverter = <T>(
-  repository: { find: (id: RowId) => T | null },
+export const createParamConverter = <
+  T extends { id: number },
+  Repository extends { find: (id: T["id"]) => T | null },
+>(
+  repository: Repository,
   requestKey: string,
 ): { convert: RequestParamHandler } => {
   return {

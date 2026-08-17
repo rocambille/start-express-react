@@ -70,6 +70,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         await fs.pathExists(path.join(tmpDir, "src/express/modules/item")),
       ).toBe(false);
       expect(
+        await fs.pathExists(path.join(tmpDir, "tests/fixtures/items.ts")),
+      ).toBe(false);
+      expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/auth")),
       ).toBe(false);
 
@@ -93,6 +96,9 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       // Verify files were removed/kept
       expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/item")),
+      ).toBe(false);
+      expect(
+        await fs.pathExists(path.join(tmpDir, "tests/fixtures/items.ts")),
       ).toBe(false);
       expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/auth")),
@@ -178,11 +184,13 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         "utf8",
       );
 
-      const result = content.replace(/type Item = \{[\s\S]*?\};\n\n?/m, "");
+      const result = content.replace(
+        `type Item = import("../express/modules/item/itemSchemas").Item;\n`,
+        "",
+      );
 
       expect(result).not.toContain("type Item");
       expect(result).toContain("type User");
-      expect(result).toContain("type MagicLinkToken");
     });
 
     it("removes item link from NavBar.tsx", async () => {
@@ -281,12 +289,12 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         "utf8",
       );
 
-      const result = content
-        .replace(/type User = \{[\s\S]*?\};\n\n?/m, "")
-        .replace(/type MagicLinkToken = \{[\s\S]*?\};\n\n?/m, "");
+      const result = content.replace(
+        `type User = import("../express/modules/user/userSchemas").User;\n`,
+        "",
+      );
 
       expect(result).not.toContain("type User");
-      expect(result).not.toContain("type MagicLinkToken");
       expect(result).toContain("type Item");
     });
 

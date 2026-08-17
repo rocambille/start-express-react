@@ -3,28 +3,15 @@
   Centralize all persistence logic related to Authentication tokens.
 */
 
-import { z } from "zod";
 import database from "../../../database";
-
-const magicLinkTokenSchema: z.ZodType<MagicLinkToken> = z.object({
-  user_id: z.number(),
-  token_hash: z.string(),
-  expires_at: z.coerce.date(),
-  consumed_at: z.coerce.date().nullable(),
-});
+import { type MagicLinkToken, MagicLinkTokenSchema } from "./authSchemas";
 
 class AuthRepository {
-  insertOrReplaceToken(
-    userId: RowId,
-    tokenHash: string,
-    expiresAt: Date,
-  ): RowId {
+  insertOrReplaceToken(userId: User["id"], tokenHash: string, expiresAt: Date) {
     const query = database.prepare(
       "insert or replace into magic_link_token (user_id, token_hash, expires_at) values (?, ?, ?)",
     );
-    const result = query.run(userId, tokenHash, expiresAt.toISOString());
-
-    return Number(result.lastInsertRowid);
+    query.run(userId, tokenHash, expiresAt.toISOString());
   }
 
   findByHash(tokenHash: string): MagicLinkToken | null {
@@ -33,10 +20,10 @@ class AuthRepository {
     );
     const row = query.get(tokenHash);
 
-    return row ? magicLinkTokenSchema.parse(row) : null;
+    return row ? MagicLinkTokenSchema.parse(row) : null;
   }
 
-  markAsConsumed(userId: RowId): boolean {
+  markAsConsumed(userId: User["id"]): boolean {
     const query = database.prepare(
       "update magic_link_token set consumed_at = datetime('now') where user_id = ?",
     );

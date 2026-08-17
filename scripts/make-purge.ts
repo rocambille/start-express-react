@@ -56,11 +56,24 @@ async function purgeItems(rootDir: string) {
   await remove(rootDir, "src/express/modules/item");
   await remove(rootDir, "src/react/components/item");
   await remove(rootDir, "tests/react/components/item");
+  await remove(rootDir, "tests/fixtures/items.ts");
+  await remove(rootDir, "tests/contracts/items.ts");
+
+  // Remove item import and fixture seeding in test-utils.ts
+  await updateFile(rootDir, "tests/express/test-utils.ts", (content) => {
+    const itemInsertRegex = / {2}\/\* insert all items \*\/[\s\S]*?\}\n\n?/m;
+    return content
+      .replace(`import { allItems } from "../fixtures/items";\n`, "")
+      .replace(itemInsertRegex, "");
+  });
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
     content
-      .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+      .replace(
+        /import itemRoutes from "\.\/modules\/item\/itemRoutes";\n+/m,
+        "",
+      )
       .replace(`router.use(itemRoutes);\n`, ""),
   );
 
@@ -85,7 +98,10 @@ async function purgeItems(rootDir: string) {
 
   // Remove Item type.
   await updateFile(rootDir, "src/types/index.d.ts", (content) =>
-    content.replace(/type Item = \{[\s\S]*?\};\n\n?/m, ""),
+    content.replace(
+      `type Item = import("../express/modules/item/itemSchemas").Item;\n`,
+      "",
+    ),
   );
 
   // Remove item link from NavBar.
@@ -126,11 +142,12 @@ async function purgeAuth(rootDir: string) {
     return content.replace(userInsertRegex, "");
   });
 
-  // Remove User and MagicLinkToken types.
+  // Remove User type.
   await updateFile(rootDir, "src/types/index.d.ts", (content) =>
-    content
-      .replace(/type User = \{[\s\S]*?\};\n\n?/m, "")
-      .replace(/type MagicLinkToken = \{[\s\S]*?\};\n\n?/m, ""),
+    content.replace(
+      `type User = import("../express/modules/user/userSchemas").User;\n`,
+      "",
+    ),
   );
 
   // Remove auth imports, loader, and auth routes from routes.tsx.

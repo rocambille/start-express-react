@@ -111,7 +111,7 @@ const read: RequestHandler = (req, res) => {
   - 204 No Content on success
 */
 const edit: RequestHandler = (req, res) => {
-  itemRepository.update(req.item.id, req.body);
+  itemRepository.update(req.body);
 
   res.sendStatus(204);
 };

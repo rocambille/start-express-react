@@ -74,7 +74,7 @@ You define API behavior in the `tests/contracts/` directory: a central, declarat
 
 ### 🔍 Zero-magic simplicity
 *   **Sync SQLite:** direct data access that AI can read and write without `async`/`await` confusion.
-*   **Zod Output Parsing:** we verify data at the edge using Zod schemas. This prevents the silent bugs AI often introduces.
+*   **Single Source of Truth Schemas:** Zod schemas in `*Schemas.ts` validate HTTP inputs at the edge and parse database entity outputs. This prevents silent runtime bugs.
 *   **Transparent stack:** Express 5 + React 19. No black boxes. You understand every line.
 
 ## 💻 Tech stack

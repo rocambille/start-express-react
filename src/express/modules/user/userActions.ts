@@ -51,7 +51,7 @@ const readMe: RequestHandler = (req, res) => {
   - 204 No Content on success
 */
 const editMe: RequestHandler = (req, res) => {
-  userRepository.update(req.me.id, req.body);
+  userRepository.update(req.body);
 
   res.sendStatus(204);
 };

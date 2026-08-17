@@ -193,7 +193,7 @@ export async function main(argv: string[] = process.argv) {
 
       npm run database:reset
 
-[ ] Define the "${singular}" type in src/types/index.d.ts`);
+[ ] Re-export the "${singular}" type in src/types/index.d.ts from "./${newName.toLowerCase()}Schemas"`);
 
   if (isExpress) {
     console.info(`[ ] Register the Express module in src/express/routes.ts:

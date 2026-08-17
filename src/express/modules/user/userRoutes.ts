@@ -44,11 +44,11 @@ import authActions from "../auth/authActions";
 */
 import userActions from "./userActions";
 /*
-  userValidator:
+  userValidators:
   - Validates request payloads
   - Prevents invalid data from reaching actions
 */
-import userValidator from "./userValidator";
+import userValidators from "./userValidators";
 
 const avatarUploader = createUploader({
   subfolder: "avatars",
@@ -80,7 +80,7 @@ router
   .route(ME_PATH)
   .all(authActions.verifyAccessToken)
   .get(userActions.readMe)
-  .put(userValidator.validate, userActions.editMe)
+  .put(userValidators.editMe, userActions.editMe)
   .delete(userActions.destroyMe);
 
 router
