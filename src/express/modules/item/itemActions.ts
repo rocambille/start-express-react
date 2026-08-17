@@ -28,20 +28,58 @@ import itemRepository from "./itemRepository";
 /* ************************************************************************ */
 
 /*
-  Browse all items.
+  Browse items by range.
 
   Preconditions:
   - None (public endpoint)
+  - A valid `Range: items=start-end` header must be present
 
   Response:
-  - 200 with an array of items
+  - 206 Partial Content with Content-Range header and the requested slice
+  - 400 if no Range header or format is invalid
+  - 416 Range Not Satisfiable if start >= total
 */
 const browse: RequestHandler = (req, res) => {
-  const offset = Number(req.query.start ?? "0");
+  // This handler implements HTTP range semantics (single range only).
+  // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Range_requests
 
-  const items = itemRepository.findAll(10, offset);
+  res.setHeader("Accept-Ranges", "items");
 
-  res.json(items);
+  // Parse the Range header
+  // Example: "Range: items=0-9"
+
+  const match = req.headers.range?.match(/^items=(\d+)-(\d+)$/);
+
+  if (!match) {
+    res.sendStatus(400);
+    return;
+  }
+
+  const [start, end] = [Number(match[1]), Number(match[2])];
+
+  // Check if the range is valid
+
+  const total = itemRepository.count();
+
+  if (start < 0 || start > end || start >= total) {
+    res.setHeader("Content-Range", `items */${total}`);
+    res.sendStatus(416);
+
+    return;
+  }
+
+  // Fetch items for the specified range
+
+  const limit = end - start + 1;
+  const items = itemRepository.findAll(limit, start);
+
+  // Set the Content-Range header and send the range of items (206)
+
+  res.setHeader(
+    "Content-Range",
+    `items ${start}-${Math.min(end, total - 1)}/${total}`,
+  );
+  res.status(206).json(items);
 };
 
 /* ************************************************************************ */

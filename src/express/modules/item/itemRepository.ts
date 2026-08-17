@@ -100,6 +100,20 @@ class ItemRepository {
     return rows.map((row) => itemSchema.parse(row));
   }
 
+  /*
+    Count all non-deleted items.
+
+    Notes:
+    - Used alongside findAll to compute pagination totals
+  */
+  count(): number {
+    const row = database
+      .prepare("select count(*) as total from item where deleted_at is null")
+      .get();
+
+    return Number(row?.total);
+  }
+
   /* ********************************************************************** */
   /* Update                                                                 */
   /* ********************************************************************** */

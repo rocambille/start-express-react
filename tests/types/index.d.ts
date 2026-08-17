@@ -4,6 +4,7 @@ type Case = {
   specialPath?: string;
   request: {
     body?: JsonObject;
+    headers?: Record<string, string>;
     attach?: {
       name: string;
       file: Buffer | string;
@@ -17,6 +18,7 @@ type Case = {
   response: {
     status: number;
     body?: JsonObject | JsonArray;
+    headers?: Record<string, string>;
     // Optional hook to run extra assertions on the response
     and?: (response: {
       headers: { [key: string]: string };

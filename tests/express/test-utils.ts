@@ -208,6 +208,12 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
 
   const apiCall = api[test.method](caseDetails.specialPath ?? test.path);
 
+  if (caseDetails.request.headers) {
+    for (const [key, value] of Object.entries(caseDetails.request.headers)) {
+      apiCall.set(key, value);
+    }
+  }
+
   if (caseDetails.request.body != null) {
     apiCall.send(caseDetails.request.body);
   }
@@ -240,6 +246,12 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
 
   expect(response.status).toBe(caseDetails.response.status);
   expect(response.body).toEqual(caseDetails.response.body);
+
+  if (caseDetails.response.headers) {
+    for (const [key, matcher] of Object.entries(caseDetails.response.headers)) {
+      expect(response.headers[key]).toEqual(matcher);
+    }
+  }
 
   if (caseDetails.response.and) {
     caseDetails.response.and(response);

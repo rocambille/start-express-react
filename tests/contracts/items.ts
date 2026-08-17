@@ -7,8 +7,27 @@ export default (<Contract>{
     path: "/api/items",
     cases: {
       success: {
+        request: { headers: { Range: "items=0-9" } },
+        response: {
+          status: 206,
+          body: allItems,
+          headers: {
+            "content-range": `items 0-${allItems.length - 1}/${allItems.length}`,
+          },
+        },
+      },
+      no_range: {
         request: {},
-        response: { status: 200, body: allItems },
+        response: { status: 400, body: {} },
+      },
+      out_of_range: {
+        specialPath: "/api/items",
+        request: { headers: { Range: "items=9999-9999" } },
+        response: {
+          status: 416,
+          body: {},
+          headers: { "content-range": `items */${allItems.length}` },
+        },
       },
     },
   },
