@@ -237,7 +237,7 @@ router.post(BASE_PATH, itemValidator.validate, itemActions.add);
 
 ### Pagination
 
-Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` from `req.query.start`. Never query a table without a LIMIT.
+Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. Never query a table without a LIMIT.
 
 ### API contract tests
 
