@@ -90,7 +90,7 @@ export function ensureMigrationsTable(database: DatabaseSync): void {
     create table if not exists _migrations (
       filename text primary key,
       checksum text not null,
-      applied_at datetime default current_timestamp
+      applied_at datetime default (strftime('%Y-%m-%dT%H:%M:%SZ'))
     );
   `);
 }
