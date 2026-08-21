@@ -32,7 +32,7 @@ function MagicLinkForm() {
       aria-label="login form"
       action={(formData) => {
         const parsed = MagicLinkFormSchema.safeParse(
-          Object.fromEntries(formData.entries()),
+          Object.fromEntries(formData),
         );
 
         if (!parsed.success) {

@@ -5,10 +5,10 @@
   Design notes:
   - Leverages Pico CSS v2's native `aria-invalid` + `<small>` support
   - Zero custom CSS: Pico automatically styles `<small>` after an invalid input
-  - Each form manages its own errors via useState<z.ZodIssue[]>
+  - Each form manages its own errors via useState<ZodIssue[]>
 
   Usage:
-    const [errors, setErrors] = useState<z.ZodIssue[]>([]);
+    const [errors, setErrors] = useState<ZodIssue[]>([]);
 
     <input
       aria-invalid={hasError(errors, "title") || undefined}

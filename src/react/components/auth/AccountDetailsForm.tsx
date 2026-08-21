@@ -34,7 +34,7 @@ function AccountDetailsForm() {
       aria-label="account details form"
       action={(formData: FormData) => {
         const parsed = AccountDetailsFormSchema.safeParse(
-          Object.fromEntries(formData.entries()),
+          Object.fromEntries(formData),
         );
 
         if (!parsed.success) {

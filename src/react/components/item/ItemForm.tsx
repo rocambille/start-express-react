@@ -68,9 +68,7 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
           Client-side validation can be done here for better UX.
           The API remains the source of truth for data integrity.
         */
-        const parsed = ItemFormSchema.safeParse(
-          Object.fromEntries(formData.entries()),
-        );
+        const parsed = ItemFormSchema.safeParse(Object.fromEntries(formData));
 
         if (!parsed.success) {
           setErrors(parsed.error.issues);

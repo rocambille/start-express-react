@@ -34,7 +34,7 @@ export const serverEnvSchema = clientEnvSchema
   .superRefine((data, ctx) => {
     if (data.NODE_ENV === "production" && data.SMTP_URL == null) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["SMTP_URL"],
         message: "SMTP_URL must be defined in production environment",
       });
