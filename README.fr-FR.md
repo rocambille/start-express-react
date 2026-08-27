@@ -65,7 +65,7 @@ npm run dev
 Ne laissez pas l'IA "deviner" votre architecture. Utilisez `make:clone` pour répliquer la logique fonctionnelle.
 
 ```bash
-npm run make:clone -- src/express/modules/item src/express/modules/task item task
+npm run make:clone -- src/express/modules/item src/express/modules/task Item Task
 ```
 Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agent IA reste ainsi concentré et précis.
 
