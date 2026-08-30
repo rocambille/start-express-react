@@ -141,6 +141,7 @@ vi.mock("nodemailer", async (importActual) => {
 // Helpers
 // -------------------------
 
+import { deleteUploadedFile } from "../../src/express/helpers/upload";
 import contracts from "../contracts";
 
 export const setupMocks = () => {
@@ -244,17 +245,33 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
 
   const response = await apiCall.set("Cookie", cookies);
 
-  expect(response.status).toBe(caseDetails.response.status);
-  expect(response.body).toEqual(caseDetails.response.body);
+  try {
+    expect(response.status).toBe(caseDetails.response.status);
+    expect(response.body).toEqual(caseDetails.response.body);
 
-  if (caseDetails.response.headers) {
-    for (const [key, matcher] of Object.entries(caseDetails.response.headers)) {
-      expect(response.headers[key]).toEqual(matcher);
+    if (caseDetails.response.headers) {
+      for (const [key, matcher] of Object.entries(
+        caseDetails.response.headers,
+      )) {
+        expect(response.headers[key]).toEqual(matcher);
+      }
     }
-  }
 
-  if (caseDetails.response.and) {
-    caseDetails.response.and(response);
+    if (caseDetails.response.and) {
+      caseDetails.response.and(response);
+    }
+  } finally {
+    if (
+      caseDetails.request.attach != null &&
+      typeof response.body === "object" &&
+      response.body !== null
+    ) {
+      for (const val of Object.values(response.body)) {
+        if (typeof val === "string" && val.startsWith("/uploads/")) {
+          deleteUploadedFile(val);
+        }
+      }
+    }
   }
 
   return response;
