@@ -299,7 +299,12 @@ StartER has no file upload handling. If adding one, store files outside the docu
 
 Environment variables are defined and validated in `src/env/client.ts` (client) and `src/env/server.ts` (server). Import `{ serverEnv }` from `env/server` (if you are in server code) or `{ clientEnv }` from `env/client` (if you are in frontend code).
 
-Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
+- `APP_SECRET`: Secret key for JWT signing. Generate with `openssl rand -hex 32`.
+- `SMTP_URL`: Optional in development (magic links print to console); required in production.
+- `DKIM_PRIVATE_KEY`: Optional path to private key file or inline PEM string for DKIM signing.
+- `DKIM_DOMAIN` / `DKIM_SELECTOR`: Optional domain and selector overrides (auto-derived from SMTP_URL hostname and `"mail"` if omitted).
+
+Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`.
 
 ---
 
