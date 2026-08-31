@@ -1,4 +1,4 @@
-import { fooUser } from "../fixtures/users";
+import { barUser, corruptedUser, fooUser } from "../fixtures/users";
 
 const dummyImageBuffer = Buffer.from(
   "UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=",
@@ -18,6 +18,19 @@ export default (<Contract>{
           status: 200,
           body: fooUser,
         },
+      },
+      as_user_with_avatar: {
+        request: {
+          jwtPayload: { sub: barUser.id },
+        },
+        response: {
+          status: 200,
+          body: barUser,
+        },
+      },
+      corrupted_avatar_url: {
+        request: { jwtPayload: { sub: corruptedUser.id } },
+        response: { status: 401, body: {} },
       },
       unauthorized: {
         request: {},

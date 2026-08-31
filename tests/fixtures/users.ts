@@ -18,7 +18,7 @@ export const allUsers: User[] = [
     id: 2,
     email: "bar@mail.com",
     name: "bar",
-    avatar_url: null,
+    avatar_url: "/uploads/avatars/bar.webp",
   },
   {
     id: 3,
@@ -32,9 +32,16 @@ export const allUsers: User[] = [
     name: "deleted",
     avatar_url: null,
   },
+  {
+    id: 5,
+    email: "corrupted@mail.com",
+    name: "corrupted",
+    avatar_url: "http://[invalid",
+  },
 ];
 
 export const fooUser = allUsers[0];
 export const barUser = allUsers[1];
 export const bazUser = allUsers[2];
 export const deletedUser = allUsers[3];
+export const corruptedUser = allUsers[4];
