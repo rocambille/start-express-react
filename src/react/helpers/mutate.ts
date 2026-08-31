@@ -81,8 +81,12 @@ export const apiMutate = async (
   const init: RequestInit = { method, headers };
 
   if (body != null) {
-    headers["Content-Type"] = "application/json";
-    init.body = JSON.stringify(body);
+    if (body instanceof FormData) {
+      init.body = body;
+    } else {
+      headers["Content-Type"] = "application/json";
+      init.body = JSON.stringify(body);
+    }
   }
 
   const response = await fetch(url, init);

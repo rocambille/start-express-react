@@ -4,37 +4,39 @@
 
   Design notes:
   - Use a native <form> to keep semantics explicit
-  - Delegates all side effects to the useAuth hook
+  - Delegates all side effects to the useMe hook
 
   Related docs:
   - https://react.dev/reference/react-dom/components/form
 */
 
 import { useId, useState } from "react";
-import z from "zod";
+import { z } from "zod";
 import type { $ZodIssue as ZodIssue } from "zod/v4/core";
 import { FormError, hasError } from "../FormError";
-import { useAuth } from "./AuthContext";
+import { useMe } from "./MeContext";
 
-const schema = z.object({
+type AccountDetailsFormValues = Pick<User, "email" | "name">;
+
+const AccountDetailsFormSchema: z.ZodType<AccountDetailsFormValues> = z.object({
   email: z.email("Email invalide"),
   name: z.string().min(1, "Nom requis"),
 });
 
 function AccountDetailsForm() {
-  const { me, updateMe } = useAuth();
+  const { user, updateMe } = useMe();
   const emailId = useId();
   const nameId = useId();
   const [errors, setErrors] = useState<ZodIssue[]>([]);
 
   return (
     <form
-      aria-label="Formulaire de modification de mes informations"
+      aria-label="account details form"
       action={(formData: FormData) => {
-        const email = formData.get("email")?.toString();
-        const name = formData.get("name")?.toString();
+        const parsed = AccountDetailsFormSchema.safeParse(
+          Object.fromEntries(formData),
+        );
 
-        const parsed = schema.safeParse({ email, name });
         if (!parsed.success) {
           setErrors(parsed.error.issues);
           return;
@@ -51,7 +53,7 @@ function AccountDetailsForm() {
           id={emailId}
           name="email"
           required
-          defaultValue={me?.email}
+          defaultValue={user?.email}
           aria-invalid={hasError(errors, "email") || undefined}
           aria-describedby={`${emailId}-error`}
         />
@@ -64,7 +66,7 @@ function AccountDetailsForm() {
           id={nameId}
           name="name"
           required
-          defaultValue={me?.name}
+          defaultValue={user?.name}
           aria-invalid={hasError(errors, "name") || undefined}
           aria-describedby={`${nameId}-error`}
         />

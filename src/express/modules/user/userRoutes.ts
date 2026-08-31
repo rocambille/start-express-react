@@ -26,25 +26,34 @@ const router = Router();
 /* ************************************************************************ */
 
 /*
+  avatarUploader:
+  - Handles avatar file uploads
+  - Validates file type and size
+*/
+import { createUploader } from "../../helpers/upload";
+/*
   authActions:
   - verifyAccessToken injects `req.me`
   - `req.me` contains the authenticated user
 */
 import authActions from "../auth/authActions";
-
 /*
   userActions:
   - Thin controllers
   - One action per route
 */
 import userActions from "./userActions";
-
 /*
-  userValidator:
+  userValidators:
   - Validates request payloads
   - Prevents invalid data from reaching actions
 */
-import userValidator from "./userValidator";
+import userValidators from "./userValidators";
+
+const avatarUploader = createUploader({
+  subfolder: "avatars",
+  maxSizeBytes: 2 * 1024 * 1024,
+});
 
 /* ************************************************************************ */
 /* Route constants                                                          */
@@ -56,6 +65,7 @@ import userValidator from "./userValidator";
   - Make refactors trivial
 */
 const ME_PATH = "/api/users/me";
+const ME_AVATAR_PATH = "/api/users/me/avatar";
 
 /* ************************************************************************ */
 /* Authenticated routes                                                     */
@@ -70,8 +80,14 @@ router
   .route(ME_PATH)
   .all(authActions.verifyAccessToken)
   .get(userActions.readMe)
-  .put(userValidator.validate, userActions.editMe)
+  .put(userValidators.editMe, userActions.editMe)
   .delete(userActions.destroyMe);
+
+router
+  .route(ME_AVATAR_PATH)
+  .all(authActions.verifyAccessToken)
+  .post(avatarUploader.single("avatar"), userActions.uploadMeAvatar)
+  .delete(userActions.deleteMeAvatar);
 
 /* ************************************************************************ */
 /* Export                                                                   */

@@ -10,11 +10,11 @@
 import { use } from "react";
 import { Link, useParams } from "react-router";
 import { getOrFetch } from "../../helpers/cache";
-import { useAuth } from "../auth/AuthContext";
+import { useMe } from "../auth/MeContext";
 import ItemDeleteForm from "./ItemDeleteForm";
 
 function ItemShow() {
-  const auth = useAuth();
+  const { user } = useMe();
   const { id } = useParams();
 
   const item = use(getOrFetch<Item>(`/api/items/${id}`));
@@ -31,7 +31,7 @@ function ItemShow() {
       {/* Owner-only actions                                               */}
       {/* **************************************************************** */}
 
-      {auth.me?.id === item.user_id && (
+      {user?.id === item.user_id && (
         <>
           {/*
             Edit action:

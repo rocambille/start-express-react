@@ -19,13 +19,6 @@
 import { z } from "zod";
 
 /**
- * Resolve env sources (server & client)
- */
-const processEnv = typeof process !== "undefined" ? process.env : {};
-const metaEnv =
-  typeof import.meta !== "undefined" && import.meta.env ? import.meta.env : {};
-
-/**
  * Helper: validates whether a string is a valid IANA timezone name.
  */
 function isValidTimezone(timeZone: string): boolean {
@@ -55,31 +48,4 @@ export const clientEnvSchema = z.object({
     .default("development"),
 });
 
-/**
- * Server-side environment variables schema.
- * Validates all server and client environment variables.
- */
-export const serverEnvSchema = clientEnvSchema.extend({
-  APP_PORT: z.coerce.number().int().min(1).max(65535).default(5173),
-  APP_BASE_URL: z.url().default("http://localhost:5173"),
-  APP_SECRET: z.string().min(1, "APP_SECRET is required"),
-  SMTP_URL: z
-    .url()
-    .optional()
-    .refine(
-      (smtpUrl) => {
-        return smtpUrl != null || processEnv.NODE_ENV !== "production";
-      },
-      {
-        message: "SMTP_URL must be defined in production environment",
-      },
-    ),
-});
-
-const isServer = typeof window === "undefined";
-
-export const clientEnv = clientEnvSchema.parse(metaEnv);
-
-export const serverEnv = isServer
-  ? serverEnvSchema.parse(processEnv)
-  : (null as unknown as z.infer<typeof serverEnvSchema>);
+export const clientEnv = clientEnvSchema.parse(import.meta.env ?? {});

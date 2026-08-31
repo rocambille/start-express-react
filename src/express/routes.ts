@@ -36,7 +36,7 @@ const router = Router();
 import cookieParser from "cookie-parser";
 import { json } from "express";
 
-import { csrf } from "./middlewares";
+import { csrf } from "./helpers/csrf";
 
 /*
   Middleware order matters:

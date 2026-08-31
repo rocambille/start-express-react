@@ -18,19 +18,8 @@
   - Soft delete is the default find behavior
 */
 
-import z from "zod";
-
 import database from "../../../database";
-
-/* ************************************************************************ */
-/* Schemas                                                                  */
-/* ************************************************************************ */
-
-const userSchema: z.ZodType<User> = z.object({
-  id: z.number(),
-  email: z.string(),
-  name: z.string(),
-});
+import { type UserDTO, UserSchema } from "./userSchemas";
 
 /* ************************************************************************ */
 /* Repository                                                               */
@@ -52,7 +41,7 @@ class UserRepository {
     - No validation here (done earlier in the pipeline)
     - Assumes referential integrity (user_id exists)
   */
-  create(user: Omit<User, "id">): RowId {
+  create(user: UserDTO): User["id"] {
     const query = database.prepare(
       "insert into user (email, name) values (?, ?)",
     );
@@ -75,13 +64,13 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  find(id: RowId): User | null {
+  find(id: User["id"]): User | null {
     const query = database.prepare(
-      "select id, email, name from user where id = ? and deleted_at is null",
+      "select id, email, name, avatar_url from user where id = ? and deleted_at is null",
     );
     const row = query.get(id);
 
-    return row ? userSchema.parse(row) : null;
+    return row ? UserSchema.parse(row) : null;
   }
 
   /*
@@ -97,11 +86,11 @@ class UserRepository {
   */
   findByEmail(email: string): User | null {
     const query = database.prepare(
-      "select id, email, name from user where email = ? and deleted_at is null",
+      "select id, email, name, avatar_url from user where email = ? and deleted_at is null",
     );
     const row = query.get(email);
 
-    return row ? userSchema.parse(row) : null;
+    return row ? UserSchema.parse(row) : null;
   }
 
   /*
@@ -114,7 +103,7 @@ class UserRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  findByEmailOrCreate(email: string): RowId {
+  findByEmailOrCreate(email: string): User["id"] {
     const user = this.findByEmail(email);
     if (user) return user.id;
 
@@ -140,11 +129,23 @@ class UserRepository {
     Why:
     - Allows callers to decide how to interpret "0 rows affected"
   */
-  update(id: RowId, user: Omit<User, "id">): boolean {
+  update(user: Omit<User, "avatar_url">): boolean {
     const query = database.prepare(
       "update user set email = ?, name = ? where id = ? and deleted_at is null",
     );
-    const result = query.run(user.email, user.name, id);
+    const result = query.run(user.email, user.name, user.id);
+
+    return result.changes > 0;
+  }
+
+  /*
+    Update user avatar URL.
+  */
+  updateAvatar(id: User["id"], avatarUrl: string | null): boolean {
+    const query = database.prepare(
+      "update user set avatar_url = ? where id = ? and deleted_at is null",
+    );
+    const result = query.run(avatarUrl, id);
 
     return result.changes > 0;
   }
@@ -160,7 +161,7 @@ class UserRepository {
     - Marks the row as deleted without removing it
     - Default find queries automatically ignore it
   */
-  softDelete(id: RowId): boolean {
+  softDelete(id: User["id"]): boolean {
     const query = database.prepare(
       "update user set deleted_at = datetime('now') where id = ?",
     );

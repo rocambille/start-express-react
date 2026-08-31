@@ -27,7 +27,9 @@
 ├── src/
 │   ├── entry-client.tsx       # Client-side hydration (hydrateRoot)
 │   ├── entry-server.tsx       # SSR rendering (renderToPipeableStream)
-│   ├── env.ts                 # Environment schemas & validation (clientEnv / serverEnv)
+│   ├── env/                   # Environment schemas & validation
+│   │   ├── client.ts          # Client-side environment variables from import.meta.env
+│   │   └── server.ts          # Server-side environment variables from process.env
 │   ├── database/
 │   │   ├── schema.sql         # SQLite schema — source of truth for DB structure
 │   │   ├── migrations/        # Forward-only migration scripts (production)
@@ -41,13 +43,14 @@
 │   │           ├── <name>Actions.ts           # Request handlers (thin, delegate to repo)
 │   │           ├── <name>ParamConverter.ts    # Converts URL params to entity-typed objects
 │   │           ├── <name>Repository.ts        # All SQL queries for this entity
-│   │           └── <name>Validator.ts         # Zod schema + validate middleware
+│   │           ├── <name>Schemas.ts           # Single Source of Truth Zod schemas & types (ItemSchema, ItemDTOSchema)
+│   │           └── <name>Validators.ts        # Express validation middleware handlers ({ add, edit })
 │   ├── react/
 │   │   ├── routes.tsx         # React Router route tree
 │   │   ├── helpers/           # Hooks, mutations, fetch utilities
 │   │   └── components/        # UI components and pages
 │   └── types/
-│       └── index.d.ts         # Shared TypeScript types (Item, User, etc.)
+│       └── index.d.ts         # Shared ambient TypeScript types (Item, User) re-exported from schemas
 ├── tests/
 │   └── contracts              # API contract definitions — declarative source of truth
 └── biome.json                 # Lint + format config
@@ -173,26 +176,29 @@ const browse: RequestHandler = (req, res) => {
 };
 ```
 
-### Zod Output Parsing — never use `as Type`
+### Zod Output Parsing & Single Source of Truth (`*Schemas.ts`)
 
-SQLite returns raw SQL primitives (`string | number | bigint | null`). Always reconstruct objects by parsing them through a Zod schema bound to your TypeScript type (`z.ZodType<Item>`).
+Zod schemas are centralized per module in `*Schemas.ts` as a Single Source of Truth (SSOT). SQLite returns raw SQL primitives (`string | number | bigint | null`). Always reconstruct entity objects in repositories by parsing them through the master entity schema (`ItemSchema`, `UserSchema`).
 
-> **⚠️ CRITICAL**: Do NOT confuse the **Output Schema** (in `*Repository.ts`) with the **Input Schema** (in `*Validator.ts`). The Repository output schema only casts raw primitives to match the TypeScript type. It does NOT enforce business constraints (like `.email()` or `.min()`).
+Input DTO schemas (e.g. `ItemDTOSchema`) are derived from the master entity schema using `.omit()` to enforce DRY validation rules across boundaries.
 
 ```ts
-// In your Repository file
-import { z } from "zod";
-
-const itemSchema: z.ZodType<Item> = z.object({
+// In src/express/modules/item/itemSchemas.ts
+export const ItemSchema = z.object({
   id: z.number(),
-  title: z.string(),
-  user_id: z.number()
+  title: z.string().max(255),
+  user_id: z.number(),
 });
 
-// ✅ Correct
-return itemSchema.parse(row);
+export const ItemDTOSchema = ItemSchema.omit({ id: true, user_id: true });
 
-// ❌ Wrong — hides runtime errors
+// In src/express/modules/item/itemRepository.ts
+import { ItemSchema } from "./itemSchemas";
+
+// ✅ Correct — validates SQL raw row against schema
+return ItemSchema.parse(row);
+
+// ❌ Wrong — hides runtime SQL errors
 return row as Item;
 ```
 
@@ -226,16 +232,22 @@ The `destroy` action uses `softDelete` (sets `deleted_at = datetime('now')`), no
 
 ### Validation at the edge with Zod
 
-Input validation belongs in a `*Validator.ts` file using Zod, registered as middleware before actions in `*Routes.ts`. Actions receive already-validated data — they do not re-validate.
+Input validation belongs in a `*Validators.ts` file using `createValidator` and DTO schemas from `*Schemas.ts`, registered as middleware before actions in `*Routes.ts`. Validators merge client DTO input with trusted server-side injections (`inject: (req) => ({ user_id: req.me.id })`), so actions receive complete, trusted payloads (`req.body`).
 
 ```ts
+// In itemValidators.ts
+const add = createValidator(
+  { body: ItemDTOSchema },
+  { inject: (req) => ({ user_id: req.me.id }) }
+);
+
 // In itemRoutes.ts
-router.post(BASE_PATH, itemValidator.validate, itemActions.add);
+router.post(BASE_PATH, itemValidators.add, itemActions.add);
 ```
 
 ### Pagination
 
-Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` from `req.query.start`. Never query a table without a LIMIT.
+Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. Never query a table without a LIMIT.
 
 ### API contract tests
 
@@ -285,9 +297,14 @@ StartER has no file upload handling. If adding one, store files outside the docu
 
 ### Environment variables
 
-Environment variables are defined and validated in `src/env.ts` using separate Zod schemas: `clientEnv` (browser-accessible via `import.meta.env`) and `serverEnv` (server-only via `process.env`). Import `serverEnv` for Node.js server code and `clientEnv` for frontend/shared helpers.
+Environment variables are defined and validated in `src/env/client.ts` (client) and `src/env/server.ts` (server). Import `{ serverEnv }` from `env/server` (if you are in server code) or `{ clientEnv }` from `env/client` (if you are in frontend code).
 
-Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`. Generate `APP_SECRET` with `openssl rand -hex 32`.
+- `APP_SECRET`: Secret key for JWT signing. Generate with `openssl rand -hex 32`.
+- `SMTP_URL`: Optional in development (magic links print to console); required in production.
+- `DKIM_PRIVATE_KEY`: Optional path to private key file or inline PEM string for DKIM signing.
+- `DKIM_DOMAIN` / `DKIM_SELECTOR`: Optional domain and selector overrides (auto-derived from SMTP_URL hostname and `"mail"` if omitted).
+
+Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.gitignore`.
 
 ---
 
@@ -295,10 +312,11 @@ Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.g
 
 | Term | What it means in this codebase |
 |---|---|
-| **Module** | A self-contained Express feature folder: `*Routes.ts`, `*Actions.ts`, `*Repository.ts`, `*Validator.ts` |
+| **Module** | A self-contained Express feature folder: `*Routes.ts`, `*Actions.ts`, `*Repository.ts`, `*Schemas.ts`, `*Validators.ts` |
 | **Action** | An Express `RequestHandler` — thin, delegates to repository, sends HTTP response |
 | **Repository** | Class encapsulating all SQL for one table — the only place raw SQL is allowed |
-| **Validator** | Zod schema + Express middleware that validates `req.body` before the action runs |
+| **Schema** | Centralized Zod schema in `*Schemas.ts` defining master entity and derived input DTO shapes |
+| **Validator** | Express middleware in `*Validators.ts` created via `createValidator` to validate request targets |
 | **Contract** | A test declaration in `tests/contracts/` describing expected API behavior |
 | **SSR outlet** | The `<!--ssr-outlet-->` placeholder in `index.html` where server-rendered HTML is injected |
 | **Hydration** | Client-side React taking over the server-rendered DOM via `hydrateRoot` in `entry-client.tsx` |

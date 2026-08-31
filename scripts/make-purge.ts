@@ -56,11 +56,24 @@ async function purgeItems(rootDir: string) {
   await remove(rootDir, "src/express/modules/item");
   await remove(rootDir, "src/react/components/item");
   await remove(rootDir, "tests/react/components/item");
+  await remove(rootDir, "tests/fixtures/items.ts");
+  await remove(rootDir, "tests/contracts/items.ts");
+
+  // Remove item import and fixture seeding in test-utils.ts
+  await updateFile(rootDir, "tests/express/test-utils.ts", (content) => {
+    const itemInsertRegex = / {2}\/\* insert all items \*\/[\s\S]*?\}\n\n?/m;
+    return content
+      .replace(`import { allItems } from "../fixtures/items";\n`, "")
+      .replace(itemInsertRegex, "");
+  });
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
     content
-      .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
+      .replace(
+        /import itemRoutes from "\.\/modules\/item\/itemRoutes";\n+/m,
+        "",
+      )
       .replace(`router.use(itemRoutes);\n`, ""),
   );
 
@@ -85,7 +98,10 @@ async function purgeItems(rootDir: string) {
 
   // Remove Item type.
   await updateFile(rootDir, "src/types/index.d.ts", (content) =>
-    content.replace(/type Item = \{[\s\S]*?\};\n\n?/m, ""),
+    content.replace(
+      `type Item = import("../express/modules/item/itemSchemas").Item;\n`,
+      "",
+    ),
   );
 
   // Remove item link from NavBar.
@@ -126,11 +142,12 @@ async function purgeAuth(rootDir: string) {
     return content.replace(userInsertRegex, "");
   });
 
-  // Remove User and MagicLinkToken types.
+  // Remove User type.
   await updateFile(rootDir, "src/types/index.d.ts", (content) =>
-    content
-      .replace(/type User = \{[\s\S]*?\};\n\n?/m, "")
-      .replace(/type MagicLinkToken = \{[\s\S]*?\};\n\n?/m, ""),
+    content.replace(
+      `type User = import("../express/modules/user/userSchemas").User;\n`,
+      "",
+    ),
   );
 
   // Remove auth imports, loader, and auth routes from routes.tsx.
@@ -140,7 +157,7 @@ async function purgeAuth(rootDir: string) {
       .replace(`import AccountPage from "./components/auth/AccountPage";\n`, "")
       .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
       .replace(
-        `import { AuthProvider } from "./components/auth/AuthContext";\n`,
+        `import { AuthProvider } from "./components/auth/MeContext";\n`,
         "",
       )
       // Simplify RouteObject import (remove useLoaderData)
@@ -174,10 +191,10 @@ async function purgeAuth(rootDir: string) {
         `import { Outlet, useLocation } from "react-router";`,
         `import { Outlet } from "react-router";`,
       )
-      .replace(`import { useAuth } from "./auth/AuthContext";\n`, "")
+      .replace(`import { useMe } from "./auth/MeContext";\n`, "")
       .replace(`import MagicLinkForm from "./auth/MagicLinkForm";\n`, "")
       // Remove auth hooks
-      .replace(`  const { check } = useAuth();\n`, "")
+      .replace(`  const { isAuthenticated } = useMe();\n`, "")
       .replace(`  const location = useLocation();\n\n`, "")
       // Replace conditional rendering with simple Suspense + Outlet
       .replace(
@@ -189,8 +206,8 @@ async function purgeAuth(rootDir: string) {
   // Remove auth-related code from NavBar.tsx.
   await updateFile(rootDir, "src/react/components/NavBar.tsx", (content) =>
     content
-      .replace(`import { useAuth } from "./auth/AuthContext";\n\n`, "")
-      .replace(`  const { check } = useAuth();\n`, "")
+      .replace(`import { useMe } from "./auth/MeContext";\n\n`, "")
+      .replace(`  const { isAuthenticated } = useMe();\n`, "")
       // After purgeItems, only the account link remains in the auth block.
       // Remove the whole conditional block.
       .replace(/ {8}\{check\(\) && \(\n[\s\S]*?\n {8}\)}\n/m, ""),

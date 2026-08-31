@@ -18,19 +18,8 @@
   - Soft delete is the default find behavior
 */
 
-import { z } from "zod";
-
 import database from "../../../database";
-
-/* ************************************************************************ */
-/* Schemas                                                                  */
-/* ************************************************************************ */
-
-const itemSchema: z.ZodType<Item> = z.object({
-  id: z.number(),
-  title: z.string(),
-  user_id: z.number(),
-});
+import { type ItemDTOWithUserId, ItemSchema } from "./itemSchemas";
 
 /* ************************************************************************ */
 /* Repository                                                               */
@@ -52,7 +41,7 @@ class ItemRepository {
     - No validation here (done earlier in the pipeline)
     - Assumes referential integrity (user_id exists)
   */
-  create(item: Omit<Item, "id">): RowId {
+  create(item: ItemDTOWithUserId): Item["id"] {
     const result = database
       .prepare("insert into item (title, user_id) values (?, ?)")
       .run(item.title, item.user_id);
@@ -74,14 +63,14 @@ class ItemRepository {
     Why null instead of throwing:
     - Allows upper layers to decide HTTP semantics (404, 204, etc.)
   */
-  find(id: RowId): Item | null {
+  find(id: Item["id"]): Item | null {
     const row = database
       .prepare(
         "select id, title, user_id from item where id = ? and deleted_at is null",
       )
       .get(id);
 
-    return row ? itemSchema.parse(row) : null;
+    return row ? ItemSchema.parse(row) : null;
   }
 
   /*
@@ -97,7 +86,21 @@ class ItemRepository {
       )
       .all(limit, offset);
 
-    return rows.map((row) => itemSchema.parse(row));
+    return rows.map((row) => ItemSchema.parse(row));
+  }
+
+  /*
+    Count all non-deleted items.
+
+    Notes:
+    - Used alongside findAll to compute pagination totals
+  */
+  count(): number {
+    const row = database
+      .prepare("select count(*) as total from item where deleted_at is null")
+      .get();
+
+    return Number(row?.total);
   }
 
   /* ********************************************************************** */
@@ -114,12 +117,12 @@ class ItemRepository {
     Why:
     - Allows callers to decide how to interpret "0 rows affected"
   */
-  update(id: RowId, item: Omit<Item, "id">): boolean {
+  update(item: Item): boolean {
     const result = database
       .prepare(
         "update item set title = ?, user_id = ? where id = ? and deleted_at is null",
       )
-      .run(item.title, item.user_id, id);
+      .run(item.title, item.user_id, item.id);
 
     return result.changes > 0;
   }
@@ -135,7 +138,7 @@ class ItemRepository {
     - Marks the row as deleted without removing it
     - Default find queries automatically ignore it
   */
-  softDelete(id: RowId): boolean {
+  softDelete(id: Item["id"]): boolean {
     const result = database
       .prepare("update item set deleted_at = datetime('now') where id = ?")
       .run(id);
@@ -146,7 +149,7 @@ class ItemRepository {
   /*
     Restore a soft-deleted item.
   */
-  softUndelete(id: RowId): boolean {
+  softUndelete(id: Item["id"]): boolean {
     const result = database
       .prepare("update item set deleted_at = null where id = ?")
       .run(id);
@@ -160,7 +163,7 @@ class ItemRepository {
     Warning:
     - This permanently removes the row
   */
-  hardDelete(id: RowId): boolean {
+  hardDelete(id: Item["id"]): boolean {
     const result = database.prepare("delete from item where id = ?").run(id);
 
     return result.changes > 0;

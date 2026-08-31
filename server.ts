@@ -28,7 +28,7 @@
  * - https://vitejs.dev/guide/ssr
  */
 
-import { serverEnv } from "./src/env";
+import { serverEnv } from "./src/env/server";
 
 /* ************************************************************************ */
 /*                                  Startup                                 */
@@ -103,6 +103,7 @@ import http from "node:http";
 import express, { type ErrorRequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
+import { MulterError } from "multer";
 
 export async function createServerWith(routesPath: string) {
   const app = express();
@@ -141,6 +142,12 @@ export async function createServerWith(routesPath: string) {
 
     app.use(limiter);
   }
+
+  /* ********************************************************************** */
+  /* Static file serving                                                    */
+  /* ********************************************************************** */
+
+  app.use("/uploads", express.static("./data/uploads"));
 
   /* ********************************************************************** */
   /* API routes                                                             */
@@ -238,6 +245,11 @@ export async function createServerWith(routesPath: string) {
     Stack traces are hidden in production to avoid leaking implementation details.
   */
   const sendErrors: ErrorRequestHandler = (err, _req, res, _next) => {
+    if (err instanceof MulterError && err.code === "LIMIT_FILE_SIZE") {
+      res.sendStatus(400);
+      return;
+    }
+
     const status = err.status ?? err.statusCode ?? 500;
 
     res.status(status).json({

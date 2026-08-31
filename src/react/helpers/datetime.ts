@@ -20,7 +20,7 @@
   ```
 */
 
-import { clientEnv } from "../../env";
+import { clientEnv } from "../../env/client";
 
 /**
  * The default timezone to use for date and time operations.

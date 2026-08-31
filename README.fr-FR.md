@@ -29,7 +29,7 @@ StartER est un framework open-source pour **apprendre** et **construire** des ap
 * Backend Express
 * Frontend React
 * Types et contrats partagés pour la vérification de l'API
-* Une architecture « sans magie » où vous comprenez chaque ligne
+* Une architecture "sans magie" où vous comprenez chaque ligne
 
 Que vous soyez étudiant·e, en reconversion, ou développeur·se expérimenté·e qui prototype une nouvelle idée, StartER vous offre une base solide et lisible.
 
@@ -65,7 +65,7 @@ npm run dev
 Ne laissez pas l'IA "deviner" votre architecture. Utilisez `make:clone` pour répliquer la logique fonctionnelle.
 
 ```bash
-npm run make:clone -- src/express/modules/item src/express/modules/task item task
+npm run make:clone -- src/express/modules/item src/express/modules/task Item Task
 ```
 Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agent IA reste ainsi concentré et précis.
 
@@ -83,7 +83,7 @@ Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : u
 
 * **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
 
-* **Validation de sortie avec Zod :** typage des données aux emplacements clés à l'aide de schémas Zod. Ceci évite les bugs silencieux souvent introduits par l'IA.
+* **Schémas comme cource unique de Vvrité :** des schémas Zod centralisés dans `*Schemas.ts` qui valident les entrées HTTP et analysent les sorties de la base de données pour éviter les bugs silencieux.
 
 * **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
 

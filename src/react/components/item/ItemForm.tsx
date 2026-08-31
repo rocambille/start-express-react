@@ -19,7 +19,11 @@ import { z } from "zod";
 import type { $ZodIssue as ZodIssue } from "zod/v4/core";
 import { FormError, hasError } from "../FormError";
 
-const itemSchema = z.object({
+// 1. Define the shape using the shared ambient Item type
+type ItemFormValues = Pick<Item, "title">;
+
+// 2. Annotate the Zod schema with z.ZodType<ItemFormValues>
+const ItemFormSchema: z.ZodType<ItemFormValues> = z.object({
   title: z.string().min(1, "Title is required"),
 });
 
@@ -56,18 +60,15 @@ function ItemForm({ children, defaultValue, action }: ItemFormProps) {
         /*
           Form submission flow:
 
-          1. Read raw values from FormData
-          2. Perform minimal synchronous validation
-          3. Delegate side effects to the caller
+          1. Perform minimal synchronous validation
+          2. Delegate side effects to the caller
         */
-
-        const title = formData.get("title")?.toString();
 
         /*
           Client-side validation can be done here for better UX.
           The API remains the source of truth for data integrity.
         */
-        const parsed = itemSchema.safeParse({ title });
+        const parsed = ItemFormSchema.safeParse(Object.fromEntries(formData));
 
         if (!parsed.success) {
           setErrors(parsed.error.issues);

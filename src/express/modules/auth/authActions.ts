@@ -21,7 +21,7 @@ import type { CookieOptions, RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
-import { serverEnv } from "../../../env";
+import { serverEnv } from "../../../env/server";
 import userRepository from "../user/userRepository";
 import authRepository from "./authRepository";
 
@@ -82,7 +82,17 @@ class TokenSigner<Payload extends JwtPayload | string = JwtPayload> {
 const tokenSigner = new TokenSigner(serverEnv.APP_SECRET);
 
 const transporter = serverEnv.SMTP_URL
-  ? nodemailer.createTransport(serverEnv.SMTP_URL)
+  ? nodemailer.createTransport({
+      url: serverEnv.SMTP_URL,
+      ...(serverEnv.DKIM_PRIVATE_KEY &&
+        serverEnv.DKIM_DOMAIN && {
+          dkim: {
+            domainName: serverEnv.DKIM_DOMAIN,
+            keySelector: serverEnv.DKIM_SELECTOR,
+            privateKey: serverEnv.DKIM_PRIVATE_KEY,
+          },
+        }),
+    })
   : null;
 
 const trustedBaseUrl = serverEnv.APP_BASE_URL.replace(/\/+$/, "");

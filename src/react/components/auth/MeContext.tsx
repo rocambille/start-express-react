@@ -1,15 +1,15 @@
 /*
   Purpose:
-  Centralize authentication state and actions for the React application.
+  Centralize current user (me) session state and actions for the React application.
 
   This context:
   - Stores the currently authenticated user (or null)
-  - Exposes high-level auth actions (sendMagicLink, verifyMagicLink, logout)
-  - Performs an initial session check on mount (/api/users/me)
+  - Exposes authentication actions (sendMagicLink, verifyMagicLink, logout)
+  - Exposes profile management actions (updateMe, deleteMe, uploadMeAvatar)
 
   Usage:
-  - Wrap the app with <AuthProvider>
-  - Access auth state and actions via the useAuth() hook
+  - Wrap the app with <MeProvider>
+  - Access user state and actions via the useMe() hook
 */
 
 import {
@@ -19,22 +19,23 @@ import {
   useContext,
   useState,
 } from "react";
-import { getOrFetch } from "../../helpers/cache";
+import { forget, getOrFetch } from "../../helpers/cache";
 import { apiMutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
 /* Types                                                                    */
 /* ************************************************************************ */
 
-type AuthContextType = {
-  me: User | null;
-  check: () => boolean;
+type MeContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
   sendMagicLink: (email: string) => Promise<void>;
   verifyMagicLink: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   updateMe: (
-    newMe: Omit<User, "id" | "created_at" | "deleted_at">,
+    newMe: Omit<User, "id" | "created_at" | "deleted_at" | "avatar_url">,
   ) => Promise<void>;
+  updateMeAvatar: (fileOrNull: File | null) => Promise<void>;
   deleteMe: () => Promise<void>;
 };
 
@@ -42,13 +43,13 @@ type AuthContextType = {
 /* Context                                                                  */
 /* ************************************************************************ */
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const MeContext = createContext<MeContextType | null>(null);
 
 /* ************************************************************************ */
 /* Provider                                                                 */
 /* ************************************************************************ */
 
-export function AuthProvider({
+export function MeProvider({
   children,
   initialUser,
 }: PropsWithChildren<{ initialUser?: User | null }>) {
@@ -79,13 +80,30 @@ export function AuthProvider({
   }, []);
 
   const updateMe = useCallback(
-    async (newMe: Omit<User, "id" | "created_at" | "deleted_at">) => {
+    async (
+      newMe: Omit<User, "id" | "created_at" | "deleted_at" | "avatar_url">,
+    ) => {
       await apiMutate("/api/users/me", "put", newMe);
 
+      forget("/api/users/me");
       setUser(await getOrFetch<User | null>("/api/users/me"));
     },
     [],
   );
+
+  const updateMeAvatar = useCallback(async (fileOrNull: File | null) => {
+    if (fileOrNull == null) {
+      await apiMutate("/api/users/me/avatar", "delete");
+    } else {
+      const formData = new FormData();
+      formData.append("avatar", fileOrNull);
+
+      await apiMutate("/api/users/me/avatar", "post", formData);
+    }
+
+    forget("/api/users/me");
+    setUser(await getOrFetch<User | null>("/api/users/me"));
+  }, []);
 
   const deleteMe = useCallback(async () => {
     await apiMutate("/api/users/me", "delete");
@@ -98,19 +116,20 @@ export function AuthProvider({
   /* ********************************************************************** */
 
   return (
-    <AuthContext
+    <MeContext
       value={{
-        me: user,
-        check: () => user != null,
+        user,
+        isAuthenticated: user != null,
         sendMagicLink,
         verifyMagicLink,
         logout,
         updateMe,
+        updateMeAvatar,
         deleteMe,
       }}
     >
       {children}
-    </AuthContext>
+    </MeContext>
   );
 }
 
@@ -118,11 +137,11 @@ export function AuthProvider({
 /* Consumer hook                                                            */
 /* ************************************************************************ */
 
-export const useAuth = () => {
-  const value = useContext(AuthContext);
+export const useMe = () => {
+  const value = useContext(MeContext);
 
   if (value == null) {
-    throw new Error("useAuth has to be used within <AuthProvider />");
+    throw new Error("useMe has to be used within <MeProvider />");
   }
 
   return value;

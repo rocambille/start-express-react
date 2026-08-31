@@ -8,15 +8,15 @@ This repository is a **GitHub template**: a project starter, similar to what a `
 
 The versioning scheme carries an explicit compatibility contract:
 
-- **Within a month (`YYYY.MM.x`)**: only hotfixes and security patches — no breaking changes. Rebasing your project onto a newer same-month release is safe.
+- **Within a month (`YYYY.MM.x`)**: only hotfixes and security patches, no breaking changes. Rebasing your project onto a newer same-month release is safe.
 - **Across months (`YYYY.MM` → `YYYY.MM+1`)**: may include breaking changes. The upcoming release is tracked via an open PR merging `dev` into `main`, so changes are visible in advance.
 
 Because each release is a clean git snapshot, users who started from an older release can always **diff two releases** to identify relevant fixes and cherry-pick them into their own project.
 
 | Branch | Purpose |
 | ------ | ------- |
-| `main` | Current stable release — receives hotfixes and security patches during the month |
-| `dev`  | Next month's release in progress — new features and breaking changes, tracked via an open PR |
+| `main` | Current stable release: receives hotfixes and security patches during the month |
+| `dev`  | Next month's release in progress: new features and breaking changes, tracked via an open PR |
 
 ## Reporting a Vulnerability
 

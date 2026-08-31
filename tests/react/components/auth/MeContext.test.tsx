@@ -1,9 +1,9 @@
 import { act, screen } from "@testing-library/react";
 
 import {
-  AuthProvider,
-  useAuth,
-} from "../../../../src/react/components/auth/AuthContext";
+  MeProvider,
+  useMe,
+} from "../../../../src/react/components/auth/MeContext";
 import {
   expectContractCall,
   renderHookAsync,
@@ -12,7 +12,7 @@ import {
   setupMocks,
 } from "../../test-utils";
 
-describe("React Components: AuthContext", () => {
+describe("React Components: MeContext", () => {
   beforeEach(() => {
     setupMocks();
   });
@@ -22,12 +22,12 @@ describe("React Components: AuthContext", () => {
     vi.unstubAllGlobals();
   });
 
-  describe("<AuthProvider />", () => {
+  describe("<MeProvider />", () => {
     it("should render its children", async () => {
       await renderWithStub({
         path: "/",
         Component: () => (
-          <AuthProvider initialUser={null}>hello, world!</AuthProvider>
+          <MeProvider initialUser={null}>hello, world!</MeProvider>
         ),
         initialEntries: ["/"],
         me: null,
@@ -37,36 +37,36 @@ describe("React Components: AuthContext", () => {
     });
   });
 
-  describe("useAuth()", () => {
-    it("should be used within <AuthProvider>", async () => {
+  describe("useMe()", () => {
+    it("should be used within <MeProvider>", async () => {
       // Avoid exception noise in console
       vi.spyOn(console, "error").mockImplementationOnce(() => {});
 
-      await expect(renderHookAsync(() => useAuth())).rejects.toThrow(
-        /\buseAuth\b.*\bwithin\b.*\bAuthProvider\b/i,
+      await expect(renderHookAsync(() => useMe())).rejects.toThrow(
+        /\buseMe\b.*\bwithin\b.*\bMeProvider\b/i,
       );
     });
-    it("should return an auth object", async () => {
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
+    it("should return a me object", async () => {
+      const { result } = await renderHookAsync(() => useMe(), {
+        wrapper: MeProvider,
       });
 
       const auth = result.current;
 
       expect(auth).toBeDefined();
     });
-    it("should return a check function", async () => {
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
+    it("should return an isAuthenticated boolean", async () => {
+      const { result } = await renderHookAsync(() => useMe(), {
+        wrapper: MeProvider,
       });
 
       const auth = result.current;
 
-      expect(auth.check()).toBe(auth.me != null);
+      expect(auth.isAuthenticated).toBe(auth.user != null);
     });
     it("should return a sendMagicLink function", async () => {
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
+      const { result } = await renderHookAsync(() => useMe(), {
+        wrapper: MeProvider,
       });
 
       const auth = result.current;
@@ -81,8 +81,8 @@ describe("React Components: AuthContext", () => {
       expectContractCall("auth", "magic_link", "success");
     });
     it("should return a verifyMagicLink function", async () => {
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
+      const { result } = await renderHookAsync(() => useMe(), {
+        wrapper: MeProvider,
       });
 
       const auth = result.current;
@@ -97,8 +97,8 @@ describe("React Components: AuthContext", () => {
       expectContractCall("auth", "verify", "success");
     });
     it("should return a logout function", async () => {
-      const { result } = await renderHookAsync(() => useAuth(), {
-        wrapper: AuthProvider,
+      const { result } = await renderHookAsync(() => useMe(), {
+        wrapper: MeProvider,
       });
 
       const auth = result.current;

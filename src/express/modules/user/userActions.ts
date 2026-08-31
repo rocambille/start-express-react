@@ -21,6 +21,7 @@
 
 import type { RequestHandler } from "express";
 
+import { deleteUploadedFile } from "../../helpers/upload";
 import userRepository from "./userRepository";
 
 /* ************************************************************************ */
@@ -50,7 +51,7 @@ const readMe: RequestHandler = (req, res) => {
   - 204 No Content on success
 */
 const editMe: RequestHandler = (req, res) => {
-  userRepository.update(req.me.id, req.body);
+  userRepository.update(req.body);
 
   res.sendStatus(204);
 };
@@ -73,6 +74,47 @@ const destroyMe: RequestHandler = (req, res) => {
 };
 
 /* ************************************************************************ */
+
+/*
+  Upload avatar image for the currently authenticated user.
+
+  Preconditions:
+  - User is authenticated
+  - Multer middleware has processed and attached req.file
+*/
+const uploadMeAvatar: RequestHandler = (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ message: "No file attached" });
+    return;
+  }
+
+  const oldAvatarUrl = req.me.avatar_url;
+  const newAvatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+  userRepository.updateAvatar(req.me.id, newAvatarUrl);
+  deleteUploadedFile(oldAvatarUrl);
+
+  res.status(201).json({ avatar_url: newAvatarUrl });
+};
+
+/* ************************************************************************ */
+
+/*
+  Delete avatar image for the currently authenticated user.
+
+  Preconditions:
+  - User is authenticated
+*/
+const deleteMeAvatar: RequestHandler = (req, res) => {
+  const oldAvatarUrl = req.me.avatar_url;
+
+  userRepository.updateAvatar(req.me.id, null);
+  deleteUploadedFile(oldAvatarUrl);
+
+  res.sendStatus(204);
+};
+
+/* ************************************************************************ */
 /* Export                                                                   */
 /* ************************************************************************ */
 
@@ -80,4 +122,6 @@ export default {
   readMe,
   editMe,
   destroyMe,
+  uploadMeAvatar,
+  deleteMeAvatar,
 };

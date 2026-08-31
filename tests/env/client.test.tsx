@@ -1,4 +1,4 @@
-import { clientEnvSchema } from "../src/env";
+import { clientEnvSchema } from "../../src/env/client";
 
 describe("clientEnvSchema", () => {
   it("should validate valid environment variables", () => {
