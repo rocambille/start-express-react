@@ -16,7 +16,6 @@ export async function main(
 
   const database = new DatabaseSync(databasePath);
 
-  console.info();
   console.info(`\tUsing database ${databasePath}`);
   console.info(`\tType ${EXIT_COMMAND} to close the interface`);
   console.info();
