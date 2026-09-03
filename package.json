@@ -15,6 +15,7 @@
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
     "database:migrate": "tsx --env-file=.env scripts/database-migrate",
     "database:reset": "tsx --env-file=.env scripts/database-reset",
+    "database:repl": "tsx --env-file=.env scripts/database-repl data/sqlite/database.sqlite",
     "dev": "tsx watch --include .env --env-file=.env server",
     "install:check": "vitest run tests/install",
     "make:clone": "tsx  --env-file=.env scripts/make-clone",
