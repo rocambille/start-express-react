@@ -52,7 +52,8 @@
 │   └── types/
 │       └── index.d.ts         # Shared ambient TypeScript types (Item, User) re-exported from schemas
 ├── tests/
-│   └── contracts              # API contract definitions — declarative source of truth
+│   ├── contracts              # API contract definitions — declarative source of truth
+│   └── fixtures               # Central mock fixtures & database seeders (ordered by FK)
 └── biome.json                 # Lint + format config
 ```
 

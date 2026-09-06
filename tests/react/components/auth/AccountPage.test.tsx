@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 
 import AccountPage from "../../../../src/react/components/auth/AccountPage";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -24,7 +24,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("heading", { level: 1, name: /account/i });
@@ -35,7 +35,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.clear(screen.getByRole("textbox", { name: /email/i }));
@@ -58,7 +58,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.clear(screen.getByRole("textbox", { name: /email/i }));
@@ -76,7 +76,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.click(screen.getByRole("button", { name: /log out/i }));
@@ -91,7 +91,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.click(screen.getByRole("button", { name: /delete/i }));
@@ -106,7 +106,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockClear();
@@ -127,7 +127,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     const file = new window.File(
@@ -159,7 +159,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: fooUser,
+      me: standardUser,
     });
 
     const file = new window.File(
@@ -183,7 +183,7 @@ describe("<AccountPage />", () => {
       path: "/",
       Component: AccountPage,
       initialEntries: ["/"],
-      me: { ...fooUser, avatar_url: "/uploads/avatars/foo.webp" },
+      me: { ...standardUser, avatar_url: "/uploads/avatars/foo.webp" },
     });
 
     const removeButton = screen.getByRole("button", { name: /remove avatar/i });

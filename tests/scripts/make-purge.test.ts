@@ -243,6 +243,25 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).toContain("authRoutes");
       expect(result).toContain("userRoutes");
     });
+
+    it("removes item fixtures from tests/fixtures/index.ts", async () => {
+      await scaffoldProject(tmpDir);
+
+      const content = await fs.readFile(
+        path.join(tmpDir, "tests/fixtures/index.ts"),
+        "utf8",
+      );
+
+      const result = content
+        .replace(`import { seedItems } from "./items";\n`, "")
+        .replace(`  seedItems,\n`, "")
+        .replace(`export * from "./items";\n`, "");
+
+      expect(result).not.toContain("seedItems");
+      expect(result).not.toContain('"./items"');
+      expect(result).toContain("seedUsers");
+      expect(result).toContain("seedAuthTokens");
+    });
   });
 
   describe("purgeAuth", () => {
