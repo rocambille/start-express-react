@@ -300,7 +300,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).toContain("insert into item");
     });
 
-    it("removes User and MagicLinkToken types from index.d.ts", async () => {
+    it("removes User types from index.d.ts", async () => {
       await scaffoldProject(tmpDir);
 
       const content = await fs.readFile(
