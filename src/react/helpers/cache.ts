@@ -46,15 +46,13 @@ export const getOrFetch = <T>(
     ? `${url}\0${JSON.stringify(options.headers)}`
     : url;
 
-  // Try to get a cached Promise
-  const cachedPromise = promisesByUrl.get(cacheKey);
-
-  if (cachedPromise) {
-    return cachedPromise as Promise<T>;
+  // In browser, check the cache for an existing Promise
+  if (typeof window !== "undefined") {
+    const cachedPromise = promisesByUrl.get(cacheKey);
+    if (cachedPromise) return cachedPromise as Promise<T>;
   }
 
-  // Or fetch a new one and cache it
-
+  // Fetch new data
   const parse: NonNullable<NonNullable<typeof options>["parse"]> =
     options?.parse ?? ((response: Response) => response.json());
 
@@ -68,7 +66,10 @@ export const getOrFetch = <T>(
     return parse(response);
   });
 
-  promisesByUrl.set(cacheKey, promise);
+  // In browser, cache the Promise
+  if (typeof window !== "undefined") {
+    promisesByUrl.set(cacheKey, promise);
+  }
 
   return promise;
 };
