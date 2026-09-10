@@ -5,7 +5,7 @@ vi.mock("react-router", { spy: true });
 
 import ItemEdit from "../../../../src/react/components/item/ItemEdit";
 import { allItems } from "../../../fixtures/items";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -31,7 +31,7 @@ describe("<ItemEdit />", () => {
       path: "/items/:id/edit",
       Component: ItemEdit,
       initialEntries: [`/items/${allItems[0].id}/edit`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("button");
@@ -42,7 +42,7 @@ describe("<ItemEdit />", () => {
         path: "/items/:id/edit",
         Component: ItemEdit,
         initialEntries: [`/items/${NaN}/edit`],
-        me: fooUser,
+        me: standardUser,
       }),
     ).rejects.toThrow(/404/i);
   });
@@ -51,7 +51,7 @@ describe("<ItemEdit />", () => {
       path: "/items/:id/edit",
       Component: ItemEdit,
       initialEntries: [`/items/${allItems[0].id}/edit`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.clear(screen.getByLabelText(/title/i));

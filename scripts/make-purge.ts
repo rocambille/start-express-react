@@ -59,13 +59,13 @@ async function purgeItems(rootDir: string) {
   await remove(rootDir, "tests/fixtures/items.ts");
   await remove(rootDir, "tests/contracts/items.ts");
 
-  // Remove item import and fixture seeding in test-utils.ts
-  await updateFile(rootDir, "tests/express/test-utils.ts", (content) => {
-    const itemInsertRegex = / {2}\/\* insert all items \*\/[\s\S]*?\}\n\n?/m;
-    return content
-      .replace(`import { allItems } from "../fixtures/items";\n`, "")
-      .replace(itemInsertRegex, "");
-  });
+  // Remove item fixtures from central registry.
+  await updateFile(rootDir, "tests/fixtures/index.ts", (content) =>
+    content
+      .replace(`import { seedItems } from "./items";\n`, "")
+      .replace(`  seedItems,\n`, "")
+      .replace(`export * from "./items";\n`, ""),
+  );
 
   // Remove item routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
@@ -165,10 +165,10 @@ async function purgeAuth(rootDir: string) {
         `import { type RouteObject, useLoaderData } from "react-router";`,
         `import type { RouteObject } from "react-router";`,
       )
-      // Remove AuthProvider wrapper and useLoaderData usage
+      // Remove MeProvider wrapper and useLoaderData usage
       .replace(
         /Component: \(\) => \{[\s\S]*?\},\n/m,
-        `Component: () => {\n      return (\n        <DataRefreshProvider>\n          <Layout />\n        </DataRefreshProvider>\n      );\n    },\n`,
+        `Component: () => {\n      return <Layout />;\n    },\n`,
       )
       // Remove the loader
       .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")

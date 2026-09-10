@@ -5,7 +5,7 @@ vi.mock("react-router", { spy: true });
 
 import ItemDeleteForm from "../../../../src/react/components/item/ItemDeleteForm";
 import { allItems } from "../../../fixtures/items";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -30,7 +30,7 @@ describe("<ItemDeleteForm />", () => {
       path: "/items/:id",
       Component: ItemDeleteForm,
       initialEntries: [`/items/${allItems[0].id}`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("button");
@@ -40,7 +40,7 @@ describe("<ItemDeleteForm />", () => {
       path: "/items/:id",
       Component: ItemDeleteForm,
       initialEntries: [`/items/${allItems[0].id}`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.click(screen.getByRole("button"));

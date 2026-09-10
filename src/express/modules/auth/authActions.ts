@@ -124,7 +124,7 @@ const sendMagicLink: RequestHandler = async (req, res) => {
 
   // Store in DB
   const expiresAt = new Date(Date.now() + magicLinkTimeout);
-  authRepository.insertOrReplaceToken(userId, tokenHash, expiresAt);
+  authRepository.insertToken(userId, tokenHash, expiresAt);
 
   const magicLink = `${trustedBaseUrl}/verify?token=${rawToken}`;
 
@@ -164,24 +164,14 @@ const verifyMagicLink: RequestHandler = (req, res) => {
 
   try {
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-    const storedToken = authRepository.findByHash(tokenHash);
 
-    if (storedToken == null) {
-      throw new Error("Invalid token");
+    const userId = authRepository.consume(tokenHash);
+
+    if (userId == null) {
+      throw new Error("Invalid, expired, or already consumed token");
     }
 
-    if (storedToken.consumed_at != null) {
-      throw new Error("Token already consumed");
-    }
-
-    if (new Date(storedToken.expires_at) < new Date()) {
-      throw new Error("Token expired");
-    }
-
-    // Mark as consumed
-    authRepository.markAsConsumed(storedToken.user_id);
-
-    const user = userRepository.find(storedToken.user_id);
+    const user = userRepository.find(userId);
 
     if (user == null) {
       throw new Error("User not found");

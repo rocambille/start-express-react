@@ -1,6 +1,7 @@
 import { cookies } from "supertest";
 
-import { fooUser } from "../fixtures/users";
+import { authTokens } from "../fixtures/auth";
+import { standardUser } from "../fixtures/users";
 
 export default (<Contract>{
   magic_link: {
@@ -10,7 +11,7 @@ export default (<Contract>{
       success: {
         request: {
           body: {
-            email: fooUser.email,
+            email: standardUser.email,
           },
         },
         response: {
@@ -40,12 +41,12 @@ export default (<Contract>{
       success: {
         request: {
           body: {
-            token: "success_token",
+            token: authTokens.success,
           },
         },
         response: {
           status: 201,
-          body: fooUser,
+          body: standardUser,
           and: () => {
             expect(
               cookies.set({
@@ -90,7 +91,7 @@ export default (<Contract>{
         },
       },
       consumed: {
-        request: { body: { token: "consumed_token" } },
+        request: { body: { token: authTokens.consumed } },
         response: {
           status: 401,
           body: {},
@@ -104,7 +105,7 @@ export default (<Contract>{
         },
       },
       expired: {
-        request: { body: { token: "expired_token" } },
+        request: { body: { token: authTokens.expired } },
         response: {
           status: 401,
           body: {},
@@ -119,7 +120,7 @@ export default (<Contract>{
       },
       deleted_user: {
         request: {
-          body: { token: "deleted_token" },
+          body: { token: authTokens.deletedUser },
           jwtPayload: { sub: "deleted@mail.com" },
         },
         response: {

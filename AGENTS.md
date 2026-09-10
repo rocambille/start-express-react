@@ -52,7 +52,8 @@
 │   └── types/
 │       └── index.d.ts         # Shared ambient TypeScript types (Item, User) re-exported from schemas
 ├── tests/
-│   └── contracts              # API contract definitions — declarative source of truth
+│   ├── contracts              # API contract definitions — declarative source of truth
+│   └── fixtures               # Central mock fixtures & database seeders (ordered by FK)
 └── biome.json                 # Lint + format config
 ```
 
@@ -76,6 +77,7 @@ npm run database:reset                # Drop all, replay schema + migrations + s
 npm run database:reset -- -n          # Non-interactive (CI/CD — skips confirmation prompt)
 npm run database:migrate              # Apply un-applied migrations (production)
 npm run database:migrate -- -n        # Non-interactive (CI/CD)
+npm run database:repl                 # Interactive SQLite REPL (type SQL, see results)
 ```
 
 > SQLite requires NO Docker, NO connection string, NO async setup. The DB file is created on the fly.

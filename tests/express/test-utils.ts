@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -7,15 +6,7 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import supertest from "supertest";
 
 import database from "../../src/database";
-
-import { allItems } from "../fixtures/items";
-import {
-  allUsers,
-  barUser,
-  bazUser,
-  deletedUser,
-  fooUser,
-} from "../fixtures/users";
+import { seeders } from "../fixtures";
 
 // -------------------------
 // DB mock
@@ -55,69 +46,10 @@ const mockDatabase = () => {
     database.exec(sql);
   }
 
-  /* insert all users */
-  const insertUser = database.prepare(
-    "insert into user(id, email, name, avatar_url) values(?, ?, ?, ?)",
-  );
-  for (const user of allUsers) {
-    insertUser.run(user.id, user.email, user.name, user.avatar_url ?? null);
+  /* execute all fixture seeders */
+  for (const seed of seeders) {
+    seed(database);
   }
-
-  /* soft delete one user for tests */
-  const deleteUser = database.prepare(
-    "update user set deleted_at = datetime('now') where id = ?",
-  );
-  deleteUser.run(deletedUser.id);
-
-  /* insert all items */
-  const insertItem = database.prepare(
-    "insert into item(id, title, user_id) values(?, ?, ?)",
-  );
-  for (const item of allItems) {
-    insertItem.run(item.id, item.title, item.user_id);
-  }
-
-  /* insert magic link tokens */
-  const insertMagicLinkToken = database.prepare(
-    "insert into magic_link_token(user_id, token_hash, expires_at, consumed_at) values(?, ?, ?, ?)",
-  );
-
-  const hash = (token: string) =>
-    crypto.createHash("sha256").update(token).digest("hex");
-
-  /* valid token for testing valid token scenarios */
-  const validDate = new Date(Date.now() + 100000);
-  insertMagicLinkToken.run(
-    fooUser.id,
-    hash(requestValue("auth", "verify", "success", "token")),
-    validDate.toISOString(),
-    null,
-  );
-
-  /* expired token for testing expired token scenarios */
-  const expiredDate = new Date(Date.now() - 100000);
-  insertMagicLinkToken.run(
-    barUser.id,
-    hash(requestValue("auth", "verify", "expired", "token")),
-    expiredDate.toISOString(),
-    null,
-  );
-
-  /* consumed token for testing consumed token scenarios */
-  insertMagicLinkToken.run(
-    bazUser.id,
-    hash(requestValue("auth", "verify", "consumed", "token")),
-    validDate.toISOString(),
-    validDate.toISOString(),
-  );
-
-  /* deleted user for testing deleted user scenarios */
-  insertMagicLinkToken.run(
-    deletedUser.id,
-    hash(requestValue("auth", "verify", "deleted_user", "token")),
-    validDate.toISOString(),
-    null,
-  );
 };
 
 // -------------------------
