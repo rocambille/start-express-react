@@ -9,20 +9,21 @@
   Design notes:
   - Relies on routing context to identify the item
   - Does not manage persistence directly
-  - Delegates all data mutations to domain hooks
+  - Delegates all data mutations to the mutate helper
   - Focuses only on UI composition
 */
 
 import { use, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
-import { getOrFetch } from "../../helpers/cache";
-import { useMutate } from "../../helpers/mutate";
+import { getOrFetch, useRefresh } from "../../helpers/cache";
+import { mutate } from "../../helpers/mutate";
 import ItemForm from "./ItemForm";
 
 function ItemEdit() {
-  const mutate = useMutate();
   const navigate = useNavigate();
   const { id } = useParams();
+
+  useRefresh(`/api/items/${id}`);
 
   const editItem = useCallback(
     async (partialItem: Omit<Item, "id" | "user_id">) => {
@@ -33,7 +34,7 @@ function ItemEdit() {
 
       navigate(`/items/${id}`);
     },
-    [id, mutate, navigate],
+    [id, navigate],
   );
 
   const item = use(getOrFetch<Item>(`/api/items/${id}`));

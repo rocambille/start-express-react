@@ -1,11 +1,15 @@
 /*
   Purpose:
-  Provide a minimal cache layer compatible with React `use`.
+  Provide a minimal cache layer and targeted reactivity compatible with React `use`.
 
   Design notes:
   - Promises must be cached, not resolved values.
   - React `use` relies on Promise identity to suspend correctly.
+  - refresh(paths) evicts stale promises and notifies subscribed components.
+  - useRefresh(paths) subscribes a component to updates for those path(s).
 */
+
+import { useEffect, useState } from "react";
 
 /* ************************************************************************ */
 /* Cache                                                                    */
@@ -26,7 +30,7 @@ const promisesByUrl = new Map<string, Promise<unknown>>();
   getOrFetch(url, options?):
   - Returns a cached Promise for the given URL (+ headers if any)
   - Fetch is triggered only once per cache key
-  - Subsequent calls reuse the same Promise unless `forget` is called
+  - Subsequent calls reuse the same Promise unless `refresh` is called
 
   options.parse — custom response parser; defaults to response.json()
   options.headers — request headers forwarded to fetch (e.g. Range)
@@ -74,37 +78,87 @@ export const getOrFetch = <T>(
   return promise;
 };
 
+/* ************************************************************************ */
+/* Reactivity & Invalidation                                                */
+/* ************************************************************************ */
+
+type Listener = () => void;
+
+type Subscription = {
+  paths: string[];
+  callback: Listener;
+};
+
+const subscriptions = new Set<Subscription>();
+
 /*
-  forget(basePath):
-  - Removes all cached entries matching a path prefix
-  - Used after mutations to force refetch on next render
+  subscribe(paths, callback):
+  - Registers a listener to be notified when `paths` are refreshed
+  - Returns an unregister function
+*/
+export const subscribe = (paths: string | string[], callback: Listener) => {
+  const newSubscription: Subscription = {
+    paths: Array.isArray(paths) ? paths : [paths],
+    callback,
+  };
+
+  subscriptions.add(newSubscription);
+
+  return () => {
+    subscriptions.delete(newSubscription);
+  };
+};
+
+/*
+  refresh(paths?):
+  - Evicts cached promises matching path prefix(es)
+  - Notifies active subscribers watching matching paths
   - Works for both plain URL keys and URL\0headers keys because \0 is
     not a valid URL character, so prefix matching on the URL still holds
 */
-export const forget = (basePath: string) => {
-  if (basePath === "*") {
+export const refresh = (paths: string | string[] = "*") => {
+  const pathList = Array.isArray(paths) ? paths : [paths];
+  const isWildcard = pathList.includes("*") || pathList.length === 0;
+
+  // 1. Evict stale entries from cache
+  if (isWildcard) {
     promisesByUrl.clear();
-    return;
+  } else {
+    promisesByUrl.forEach((_, url) => {
+      if (pathList.some((path) => url.startsWith(path))) {
+        promisesByUrl.delete(url);
+      }
+    });
   }
 
-  promisesByUrl.forEach((_, url) => {
-    if (url.startsWith(basePath)) {
-      promisesByUrl.delete(url);
+  // 2. Notify matching subscribers
+  for (const subscription of subscriptions) {
+    if (
+      isWildcard ||
+      subscription.paths.includes("*") ||
+      subscription.paths.some((subPath) =>
+        pathList.some(
+          (path) => path.startsWith(subPath) || subPath.startsWith(path),
+        ),
+      )
+    ) {
+      subscription.callback();
     }
-  });
+  }
 };
 
-/* ************************************************************************ */
-/* Helpers                                                                  */
-/* ************************************************************************ */
-
 /*
-  parseContentRangeTotal(header):
-  - Extracts the total count from a Content-Range response header
-  - "items 0-9/42" → 42
-  - Returns 0 if the header is absent or malformed
+  useRefresh(paths?):
+  - Subscribes the caller to refresh notifications for `paths` (defaulting to "*")
 */
-export const parseContentRangeTotal = (header: string | null): number => {
-  const match = /\/(\d+)$/.exec(header ?? "");
-  return match ? Number(match[1]) : 0;
+export const useRefresh = (paths: string | string[] = "*"): void => {
+  const [, setRefreshCounter] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = subscribe(paths, () => {
+      setRefreshCounter((counter) => counter + 1);
+    });
+
+    return unsubscribe;
+  }, [paths]);
 };

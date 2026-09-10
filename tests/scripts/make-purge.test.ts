@@ -341,7 +341,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(
           /Component: \(\) => \{[\s\S]*?\},\n/m,
-          `Component: () => {\n      return (\n        <DataRefreshProvider>\n          <Layout />\n        </DataRefreshProvider>\n      );\n    },\n`,
+          `Component: () => {\n      return <Layout />;\n    },\n`,
         )
         .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
         .replace(
@@ -360,7 +360,6 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("Root loader");
       expect(result).not.toContain('path: "account"');
       expect(result).not.toContain('path: "verify"');
-      expect(result).toContain("DataRefreshProvider");
       expect(result).toContain("Layout");
     });
 

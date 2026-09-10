@@ -165,10 +165,10 @@ async function purgeAuth(rootDir: string) {
         `import { type RouteObject, useLoaderData } from "react-router";`,
         `import type { RouteObject } from "react-router";`,
       )
-      // Remove AuthProvider wrapper and useLoaderData usage
+      // Remove MeProvider wrapper and useLoaderData usage
       .replace(
         /Component: \(\) => \{[\s\S]*?\},\n/m,
-        `Component: () => {\n      return (\n        <DataRefreshProvider>\n          <Layout />\n        </DataRefreshProvider>\n      );\n    },\n`,
+        `Component: () => {\n      return <Layout />;\n    },\n`,
       )
       // Remove the loader
       .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
