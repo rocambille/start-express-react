@@ -3,6 +3,7 @@
 import { act } from "@testing-library/react";
 
 import {
+  DEFAULT_TTL,
   getOrFetch,
   refresh,
   subscribe,
@@ -18,9 +19,14 @@ describe("React Helpers: cache", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   describe("getOrFetch()", () => {
+    it("should export a default TTL of 5 minutes", () => {
+      expect(DEFAULT_TTL).toBe(300_000);
+    });
+
     it("should fetch data when not cached", async () => {
       const result = await getOrFetch("/api/health");
 
@@ -82,6 +88,61 @@ describe("React Helpers: cache", () => {
 
     it("should throw error when response is not ok", async () => {
       await expect(() => getOrFetch("/api/404")).rejects.toThrow(/404/i);
+    });
+
+    it("should automatically evict rejected promises so subsequent calls retry fetch", async () => {
+      await expect(() => getOrFetch("/api/404")).rejects.toThrow(/404/i);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Allow the eviction tick to run
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Calling it again should trigger a fresh fetch attempt, not reuse the rejected promise
+      await expect(() => getOrFetch("/api/404")).rejects.toThrow(/404/i);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should evict entry after custom TTL expires", async () => {
+      vi.useFakeTimers();
+
+      const firstCall = await getOrFetch("/api/health", { ttl: 1000 });
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Advance time within TTL
+      vi.advanceTimersByTime(500);
+      const cachedCall = await getOrFetch("/api/health", { ttl: 1000 });
+      expect(cachedCall).toEqual(firstCall);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Advance time past TTL
+      vi.advanceTimersByTime(600);
+      const expiredCall = await getOrFetch("/api/health", { ttl: 1000 });
+      expect(expiredCall).toEqual(firstCall);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it("should not expire entries when ttl is Infinity", async () => {
+      vi.useFakeTimers();
+
+      await getOrFetch("/api/health", { ttl: Infinity });
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(10 * 365 * 24 * 60 * 60 * 1000); // 10 years
+      await getOrFetch("/api/health", { ttl: Infinity });
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("should deduplicate in-flight requests but evict on resolution when ttl is 0", async () => {
+      const call1 = getOrFetch("/api/health", { ttl: 0 });
+      const call2 = getOrFetch("/api/health", { ttl: 0 });
+
+      expect(call1).toBe(call2);
+      await Promise.all([call1, call2]);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
+      // Once resolved, subsequent call fetches anew
+      await getOrFetch("/api/health", { ttl: 0 });
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 

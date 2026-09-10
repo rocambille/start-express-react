@@ -24,16 +24,28 @@ import { useEffect, useState } from "react";
   - Cache key includes serialised request headers when provided, so that
     different Range headers on the same URL produce separate cache entries
 */
-const promisesByUrl = new Map<string, Promise<unknown>>();
+/*
+  Default cache time-to-live: 5 minutes in milliseconds.
+*/
+export const DEFAULT_TTL = 5 * 60 * 1000;
+
+type CacheEntry = {
+  promise: Promise<unknown>;
+  expiresAt: number | null;
+};
+
+const promisesByUrl = new Map<string, CacheEntry>();
 
 /*
   getOrFetch(url, options?):
   - Returns a cached Promise for the given URL (+ headers if any)
   - Fetch is triggered only once per cache key
-  - Subsequent calls reuse the same Promise unless `refresh` is called
+  - Subsequent calls reuse the same Promise unless expired or `refresh` is called
+  - Automatically evicts rejected promises so retries fetch fresh data
 
   options.parse — custom response parser; defaults to response.json()
   options.headers — request headers forwarded to fetch (e.g. Range)
+  options.ttl — time-to-live in milliseconds; defaults to DEFAULT_TTL (5 minutes)
 
   Note: the cache key is url + serialised headers. The same URL must always
   be called with the same parse function to avoid shape mismatches on cache hits.
@@ -43,6 +55,7 @@ export const getOrFetch = <T>(
   options?: {
     parse?: (response: Response) => Promise<T>;
     headers?: Record<string, string>;
+    ttl?: number;
   },
 ): Promise<T> => {
   // Null byte (\0) is never valid in a URL — safe as a separator
@@ -50,10 +63,18 @@ export const getOrFetch = <T>(
     ? `${url}\0${JSON.stringify(options.headers)}`
     : url;
 
-  // In browser, check the cache for an existing Promise
+  // In browser, check the cache for an existing unexpired Promise
   if (typeof window !== "undefined") {
-    const cachedPromise = promisesByUrl.get(cacheKey);
-    if (cachedPromise) return cachedPromise as Promise<T>;
+    const cached = promisesByUrl.get(cacheKey);
+
+    if (cached) {
+      if (cached.expiresAt != null && Date.now() >= cached.expiresAt) {
+        // Evict expired entry
+        promisesByUrl.delete(cacheKey);
+      } else {
+        return cached.promise as Promise<T>;
+      }
+    }
   }
 
   // Fetch new data
@@ -70,9 +91,32 @@ export const getOrFetch = <T>(
     return parse(response);
   });
 
-  // In browser, cache the Promise
+  const ttl = options?.ttl ?? DEFAULT_TTL;
+
+  // In browser, cache the Promise and configure TTL & rejection eviction
   if (typeof window !== "undefined") {
-    promisesByUrl.set(cacheKey, promise);
+    const entry: CacheEntry = {
+      promise,
+      expiresAt: null,
+    };
+
+    promisesByUrl.set(cacheKey, entry);
+
+    promise
+      .then(() => {
+        if (ttl !== Infinity) {
+          entry.expiresAt = Date.now() + ttl;
+        }
+      })
+      .catch(() => {
+        // Keep the rejected promise for React's immediate error re-render pass,
+        // then evict it on the next tick so retries attempt a fresh fetch.
+        setTimeout(() => {
+          if (promisesByUrl.get(cacheKey)?.promise === promise) {
+            promisesByUrl.delete(cacheKey);
+          }
+        }, 0);
+      });
   }
 
   return promise;
