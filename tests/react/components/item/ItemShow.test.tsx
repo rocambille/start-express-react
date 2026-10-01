@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 
 import ItemShow from "../../../../src/react/components/item/ItemShow";
 import { allItems } from "../../../fixtures/items";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -24,7 +24,7 @@ describe("<ItemShow />", () => {
       path: "/items/:id",
       Component: ItemShow,
       initialEntries: [`/items/${allItems[0].id}`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("heading", { level: 1, name: allItems[0].title });
@@ -37,7 +37,7 @@ describe("<ItemShow />", () => {
         path: "/items/:id",
         Component: ItemShow,
         initialEntries: [`/items/${NaN}`],
-        me: fooUser,
+        me: standardUser,
       }),
     ).rejects.toThrow(/404/i);
 
@@ -60,7 +60,7 @@ describe("<ItemShow />", () => {
       path: "/items/:id",
       Component: ItemShow,
       initialEntries: [`/items/${allItems[0].id}`],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByTestId(`items-edit-${allItems[0].id}`);

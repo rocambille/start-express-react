@@ -19,8 +19,8 @@ import {
   useContext,
   useState,
 } from "react";
-import { forget, getOrFetch } from "../../helpers/cache";
-import { apiMutate } from "../../helpers/mutate";
+import { getOrFetch } from "../../helpers/cache";
+import { mutate } from "../../helpers/mutate";
 
 /* ************************************************************************ */
 /* Types                                                                    */
@@ -64,17 +64,17 @@ export function MeProvider({
   /* ********************************************************************** */
 
   const sendMagicLink = useCallback(async (email: string) => {
-    await apiMutate("/api/auth/magic-link", "post", { email });
+    await mutate("/api/auth/magic-link", "post", { email });
   }, []);
 
   const verifyMagicLink = useCallback(async (token: string) => {
-    const response = await apiMutate("/api/auth/verify", "post", { token });
+    const response = await mutate("/api/auth/verify", "post", { token });
     const data: User = await response.json();
     setUser(data);
   }, []);
 
   const logout = useCallback(async () => {
-    await apiMutate("/api/auth/logout", "post");
+    await mutate("/api/auth/logout", "post");
 
     setUser(null);
   }, []);
@@ -83,9 +83,8 @@ export function MeProvider({
     async (
       newMe: Omit<User, "id" | "created_at" | "deleted_at" | "avatar_url">,
     ) => {
-      await apiMutate("/api/users/me", "put", newMe);
+      await mutate("/api/users/me", "put", newMe, "/api/users/me");
 
-      forget("/api/users/me");
       setUser(await getOrFetch<User | null>("/api/users/me"));
     },
     [],
@@ -93,20 +92,19 @@ export function MeProvider({
 
   const updateMeAvatar = useCallback(async (fileOrNull: File | null) => {
     if (fileOrNull == null) {
-      await apiMutate("/api/users/me/avatar", "delete");
+      await mutate("/api/users/me/avatar", "delete", null, "/api/users/me");
     } else {
       const formData = new FormData();
       formData.append("avatar", fileOrNull);
 
-      await apiMutate("/api/users/me/avatar", "post", formData);
+      await mutate("/api/users/me/avatar", "post", formData, "/api/users/me");
     }
 
-    forget("/api/users/me");
     setUser(await getOrFetch<User | null>("/api/users/me"));
   }, []);
 
   const deleteMe = useCallback(async () => {
-    await apiMutate("/api/users/me", "delete");
+    await mutate("/api/users/me", "delete");
 
     setUser(null);
   }, []);

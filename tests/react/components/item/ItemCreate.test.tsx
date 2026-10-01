@@ -4,7 +4,7 @@ import * as ReactRouter from "react-router";
 vi.mock("react-router", { spy: true });
 
 import ItemCreate from "../../../../src/react/components/item/ItemCreate";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -31,7 +31,7 @@ describe("<ItemCreate />", () => {
       path: "/items/new",
       Component: ItemCreate,
       initialEntries: ["/items/new"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("button");
@@ -41,7 +41,7 @@ describe("<ItemCreate />", () => {
       path: "/items/new",
       Component: ItemCreate,
       initialEntries: ["/items/new"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await user.type(

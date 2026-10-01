@@ -19,13 +19,21 @@
 
 import { use } from "react";
 import { Link, useSearchParams } from "react-router";
-import { getOrFetch, parseContentRangeTotal } from "../../helpers/cache";
+import { getOrFetch, useRefresh } from "../../helpers/cache";
+import { parseContentRangeTotal } from "../../helpers/pagination";
 import { useMe } from "../auth/MeContext";
 import Pagination from "../Pagination";
 
 const PAGE_SIZE = 10;
 
 function ItemList() {
+  /*
+    Reactivity:
+    - Subscribes to refresh events targeting /api/items
+    - Triggers re-suspend when items are added, edited, or deleted
+  */
+  useRefresh("/api/items");
+
   /*
     Authentication state:
     - Used only to decide what actions are visible
@@ -49,7 +57,6 @@ function ItemList() {
     - Retrieved with a Range request header; the server responds with
       Content-Range carrying the total count
     - Suspends while loading (via `use`)
-    - Forgotten after mutations (forget("/api/items") clears all pages)
   */
   const { items, total } = use(
     getOrFetch<{ items: Item[]; total: number }>("/api/items", {

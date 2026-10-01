@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 
 import ItemForm from "../../../../src/react/components/item/ItemForm";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import { renderWithStub, setupMocks } from "../../test-utils";
 
 describe("<ItemForm />", () => {
@@ -23,7 +23,7 @@ describe("<ItemForm />", () => {
         </ItemForm>
       ),
       initialEntries: ["/items/new"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("form", { name: /item form/i });
@@ -37,7 +37,7 @@ describe("<ItemForm />", () => {
         </ItemForm>
       ),
       initialEntries: ["/items/new"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await fireEvent.submit(screen.getByRole("form", { name: /item form/i }));

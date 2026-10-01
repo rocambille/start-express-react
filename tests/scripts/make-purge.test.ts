@@ -243,6 +243,25 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).toContain("authRoutes");
       expect(result).toContain("userRoutes");
     });
+
+    it("removes item fixtures from tests/fixtures/index.ts", async () => {
+      await scaffoldProject(tmpDir);
+
+      const content = await fs.readFile(
+        path.join(tmpDir, "tests/fixtures/index.ts"),
+        "utf8",
+      );
+
+      const result = content
+        .replace(`import { seedItems } from "./items";\n`, "")
+        .replace(`  seedItems,\n`, "")
+        .replace(`export * from "./items";\n`, "");
+
+      expect(result).not.toContain("seedItems");
+      expect(result).not.toContain('"./items"');
+      expect(result).toContain("seedUsers");
+      expect(result).toContain("seedAuthTokens");
+    });
   });
 
   describe("purgeAuth", () => {
@@ -281,7 +300,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).toContain("insert into item");
     });
 
-    it("removes User and MagicLinkToken types from index.d.ts", async () => {
+    it("removes User types from index.d.ts", async () => {
       await scaffoldProject(tmpDir);
 
       const content = await fs.readFile(
@@ -322,7 +341,7 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
         )
         .replace(
           /Component: \(\) => \{[\s\S]*?\},\n/m,
-          `Component: () => {\n      return (\n        <DataRefreshProvider>\n          <Layout />\n        </DataRefreshProvider>\n      );\n    },\n`,
+          `Component: () => {\n      return <Layout />;\n    },\n`,
         )
         .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
         .replace(
@@ -341,7 +360,6 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(result).not.toContain("Root loader");
       expect(result).not.toContain('path: "account"');
       expect(result).not.toContain('path: "verify"');
-      expect(result).toContain("DataRefreshProvider");
       expect(result).toContain("Layout");
     });
 

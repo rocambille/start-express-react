@@ -1,4 +1,4 @@
-import { barUser, corruptedUser, fooUser } from "../fixtures/users";
+import { corruptedUser, standardUser, userWithAvatar } from "../fixtures/users";
 
 const dummyImageBuffer = Buffer.from(
   "UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=",
@@ -12,20 +12,20 @@ export default (<Contract>{
     cases: {
       as_me: {
         request: {
-          jwtPayload: { sub: fooUser.id },
+          jwtPayload: { sub: standardUser.id },
         },
         response: {
           status: 200,
-          body: fooUser,
+          body: standardUser,
         },
       },
       as_user_with_avatar: {
         request: {
-          jwtPayload: { sub: barUser.id },
+          jwtPayload: { sub: userWithAvatar.id },
         },
         response: {
           status: 200,
-          body: barUser,
+          body: userWithAvatar,
         },
       },
       corrupted_avatar_url: {
@@ -49,7 +49,7 @@ export default (<Contract>{
       as_me: {
         request: {
           body: { email: "updated@mail.com", name: "updated" },
-          jwtPayload: { sub: fooUser.id },
+          jwtPayload: { sub: standardUser.id },
         },
         response: { status: 204, body: {} },
       },
@@ -60,7 +60,7 @@ export default (<Contract>{
     path: "/api/users/me",
     cases: {
       as_me: {
-        request: { jwtPayload: { sub: fooUser.id } },
+        request: { jwtPayload: { sub: standardUser.id } },
         response: { status: 204, body: {} },
       },
       unauthorized: {
@@ -75,7 +75,7 @@ export default (<Contract>{
     cases: {
       as_me: {
         request: {
-          jwtPayload: { sub: fooUser.id },
+          jwtPayload: { sub: standardUser.id },
           attach: {
             name: "avatar",
             file: dummyImageBuffer,
@@ -91,7 +91,7 @@ export default (<Contract>{
       },
       invalid_file_type: {
         request: {
-          jwtPayload: { sub: fooUser.id },
+          jwtPayload: { sub: standardUser.id },
           attach: {
             name: "avatar",
             file: Buffer.from("plain text"),
@@ -104,7 +104,7 @@ export default (<Contract>{
         },
       },
       no_attached_file: {
-        request: { jwtPayload: { sub: fooUser.id } },
+        request: { jwtPayload: { sub: standardUser.id } },
         response: {
           status: 400,
           body: { message: expect.stringMatching(/No file attached/i) },
@@ -121,7 +121,7 @@ export default (<Contract>{
     path: "/api/users/me/avatar",
     cases: {
       as_me: {
-        request: { jwtPayload: { sub: fooUser.id } },
+        request: { jwtPayload: { sub: standardUser.id } },
         response: { status: 204, body: {} },
       },
       unauthorized: {

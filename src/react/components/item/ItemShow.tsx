@@ -9,13 +9,15 @@
 
 import { use } from "react";
 import { Link, useParams } from "react-router";
-import { getOrFetch } from "../../helpers/cache";
+import { getOrFetch, useRefresh } from "../../helpers/cache";
 import { useMe } from "../auth/MeContext";
 import ItemDeleteForm from "./ItemDeleteForm";
 
 function ItemShow() {
   const { user } = useMe();
   const { id } = useParams();
+
+  useRefresh(`/api/items/${id}`);
 
   const item = use(getOrFetch<Item>(`/api/items/${id}`));
 

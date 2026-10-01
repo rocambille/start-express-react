@@ -12,10 +12,9 @@
 import { useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 
-import { useMutate } from "../../helpers/mutate";
+import { mutate } from "../../helpers/mutate";
 
 function ItemDeleteForm() {
-  const mutate = useMutate();
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -26,7 +25,7 @@ function ItemDeleteForm() {
     ]);
 
     navigate("/items");
-  }, [id, mutate, navigate]);
+  }, [id, navigate]);
 
   return (
     <form action={deleteItem}>

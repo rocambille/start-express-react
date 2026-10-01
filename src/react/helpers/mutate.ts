@@ -7,8 +7,7 @@
   - https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
 */
 
-import { useRefresh } from "../components/DataRefreshContext";
-import { forget } from "./cache";
+import * as cache from "./cache";
 
 /* ************************************************************************ */
 /* CSRF Token                                                               */
@@ -60,19 +59,24 @@ export const csrfToken = async () => {
 };
 
 /* ************************************************************************ */
-/* API Mutation                                                             */
+/* Mutation                                                                 */
 /* ************************************************************************ */
 
 /*
-  apiMutate(url, method, body):
+  mutate(url, method, body?, paths?):
   - Performs a mutative fetch (POST, PUT, DELETE)
   - Automatically attaches CSRF token
+  - Refreshes cache and notifies matching subscribers if paths are provided
   - Returns the Response for status checking
+
+  Usage:
+    await mutate("/api/items/1", "put", { title: "New" }, ["/api/items"]);
 */
-export const apiMutate = async (
+export const mutate = async (
   url: string,
   method: "post" | "put" | "delete",
   body?: unknown,
+  paths?: string | string[],
 ) => {
   const headers: Record<string, string> = {
     "X-CSRF-Token": await csrfToken(),
@@ -95,39 +99,9 @@ export const apiMutate = async (
     throw new Error(`${response.status}: ${response.statusText}`);
   }
 
+  if (paths != null) {
+    cache.refresh(paths);
+  }
+
   return response;
 };
-
-/* ************************************************************************ */
-/* Hooks                                                                    */
-/* ************************************************************************ */
-
-/*
-  useMutate():
-  - Returns a function that performs a mutation and refreshes the UI
-  - Combines apiMutate() + forget() + refresh()
-  - Keeps components declarative
-
-  Usage:
-    const mutate = useMutate();
-    await mutate("/api/items/1", "put", { title: "New" }, ["/api/items"]);
-*/
-export function useMutate() {
-  const { refresh } = useRefresh();
-
-  return async (
-    url: string,
-    method: "post" | "put" | "delete",
-    body?: unknown,
-    pathsToForget: string[] = [],
-  ) => {
-    const response = await apiMutate(url, method, body);
-
-    for (const path of pathsToForget) {
-      forget(path);
-    }
-    refresh();
-
-    return response;
-  };
-}

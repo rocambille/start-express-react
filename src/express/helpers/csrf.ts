@@ -73,7 +73,11 @@ export const csrf =
       Skip CSRF validation for safe methods.
       This keeps read-only endpoints frictionless.
     */
-    if (req.method.match(new RegExp(`(${ignoredMethods.join("|")})`, "i"))) {
+    if (
+      ignoredMethods.some(
+        (method) => method.toUpperCase() === req.method.toUpperCase(),
+      )
+    ) {
       next();
       return;
     }

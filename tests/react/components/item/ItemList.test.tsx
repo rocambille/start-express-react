@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 
 import ItemList from "../../../../src/react/components/item/ItemList";
-import { fooUser } from "../../../fixtures/users";
+import { standardUser } from "../../../fixtures/users";
 import {
   expectContractCall,
   renderWithStub,
@@ -23,7 +23,7 @@ describe("<ItemList />", () => {
       path: "/items",
       Component: ItemList,
       initialEntries: ["/items"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByRole("heading", { level: 1, name: /items/i });
@@ -47,7 +47,7 @@ describe("<ItemList />", () => {
       path: "/items",
       Component: ItemList,
       initialEntries: ["/items"],
-      me: fooUser,
+      me: standardUser,
     });
 
     await screen.findByTestId("items-new");

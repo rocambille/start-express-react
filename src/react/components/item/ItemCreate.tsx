@@ -8,18 +8,17 @@
 
   Design notes:
   - Does not manage persistence directly
-  - Delegates all data mutations to domain hooks
+  - Delegates all data mutations to the mutate helper
   - Focuses only on UI composition
 */
 
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
 
-import { useMutate } from "../../helpers/mutate";
+import { mutate } from "../../helpers/mutate";
 import ItemForm from "./ItemForm";
 
 function ItemCreate() {
-  const mutate = useMutate();
   const navigate = useNavigate();
 
   const addItem = useCallback(
@@ -32,7 +31,7 @@ function ItemCreate() {
 
       navigate(`/items/${insertId}`);
     },
-    [mutate, navigate],
+    [navigate],
   );
 
   /*

@@ -1,14 +1,6 @@
-import { act } from "@testing-library/react";
-
-import { DataRefreshProvider } from "../../../src/react/components/DataRefreshContext";
 import * as cache from "../../../src/react/helpers/cache";
-import { apiMutate, useMutate } from "../../../src/react/helpers/mutate";
-import {
-  expectContractCall,
-  renderHookAsync,
-  requestValue,
-  setupMocks,
-} from "../test-utils";
+import { mutate } from "../../../src/react/helpers/mutate";
+import { expectContractCall, requestValue, setupMocks } from "../test-utils";
 
 describe("React Helpers: mutate", () => {
   beforeEach(() => {
@@ -20,9 +12,9 @@ describe("React Helpers: mutate", () => {
     vi.unstubAllGlobals();
   });
 
-  describe("apiMutate()", () => {
+  describe("mutate()", () => {
     it("should send a mutation request with a body", async () => {
-      await apiMutate(`/api/health`, "post", {
+      await mutate(`/api/health`, "post", {
         hello: requestValue("health", "post", "success", "hello"),
       });
 
@@ -33,13 +25,13 @@ describe("React Helpers: mutate", () => {
       const formData = new FormData();
       formData.append("avatar", "test");
 
-      await apiMutate(`/api/users/me/avatar`, "post", formData);
+      await mutate(`/api/users/me/avatar`, "post", formData);
 
       expectContractCall("users", "upload_me_avatar", "as_me");
     });
 
     it("should send a mutation request without a body", async () => {
-      await apiMutate("/api/health", "delete");
+      await mutate("/api/health", "delete");
 
       expectContractCall("health", "delete", "success");
     });
@@ -52,57 +44,39 @@ describe("React Helpers: mutate", () => {
       vi.stubGlobal("cookieStore", { get: getMock, set: vi.fn() });
 
       // first call sets expiration time + 30 seconds
-      await apiMutate("/api/health", "delete");
+      await mutate("/api/health", "delete");
       // second call should reuse CSRF token
-      await apiMutate("/api/health", "delete");
+      await mutate("/api/health", "delete");
 
       expect(getMock).toHaveBeenCalledWith("__Host-x-csrf-token");
     });
-  });
 
-  describe("useMutate()", () => {
-    it("should throw an error when used outside of RefreshProvider", async () => {
-      vi.spyOn(console, "error").mockImplementation(() => {});
-      await expect(renderHookAsync(() => useMutate())).rejects.toThrow(
-        "useRefresh must be used within a DataRefreshProvider",
-      );
-    });
+    it("should refresh matching cache entries when paths are provided", async () => {
+      const refreshMock = vi.spyOn(cache, "refresh");
 
-    it("should return a mutate function", async () => {
-      const { result } = await renderHookAsync(() => useMutate(), {
-        wrapper: DataRefreshProvider,
-      });
-
-      const mutate = result.current;
-
-      expectTypeOf(mutate).toBeFunction();
-    });
-
-    it("should return a mutate function that sends a mutation request and forgets matching cache entries", async () => {
-      const forgetMock = vi.spyOn(cache, "forget");
-      const { result } = await renderHookAsync(() => useMutate(), {
-        wrapper: DataRefreshProvider,
-      });
-
-      const mutate = result.current;
-
-      await act(() => mutate("/api/health", "delete", null, ["/api/health"]));
+      await mutate("/api/health", "delete", null, ["/api/health"]);
 
       expectContractCall("health", "delete", "success");
-      expect(forgetMock).toHaveBeenCalledWith("/api/health");
+      expect(refreshMock).toHaveBeenCalledWith(["/api/health"]);
     });
 
-    it("should return a mutate function that does not forget cache entries when the request fails", async () => {
-      const forgetMock = vi.spyOn(cache, "forget");
-      const { result } = await renderHookAsync(() => useMutate(), {
-        wrapper: DataRefreshProvider,
-      });
+    it("should not refresh cache entries when paths are omitted", async () => {
+      const refreshMock = vi.spyOn(cache, "refresh");
 
-      const mutate = result.current;
+      await mutate("/api/health", "delete");
 
-      await expect(() => mutate("/api/500", "post")).rejects.toThrow(/500/i);
+      expectContractCall("health", "delete", "success");
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
 
-      expect(forgetMock).not.toHaveBeenCalled();
+    it("should throw an error and not refresh cache entries when the request fails", async () => {
+      const refreshMock = vi.spyOn(cache, "refresh");
+
+      await expect(() =>
+        mutate("/api/500", "post", null, ["/api/health"]),
+      ).rejects.toThrow(/500/i);
+
+      expect(refreshMock).not.toHaveBeenCalled();
     });
   });
 });
