@@ -122,7 +122,11 @@ export async function createServerWith(routesPath: string) {
   // In development it is disabled because Vite's HMR relies on
   // WebSocket connections and dynamic module evaluation, which
   // are blocked by Helmet's default CSP.
-  app.use(helmet({ contentSecurityPolicy: false })); // All but CSP, handled apart
+
+  // Note: CSP is deliberately disabled here because it's applied separately
+  // below with production-specific nonce-based directives for better
+  // compatibility with SSR and modern script loading patterns.
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use((req, res, next) => {
     if (!isProduction) {
       return next();
