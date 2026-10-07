@@ -103,33 +103,8 @@ npm run make:clone -- <source_dir> <dest_dir> <OldName> <NewName>
 npm run make:clone -- src/express/modules/item src/express/modules/post Item Post
 ```
 
-After cloning an express module, register the new routes in src/express/routes.ts:
-
-```typescript
-import postRoutes from "./modules/post/postRoutes";
-
-router.use(postRoutes);
-```
-
-After cloning a react module, register the new routes in src/react/routes.tsx:
-
-```tsx
-import { postRoutes } from "./components/post/index";
-
-/* ... */
-
-const routes: RouteObject[] = [
-  {
-    /* ... */
-    children: [
-      /* ... */
-      ...postRoutes,
-    ],
-  },
-];
-```
-
 > Always prefer `make:clone` over writing modules from scratch. It replicates your actual patterns.
+> After cloning, follow the post-clone integration checklist (or use the `starter-scaffold-resource` skill) to wire the new module into the application.
 
 ### Cleanup
 

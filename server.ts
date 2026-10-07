@@ -99,10 +99,11 @@ globalThis.fetch = (resource, init) => {
 /**
  * Express / Vite integration
  */
+import crypto from "node:crypto";
 import http from "node:http";
 import express, { type ErrorRequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
-import helmet from "helmet";
+import helmet, { contentSecurityPolicy } from "helmet";
 import { MulterError } from "multer";
 
 export async function createServerWith(routesPath: string) {
@@ -121,11 +122,25 @@ export async function createServerWith(routesPath: string) {
   // In development it is disabled because Vite's HMR relies on
   // WebSocket connections and dynamic module evaluation, which
   // are blocked by Helmet's default CSP.
-  app.use(
-    helmet({
-      contentSecurityPolicy: isProduction,
-    }),
-  );
+
+  // Note: CSP is deliberately disabled here because it's applied separately
+  // below with production-specific nonce-based directives for better
+  // compatibility with SSR and modern script loading patterns.
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use((req, res, next) => {
+    if (!isProduction) {
+      return next();
+    }
+
+    const nonce = crypto.randomBytes(16).toString("base64");
+    res.locals.cspNonce = nonce;
+
+    contentSecurityPolicy({
+      directives: {
+        scriptSrc: ["'self'", `'nonce-${nonce}'`],
+      },
+    })(req, res, next);
+  });
 
   /* ********************************************************************** */
   /* Rate limiting                                                          */
