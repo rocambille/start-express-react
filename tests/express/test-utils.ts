@@ -106,9 +106,13 @@ app.use(routes);
 /*
   Error logging middleware:
   Logs errors for debugging, then passes them to the error response handler.
+
+  Every server error (5xx) is logged, including errors without a status
+  (a TypeError, a SQLite error…, which end as 500): those are the bugs a
+  failing contract needs to show. Client errors (4xx) stay quiet.
 */
-const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
-  if (err.status === 500) {
+export const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
+  if ((err.status ?? err.statusCode ?? 500) >= 500) {
     console.error(err);
     console.error("on req:", req.method, req.path);
   }
