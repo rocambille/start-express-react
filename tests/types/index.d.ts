@@ -17,7 +17,7 @@ type Case = {
   };
   response: {
     status: number;
-    body?: JsonObject | JsonArray;
+    body?: JsonObject | JsonArray | null;
     headers?: Record<string, string>;
     // Optional hook to run extra assertions on the response
     and?: (response: {
