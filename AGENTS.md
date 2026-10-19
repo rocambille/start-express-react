@@ -205,7 +205,11 @@ async find(id: number): Promise<Item | null> { ... }
 
 ### Soft delete by default
 
-The `destroy` action uses `softDelete` (sets `deleted_at = datetime('now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+The `destroy` action uses `softDelete` (sets `deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+
+### Dates are ISO 8601 UTC
+
+Every date is written and compared in ISO 8601 UTC (`strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), the format of the `created_at` defaults. Never use `datetime('now')`: it produces `YYYY-MM-DD HH:MM:SS` with no UTC marker, and text comparisons against ISO dates silently give wrong results (`'T'` sorts after `' '`).
 
 ### Validation at the edge with Zod
 
