@@ -36,6 +36,7 @@ import itemRepository from "./itemRepository";
 
   Response:
   - 206 Partial Content with Content-Range header and the requested slice
+  - 200 with an empty array when there is no item
   - 400 if no Range header or format is invalid
   - 416 Range Not Satisfiable if start >= total
 */
@@ -60,6 +61,16 @@ const browse: RequestHandler = (req, res) => {
   // Check if the range is valid
 
   const total = itemRepository.count();
+
+  // An empty collection is sent whole: a server may ignore the Range
+  // header (RFC 9110), and an empty list is not an error for the client
+  // (getOrFetch throws on 416)
+  if (total === 0) {
+    res.setHeader("Content-Range", "items */0");
+    res.status(200).json([]);
+
+    return;
+  }
 
   if (start < 0 || start > end || start >= total) {
     res.setHeader("Content-Range", `items */${total}`);

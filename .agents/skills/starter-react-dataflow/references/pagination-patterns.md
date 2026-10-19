@@ -96,4 +96,5 @@ In `src/react/helpers/cache.ts`:
    - If a user requests a page beyond total records (e.g. `?page=9999`), the server returns HTTP `416`.
    - The rejection bubbles up to the nearest `<ErrorBoundary>` which displays the error page.
 3. **Empty Collection / Single Page**:
+   - An empty collection is not out of range: the server answers `200` with `[]` and `Content-Range: <unit> */0` (a server may ignore `Range` and send the whole, empty, representation). The list renders empty instead of the error page.
    - The `<Pagination />` component automatically renders `null` when `total <= pageSize`, avoiding unnecessary controls.
