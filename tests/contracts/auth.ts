@@ -1,7 +1,9 @@
-import { cookies } from "supertest";
-
 import { authTokens } from "../fixtures/auth";
 import { standardUser } from "../fixtures/users";
+import {
+  sessionCookieIsNotSet,
+  sessionCookieIsSet,
+} from "./assertions/session";
 
 export default (<Contract>{
   magic_link: {
@@ -47,19 +49,7 @@ export default (<Contract>{
         response: {
           status: 201,
           body: standardUser,
-          and: () => {
-            expect(
-              cookies.set({
-                name: "__Host-auth",
-                options: {
-                  httpOnly: true,
-                  sameSite: "strict",
-                  secure: true,
-                  path: "/",
-                },
-              }),
-            );
-          },
+          and: sessionCookieIsSet,
         },
       },
       bad_request: {
@@ -67,13 +57,7 @@ export default (<Contract>{
         response: {
           status: 400,
           body: expect.any(Object),
-          and: () => {
-            expect(
-              cookies.not("set", {
-                name: "__Host-auth",
-              }),
-            );
-          },
+          and: sessionCookieIsNotSet,
         },
       },
       unauthorized: {
@@ -81,13 +65,7 @@ export default (<Contract>{
         response: {
           status: 401,
           body: {},
-          and: () => {
-            expect(
-              cookies.not("set", {
-                name: "__Host-auth",
-              }),
-            );
-          },
+          and: sessionCookieIsNotSet,
         },
       },
       consumed: {
@@ -95,13 +73,7 @@ export default (<Contract>{
         response: {
           status: 401,
           body: {},
-          and: () => {
-            expect(
-              cookies.not("set", {
-                name: "__Host-auth",
-              }),
-            );
-          },
+          and: sessionCookieIsNotSet,
         },
       },
       expired: {
@@ -109,13 +81,7 @@ export default (<Contract>{
         response: {
           status: 401,
           body: {},
-          and: () => {
-            expect(
-              cookies.not("set", {
-                name: "__Host-auth",
-              }),
-            );
-          },
+          and: sessionCookieIsNotSet,
         },
       },
       deleted_user: {
@@ -126,13 +92,7 @@ export default (<Contract>{
         response: {
           status: 401,
           body: {},
-          and: () => {
-            expect(
-              cookies.not("set", {
-                name: "__Host-auth",
-              }),
-            );
-          },
+          and: sessionCookieIsNotSet,
         },
       },
     },
