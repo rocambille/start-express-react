@@ -158,11 +158,8 @@ export async function createServerWith(routesPath: string) {
     app.use(limiter);
   }
 
-  /* ********************************************************************** */
-  /* Static file serving                                                    */
-  /* ********************************************************************** */
-
-  app.use("/uploads", express.static("./data/uploads"));
+  // Uploaded files are not served publicly: the module storing them serves
+  // them behind its own access check (authenticated users only)
 
   /* ********************************************************************** */
   /* API routes                                                             */

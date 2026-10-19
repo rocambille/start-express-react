@@ -130,4 +130,20 @@ export default (<Contract>{
       },
     },
   },
+  read_upload: {
+    // Uploaded files are served to authenticated users only
+    method: "get",
+    path: userWithAvatar.avatar_url as string,
+    cases: {
+      unauthorized: {
+        request: {},
+        response: { status: 401, body: {} },
+      },
+      not_found: {
+        specialPath: "/uploads/avatars/missing.webp",
+        request: { jwtPayload: { sub: standardUser.id } },
+        response: { status: 404, body: {} },
+      },
+    },
+  },
 });
