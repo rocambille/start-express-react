@@ -32,6 +32,11 @@ export default (<Contract>{
         request: { body: {} },
         response: { status: 400, body: expect.any(Object) },
       },
+      invalid_email: {
+        // No account is created for something that is not an email
+        request: { body: { email: "not-an-email" } },
+        response: { status: 400, body: {} },
+      },
     },
   },
   verify: {
