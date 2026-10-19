@@ -32,6 +32,11 @@ export default (<Contract>{
         request: { body: {} },
         response: { status: 400, body: expect.any(Object) },
       },
+      no_body: {
+        // Express 5 leaves req.body undefined without a body
+        request: {},
+        response: { status: 400, body: {} },
+      },
     },
   },
   verify: {
@@ -75,6 +80,10 @@ export default (<Contract>{
             );
           },
         },
+      },
+      no_body: {
+        request: {},
+        response: { status: 400, body: {} },
       },
       unauthorized: {
         request: { body: { token: "invalid_token" } },
