@@ -1,8 +1,11 @@
 import { screen } from "@testing-library/react";
 import Layout from "../../../src/react/components/Layout";
-import { standardUser } from "../../fixtures/users";
 import { renderWithStub, setupMocks } from "../test-utils";
 
+/*
+  Authentication-specific behavior of the layout is tested with the auth
+  tests, so that make:purge removes it along with the auth module.
+*/
 describe("<Layout />", () => {
   beforeEach(() => {
     setupMocks();
@@ -22,27 +25,5 @@ describe("<Layout />", () => {
     });
 
     await screen.findByRole("navigation");
-  });
-
-  it("should render magic link form when not authenticated", async () => {
-    await renderWithStub({
-      path: "/",
-      Component: () => <Layout />,
-      initialEntries: ["/"],
-      me: null,
-    });
-
-    await screen.findByLabelText(/email/i);
-  });
-
-  it("should render account link when authenticated", async () => {
-    await renderWithStub({
-      path: "/",
-      Component: () => <Layout />,
-      initialEntries: ["/"],
-      me: standardUser,
-    });
-
-    await screen.findByText(/account/i);
   });
 });

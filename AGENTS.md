@@ -230,6 +230,8 @@ Repository `findAll` methods take `(limit: number, offset: number)` arguments. A
 
 `tests/contracts/` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
 
+Tests specific to one module that contracts cannot express (side effects checked in the database, several requests in a row) go in `tests/express/modules/<module>/`: `make:purge` removes that folder with the module, so the remaining project keeps passing its tests.
+
 ---
 
 ## Security — do not break these
