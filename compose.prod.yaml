@@ -1,10 +1,25 @@
+# Production: one container serving the API and the server-rendered app.
+#
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# - Settings come from .env (env_file), never from the image
+#   (.dockerignore excludes .env and data/)
+# - data/ is a volume: the SQLite database and uploaded files survive
+#   rebuilds and restarts. Create it before the first start, owned by
+#   uid 1000 (the "node" user of the image): mkdir -p data
+# - On start: build, apply pending migrations (an empty database gets
+#   schema.sql), then serve
+# - Put a reverse proxy with TLS in front (__Host- cookies need HTTPS)
 services:
   server:
-    extends:
-      file: compose.yaml
-      service: server
-    ports:
-      - ${APP_PORT-5173}:${APP_PORT-5173}
+    build:
+      context: .
+    restart: unless-stopped
+    env_file: .env
     environment:
       NODE_ENV: production
-    command: sh -c "npm run build && npm start"
+    ports:
+      - ${APP_PORT-5173}:${APP_PORT-5173}
+    volumes:
+      - ./data:/home/app/data
+    command: sh -c "npm run build && npm run database:migrate -- -n && npm start"
