@@ -253,17 +253,9 @@ export async function createServerWith(routesPath: string) {
 
     next(err);
   };
-
-  /*
-    Final error handler:
-    Sends a structured JSON response instead of Express's default HTML page.
-    In production, server errors (5xx) hide their message and stack:
-    see src/express/helpers/errorResponse.ts.
-  */
-  const sendErrors = createErrorResponse(isProduction);
-
   app.use(logErrors);
-  app.use(sendErrors);
+
+  app.use(createErrorResponse(isProduction));
 
   return httpServer;
 }
