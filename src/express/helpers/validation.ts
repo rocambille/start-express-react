@@ -59,7 +59,15 @@ export const createValidator = (
       if (!parsed.success) {
         issues.push(...parsed.error.issues);
       } else {
-        req.query = parsed.data as typeof req.query;
+        // Express 5 defines req.query as a getter without setter on the
+        // request prototype: assigning it throws. Define the parsed query
+        // on the request itself, which shadows the getter.
+        Object.defineProperty(req, "query", {
+          value: parsed.data,
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
 
