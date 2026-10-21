@@ -311,13 +311,14 @@ function readIndexHtml() {
  */
 import type { Express } from "express";
 import { createServer as createViteServer } from "vite";
+import { clientAssets } from "./src/express/helpers/clientAssets";
 
 async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
     const compression = (await import("compression")).default;
 
     app.use(compression());
-    app.use(express.static("./dist/client", { extensions: [] }));
+    app.use(clientAssets("./dist/client"));
   } else {
     // Create Vite server in middleware mode.
     // Express remains the main HTTP server.
