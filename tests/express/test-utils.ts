@@ -179,9 +179,17 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
     cookies.push("__Host-x-csrf-token=a-b-c-d-e");
   }
 
-  const response = await apiCall.set("Cookie", cookies);
+  apiCall.set("Cookie", cookies);
+
+  // Extra supertest assertions, registered before the request is sent
+  // (supertest runs them when the response arrives)
+  caseDetails.response.and?.(apiCall);
+
+  let response: Awaited<typeof apiCall> | undefined;
 
   try {
+    response = await apiCall;
+
     expect(response.status).toBe(caseDetails.response.status);
     expect(response.body).toEqual(caseDetails.response.body);
 
@@ -193,11 +201,10 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
       }
     }
 
-    if (caseDetails.response.and) {
-      caseDetails.response.and(response);
-    }
+    return response;
   } finally {
     if (
+      response != null &&
       caseDetails.request.attach != null &&
       typeof response.body === "object" &&
       response.body !== null
@@ -209,6 +216,4 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
       }
     }
   }
-
-  return response;
 };
