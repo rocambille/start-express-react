@@ -163,7 +163,7 @@ class UserRepository {
   */
   softDelete(id: User["id"]): boolean {
     const query = database.prepare(
-      "update user set deleted_at = datetime('now') where id = ?",
+      "update user set deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') where id = ?",
     );
     const result = query.run(id);
 
