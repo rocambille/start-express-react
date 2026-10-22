@@ -44,6 +44,24 @@ async function updateFile(
   }
 }
 
+// Lists the .ts and .tsx files of a folder, recursively, relative to rootDir.
+async function listFiles(rootDir: string, folder: string): Promise<string[]> {
+  const absolute = path.join(rootDir, folder);
+
+  if (!(await fs.pathExists(absolute))) return [];
+
+  const entries = await fs.readdir(absolute, {
+    recursive: true,
+    withFileTypes: true,
+  });
+
+  return entries
+    .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+    .map((entry) =>
+      path.relative(rootDir, path.join(entry.parentPath, entry.name)),
+    );
+}
+
 /* ************************************************************************ */
 /* Purge logic                                                              */
 /* ************************************************************************ */
@@ -56,6 +74,8 @@ async function purgeItems(rootDir: string) {
   await remove(rootDir, "src/express/modules/item");
   await remove(rootDir, "src/react/components/item");
   await remove(rootDir, "tests/react/components/item");
+  // Module-specific Express tests live in tests/express/modules/<module>
+  await remove(rootDir, "tests/express/modules/item");
   await remove(rootDir, "tests/fixtures/items.ts");
   await remove(rootDir, "tests/contracts/items.ts");
 
@@ -119,6 +139,9 @@ async function purgeAuth(rootDir: string) {
   await remove(rootDir, "src/express/modules/user");
   await remove(rootDir, "src/react/components/auth");
   await remove(rootDir, "tests/react/components/auth");
+  // Module-specific Express tests live in tests/express/modules/<module>
+  await remove(rootDir, "tests/express/modules/auth");
+  await remove(rootDir, "tests/express/modules/user");
 
   // Remove auth/user routes from Express.
   await updateFile(rootDir, "src/express/routes.ts", (content) =>
@@ -157,7 +180,7 @@ async function purgeAuth(rootDir: string) {
       .replace(`import AccountPage from "./components/auth/AccountPage";\n`, "")
       .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
       .replace(
-        `import { AuthProvider } from "./components/auth/MeContext";\n`,
+        `import { MeProvider } from "./components/auth/MeContext";\n`,
         "",
       )
       // Simplify RouteObject import (remove useLoaderData)
@@ -196,9 +219,10 @@ async function purgeAuth(rootDir: string) {
       // Remove auth hooks
       .replace(`  const { isAuthenticated } = useMe();\n`, "")
       .replace(`  const location = useLocation();\n\n`, "")
+      .replace(/ {4}\/\*\n {6}Authentication context:\n[\s\S]*?\*\/\n/m, "")
       // Replace conditional rendering with simple Suspense + Outlet
       .replace(
-        / {8}\{check\(\) \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
+        / {8}\{isAuthenticated \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
         `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
       ),
   );
@@ -206,12 +230,51 @@ async function purgeAuth(rootDir: string) {
   // Remove auth-related code from NavBar.tsx.
   await updateFile(rootDir, "src/react/components/NavBar.tsx", (content) =>
     content
-      .replace(`import { useMe } from "./auth/MeContext";\n\n`, "")
-      .replace(`  const { isAuthenticated } = useMe();\n`, "")
-      // After purgeItems, only the account link remains in the auth block.
+      .replace(`import Avatar from "./auth/Avatar";\n`, "")
+      .replace(`import { useMe } from "./auth/MeContext";\n`, "")
+      .replace(`  const { user, isAuthenticated } = useMe();\n`, "")
+      // After purgeItems, only the account links remain in the auth block.
       // Remove the whole conditional block.
-      .replace(/ {8}\{check\(\) && \(\n[\s\S]*?\n {8}\)}\n/m, ""),
+      .replace(/ {8}\{isAuthenticated && \(\n[\s\S]*?\n {8}\)\}\n/m, ""),
   );
+
+  // Remove auth test data: contracts, fixtures and their seeders.
+  await remove(rootDir, "tests/contracts/auth.ts");
+  await remove(rootDir, "tests/contracts/users.ts");
+  await remove(rootDir, "tests/fixtures/auth.ts");
+  await remove(rootDir, "tests/fixtures/users.ts");
+
+  await updateFile(rootDir, "tests/fixtures/index.ts", (content) =>
+    content
+      .replace(`import { seedAuthTokens } from "./auth";\n`, "")
+      .replace(`import { seedUsers } from "./users";\n`, "")
+      .replace(`  seedUsers,\n`, "")
+      .replace(`  seedAuthTokens,\n`, "")
+      .replace(`export * from "./auth";\n`, "")
+      .replace(`export * from "./users";\n`, ""),
+  );
+
+  // Remove the authenticated user from the React test helper.
+  await updateFile(rootDir, "tests/react/test-utils.tsx", (content) =>
+    content
+      .replace(
+        `import { MeProvider } from "../../src/react/components/auth/MeContext";\n`,
+        "",
+      )
+      .replace(
+        /Component: \(\) => \(\n {8}<MeProvider initialUser=\{me\}>\n {10}<Component \/>\n {8}<\/MeProvider>\n {6}\),/m,
+        "Component,",
+      )
+      .replace(`  me,\n`, "")
+      .replace(`  me: User | null;\n`, ""),
+  );
+
+  // Remaining React tests no longer pass a user to renderWithStub.
+  for (const file of await listFiles(rootDir, "tests/react")) {
+    await updateFile(rootDir, file, (content) =>
+      content.replace(/^ +me: null,\n/gm, ""),
+    );
+  }
 }
 
 /* ************************************************************************ */

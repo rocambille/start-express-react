@@ -11,7 +11,7 @@ type Case = {
       options?: { filename?: string; contentType?: string } | string;
     };
     // Mocked JWT payload to simulate different users
-    jwtPayload?: { sub: User["id"] | string } | null;
+    jwtPayload?: { sub: number | string } | null;
     // Explicitly bypass CSRF to test protection
     withoutCsrfProtection?: boolean;
   };

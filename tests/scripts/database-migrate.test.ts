@@ -198,15 +198,15 @@ describe("database-migrate.ts", () => {
 
   it("does not apply seeder.sql", async () => {
     // After reset, seeder data exists. Let's clear it and migrate.
-    database.exec("DELETE FROM item");
-    database.exec("DELETE FROM user");
+    database.exec("DELETE FROM note");
+    database.exec("DELETE FROM author");
     consoleSpy.mockClear();
 
     await migrateMain(["node", "script", "-n"], dbTestFixture.rootDir);
 
     // Seeder should NOT have been re-applied
-    const users = database.prepare("select * from user").all();
-    expect(users.length).toBe(0);
+    const authors = database.prepare("select * from author").all();
+    expect(authors.length).toBe(0);
   });
 
   it("respects file ordering: schema.sql first, then migrations alphabetically", async () => {
