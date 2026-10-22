@@ -52,4 +52,31 @@ describe("<ItemList />", () => {
 
     await screen.findByTestId("items-new");
   });
+  it("should display an empty list without error", async () => {
+    // What the API answers when there is no item (see itemActions.browse)
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response("[]", {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json",
+              "Content-Range": "items */0",
+            },
+          }),
+      ),
+    );
+
+    await renderWithStub({
+      path: "/items",
+      Component: ItemList,
+      initialEntries: ["/items"],
+      me: standardUser,
+    });
+
+    await screen.findByRole("heading", { level: 1, name: /items/i });
+    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+    screen.getByTestId("items-new");
+  });
 });

@@ -99,11 +99,12 @@ globalThis.fetch = (resource, init) => {
 /**
  * Express / Vite integration
  */
+import crypto from "node:crypto";
 import http from "node:http";
 import express, { type ErrorRequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
-import helmet from "helmet";
-import { MulterError } from "multer";
+import helmet, { contentSecurityPolicy } from "helmet";
+import { createErrorResponse } from "./src/express/helpers/errorResponse";
 
 export async function createServerWith(routesPath: string) {
   const app = express();
@@ -121,11 +122,25 @@ export async function createServerWith(routesPath: string) {
   // In development it is disabled because Vite's HMR relies on
   // WebSocket connections and dynamic module evaluation, which
   // are blocked by Helmet's default CSP.
-  app.use(
-    helmet({
-      contentSecurityPolicy: isProduction,
-    }),
-  );
+
+  // Note: CSP is deliberately disabled here because it's applied separately
+  // below with production-specific nonce-based directives for better
+  // compatibility with SSR and modern script loading patterns.
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use((req, res, next) => {
+    if (!isProduction) {
+      return next();
+    }
+
+    const nonce = crypto.randomBytes(16).toString("base64");
+    res.locals.cspNonce = nonce;
+
+    contentSecurityPolicy({
+      directives: {
+        scriptSrc: ["'self'", `'nonce-${nonce}'`],
+      },
+    })(req, res, next);
+  });
 
   /* ********************************************************************** */
   /* Rate limiting                                                          */
@@ -238,28 +253,9 @@ export async function createServerWith(routesPath: string) {
 
     next(err);
   };
-
-  /*
-    Final error handler:
-    Sends a structured JSON response instead of Express's default HTML page.
-    Stack traces are hidden in production to avoid leaking implementation details.
-  */
-  const sendErrors: ErrorRequestHandler = (err, _req, res, _next) => {
-    if (err instanceof MulterError && err.code === "LIMIT_FILE_SIZE") {
-      res.sendStatus(400);
-      return;
-    }
-
-    const status = err.status ?? err.statusCode ?? 500;
-
-    res.status(status).json({
-      message: err.message ?? "Internal Server Error",
-      ...(isProduction ? {} : { stack: err.stack }),
-    });
-  };
-
   app.use(logErrors);
-  app.use(sendErrors);
+
+  app.use(createErrorResponse(isProduction));
 
   return httpServer;
 }
@@ -296,13 +292,14 @@ function readIndexHtml() {
  */
 import type { Express } from "express";
 import { createServer as createViteServer } from "vite";
+import { clientAssets } from "./src/express/helpers/clientAssets";
 
 async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
     const compression = (await import("compression")).default;
 
     app.use(compression());
-    app.use(express.static("./dist/client", { extensions: [] }));
+    app.use(clientAssets("./dist/client"));
   } else {
     // Create Vite server in middleware mode.
     // Express remains the main HTTP server.

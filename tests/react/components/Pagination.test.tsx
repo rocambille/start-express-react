@@ -103,4 +103,20 @@ describe("<Pagination />", () => {
 
     expect(screen.getByText("5").getAttribute("aria-current")).toBe("page");
   });
+
+  it("should keep the other search params", async () => {
+    await renderWithStub({
+      path: "/",
+      Component: () => <Pagination total={30} pageSize={10} currentPage={2} />,
+      initialEntries: ["/?q=stuff&sort=title&page=2"],
+      me: null,
+    });
+
+    expect((await screen.findByText("Next")).getAttribute("href")).toBe(
+      "/?q=stuff&sort=title&page=3",
+    );
+    expect(screen.getByText("Previous").getAttribute("href")).toBe(
+      "/?q=stuff&sort=title&page=1",
+    );
+  });
 });

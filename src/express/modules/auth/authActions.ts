@@ -23,6 +23,7 @@ import nodemailer from "nodemailer";
 
 import { serverEnv } from "../../../env/server";
 import userRepository from "../user/userRepository";
+import { EmailSchema } from "../user/userSchemas";
 import authRepository from "./authRepository";
 
 /*
@@ -108,12 +109,16 @@ const trustedBaseUrl = serverEnv.APP_BASE_URL.replace(/\/+$/, "");
   - 204 on success
 */
 const sendMagicLink: RequestHandler = async (req, res) => {
-  const { email } = req.body;
+  // Normalized (trimmed, lowercase) and validated: "Foo@Mail.com " must
+  // find the account of "foo@mail.com", not create a second one
+  const parsed = EmailSchema.safeParse(req.body?.email);
 
-  if (!email || typeof email !== "string") {
+  if (!parsed.success) {
     res.sendStatus(400);
     return;
   }
+
+  const email = parsed.data;
 
   // Find or create user ID
   const userId = userRepository.findByEmailOrCreate(email);
@@ -155,7 +160,8 @@ const sendMagicLink: RequestHandler = async (req, res) => {
   - 401 on error
 */
 const verifyMagicLink: RequestHandler = (req, res) => {
-  const { token } = req.body;
+  // Express 5 leaves req.body undefined when the request has no body
+  const { token } = req.body ?? {};
 
   if (!token || typeof token !== "string") {
     res.sendStatus(400);

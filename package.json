@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "starter",
-  "version": "2026.10.01",
+  "version": "2026.11.01",
   "main": "server.ts",
   "engines": {
     "node": ">=22.5.0"
@@ -13,14 +13,14 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server",
-    "database:migrate": "tsx --env-file=.env scripts/database-migrate",
-    "database:reset": "tsx --env-file=.env scripts/database-reset",
-    "database:repl": "tsx --env-file=.env scripts/database-repl data/sqlite/database.sqlite",
+    "database:migrate": "tsx --env-file-if-exists=.env scripts/database-migrate",
+    "database:reset": "tsx --env-file-if-exists=.env scripts/database-reset",
+    "database:repl": "tsx --env-file-if-exists=.env scripts/database-repl data/sqlite/database.sqlite",
     "dev": "tsx watch --include .env --env-file=.env server",
     "install:check": "vitest run tests/install",
-    "make:clone": "tsx  --env-file=.env scripts/make-clone",
-    "make:purge": "tsx --env-file=.env scripts/make-purge",
-    "start": "tsx --env-file=.env server",
+    "make:clone": "tsx  --env-file-if-exists=.env scripts/make-clone",
+    "make:purge": "tsx --env-file-if-exists=.env scripts/make-purge",
+    "start": "tsx --env-file-if-exists=.env server",
     "test": "vitest run --coverage --exclude tests/install",
     "types:check": "tsc --noEmit -p tsconfig.test.json"
   },

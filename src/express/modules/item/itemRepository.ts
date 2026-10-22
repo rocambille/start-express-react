@@ -140,7 +140,9 @@ class ItemRepository {
   */
   softDelete(id: Item["id"]): boolean {
     const result = database
-      .prepare("update item set deleted_at = datetime('now') where id = ?")
+      .prepare(
+        "update item set deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') where id = ?",
+      )
       .run(id);
 
     return result.changes > 0;

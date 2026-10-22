@@ -103,33 +103,8 @@ npm run make:clone -- <source_dir> <dest_dir> <OldName> <NewName>
 npm run make:clone -- src/express/modules/item src/express/modules/post Item Post
 ```
 
-After cloning an express module, register the new routes in src/express/routes.ts:
-
-```typescript
-import postRoutes from "./modules/post/postRoutes";
-
-router.use(postRoutes);
-```
-
-After cloning a react module, register the new routes in src/react/routes.tsx:
-
-```tsx
-import { postRoutes } from "./components/post/index";
-
-/* ... */
-
-const routes: RouteObject[] = [
-  {
-    /* ... */
-    children: [
-      /* ... */
-      ...postRoutes,
-    ],
-  },
-];
-```
-
 > Always prefer `make:clone` over writing modules from scratch. It replicates your actual patterns.
+> After cloning, follow the post-clone integration checklist (or use the `starter-scaffold-resource` skill) to wire the new module into the application.
 
 ### Cleanup
 
@@ -230,7 +205,11 @@ async find(id: number): Promise<Item | null> { ... }
 
 ### Soft delete by default
 
-The `destroy` action uses `softDelete` (sets `deleted_at = datetime('now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+The `destroy` action uses `softDelete` (sets `deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+
+### Dates are ISO 8601 UTC
+
+Every date is written and compared in ISO 8601 UTC (`strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), the format of the `created_at` defaults. Never use `datetime('now')`: it produces `YYYY-MM-DD HH:MM:SS` with no UTC marker, and text comparisons against ISO dates silently give wrong results (`'T'` sorts after `' '`).
 
 ### Validation at the edge with Zod
 
@@ -249,11 +228,13 @@ router.post(BASE_PATH, itemValidators.add, itemActions.add);
 
 ### Pagination
 
-Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. Never query a table without a LIMIT.
+Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. An empty collection answers `200` with `[]` and `Content-Range: <unit> */0`, not `416`: the client treats any non-2xx status as an error. Never query a table without a LIMIT.
 
 ### API contract tests
 
 `tests/contracts/` is the declarative source of truth for API behavior. When adding or modifying endpoints, update the contract file first, then implement to satisfy it.
+
+Tests specific to one module that contracts cannot express (side effects checked in the database, several requests in a row) go in `tests/express/modules/<module>/`: `make:purge` removes that folder with the module, so the remaining project keeps passing its tests.
 
 ---
 
