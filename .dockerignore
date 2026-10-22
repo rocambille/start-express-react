@@ -31,3 +31,11 @@
 **/dist
 LICENSE
 README.md
+
+# Secrets and data never go into the image: settings come from the
+# container environment (env_file), data from a volume (compose.prod.yaml)
+**/.env
+**/.env.*
+!.env.sample
+data
+coverage

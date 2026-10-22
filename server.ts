@@ -104,7 +104,7 @@ import http from "node:http";
 import express, { type ErrorRequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet, { contentSecurityPolicy } from "helmet";
-import { MulterError } from "multer";
+import { createErrorResponse } from "./src/express/helpers/errorResponse";
 
 export async function createServerWith(routesPath: string) {
   const app = express();
@@ -253,28 +253,9 @@ export async function createServerWith(routesPath: string) {
 
     next(err);
   };
-
-  /*
-    Final error handler:
-    Sends a structured JSON response instead of Express's default HTML page.
-    Stack traces are hidden in production to avoid leaking implementation details.
-  */
-  const sendErrors: ErrorRequestHandler = (err, _req, res, _next) => {
-    if (err instanceof MulterError && err.code === "LIMIT_FILE_SIZE") {
-      res.sendStatus(400);
-      return;
-    }
-
-    const status = err.status ?? err.statusCode ?? 500;
-
-    res.status(status).json({
-      message: err.message ?? "Internal Server Error",
-      ...(isProduction ? {} : { stack: err.stack }),
-    });
-  };
-
   app.use(logErrors);
-  app.use(sendErrors);
+
+  app.use(createErrorResponse(isProduction));
 
   return httpServer;
 }
@@ -311,13 +292,14 @@ function readIndexHtml() {
  */
 import type { Express } from "express";
 import { createServer as createViteServer } from "vite";
+import { clientAssets } from "./src/express/helpers/clientAssets";
 
 async function configure(app: Express, httpServer: http.Server) {
   if (isProduction) {
     const compression = (await import("compression")).default;
 
     app.use(compression());
-    app.use(express.static("./dist/client", { extensions: [] }));
+    app.use(clientAssets("./dist/client"));
   } else {
     // Create Vite server in middleware mode.
     // Express remains the main HTTP server.

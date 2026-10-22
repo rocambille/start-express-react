@@ -79,7 +79,9 @@ update(item: Item): boolean {
 
 softDelete(id: Item["id"]): boolean {
   const result = database
-    .prepare("update item set deleted_at = datetime('now') where id = ?")
+    .prepare(
+      "update item set deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') where id = ?",
+    )
     .run(id);
 
   return result.changes > 0;
@@ -137,8 +139,14 @@ SQLite returns untyped plain JavaScript objects. Using `Schema.parse(row)` guara
 
 ### 3. Soft Delete Semantics
 
-- Every entity table includes `deleted_at text default null`.
+- Every entity table includes `deleted_at datetime default null`.
 - `find` and `findAll` queries must explicitly filter: `where deleted_at is null`.
-- `softDelete` sets `deleted_at = datetime('now')`.
+- `softDelete` sets `deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`.
 - `softUndelete` resets `deleted_at = null`.
 - `hardDelete` is available for maintenance or test cleanup.
+
+### 4. Dates in ISO 8601 UTC
+
+- Write every date in ISO 8601 UTC, the format of the `created_at` defaults: `strftime('%Y-%m-%dT%H:%M:%SZ', 'now')` in SQL, `toISOString()` for a date computed in JavaScript.
+- Never use `datetime('now')`: it produces `YYYY-MM-DD HH:MM:SS` (no `T`, no UTC marker), and comparing it as text with ISO dates silently gives wrong results.
+- SQLite never updates `updated_at` by itself: `update` sets it, e.g. `set title = ?, updated_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`.

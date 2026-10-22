@@ -160,7 +160,8 @@ const sendMagicLink: RequestHandler = async (req, res) => {
   - 401 on error
 */
 const verifyMagicLink: RequestHandler = (req, res) => {
-  const { token } = req.body;
+  // Express 5 leaves req.body undefined when the request has no body
+  const { token } = req.body ?? {};
 
   if (!token || typeof token !== "string") {
     res.sendStatus(400);

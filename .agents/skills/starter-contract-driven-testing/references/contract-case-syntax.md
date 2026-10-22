@@ -56,19 +56,33 @@ attach: {
 | `response.status` | `number` | Expected HTTP response status code. | `status: 200` |
 | `response.body` | `unknown` | Expected response body. Evaluated via deep equality, supporting Vitest asymmetric matchers. | `body: expect.any(Number)` |
 | `response.headers` | `Record<string, string>` | Expected response headers (case-insensitive keys). | `headers: { "content-range": "items 0-9/42" }` |
-| `response.and` | `() => void` | Optional callback for custom assertions after the request finishes (e.g. cookie assertions). | See below. |
+| `response.and` | `(test: supertest.Test) => void` | Optional hook receiving the supertest request **before it is sent**, to register extra `.expect(...)` assertions (e.g. cookie assertions). supertest runs them on the response and fails the case if one fails. | See below. |
 
-#### Custom Assertion Callback (`response.and`)
+#### Custom Assertion Hook (`response.and`)
 ```typescript
-and: () => {
-  expect(
-    cookies.set({
-      name: "__Host-auth",
-      options: { httpOnly: true, sameSite: "strict", secure: true, path: "/" },
-    }),
-  );
+import { cookies } from "supertest";
+
+and: (test) => {
+  test
+    // Attribute names are lowercase: supertest's Set-Cookie parser lowercases them
+    .expect(
+      cookies.set({
+        name: "__Host-auth",
+        options: { httponly: true, samesite: "Strict", secure: true, path: "/" },
+      }),
+    )
+    // cookies.set() only checks that options are present, not their values
+    .expect("set-cookie", /__Host-auth=[^;]*;.* SameSite=Strict(;|$)/);
 }
 ```
+
+> [!CAUTION]
+> `expect(cookies.set(...))` (Vitest `expect` with no matcher) asserts nothing:
+> `cookies.set()` returns an assertion function that only runs when supertest
+> calls it, which is what `test.expect(...)` does.
+
+Reusable hooks live in `tests/contracts/assertions/` (e.g. `sessionCookieIsSet`).
+That folder is not loaded as contracts: `tests/contracts/index.ts` only globs root files.
 
 ---
 

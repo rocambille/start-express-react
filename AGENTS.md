@@ -205,7 +205,11 @@ async find(id: number): Promise<Item | null> { ... }
 
 ### Soft delete by default
 
-The `destroy` action uses `softDelete` (sets `deleted_at = datetime('now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+The `destroy` action uses `softDelete` (sets `deleted_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), not `hardDelete`. All read queries filter with `WHERE deleted_at IS NULL`. Do not bypass this without explicit intent.
+
+### Dates are ISO 8601 UTC
+
+Every date is written and compared in ISO 8601 UTC (`strftime('%Y-%m-%dT%H:%M:%SZ', 'now')`), the format of the `created_at` defaults. Never use `datetime('now')`: it produces `YYYY-MM-DD HH:MM:SS` with no UTC marker, and text comparisons against ISO dates silently give wrong results (`'T'` sorts after `' '`).
 
 ### Validation at the edge with Zod
 
@@ -224,7 +228,7 @@ router.post(BASE_PATH, itemValidators.add, itemActions.add);
 
 ### Pagination
 
-Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. Never query a table without a LIMIT.
+Repository `findAll` methods take `(limit: number, offset: number)` arguments. Actions derive `offset` (`start`) and `limit` (`end - start + 1`) from the HTTP `Range: <unit>=start-end` header, returning `206 Partial Content` with `Content-Range: <unit> start-end/total`. An empty collection answers `200` with `[]` and `Content-Range: <unit> */0`, not `416`: the client treats any non-2xx status as an error. Never query a table without a LIMIT.
 
 ### API contract tests
 
