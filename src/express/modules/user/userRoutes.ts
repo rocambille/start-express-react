@@ -17,7 +17,7 @@
 /* Router setup                                                             */
 /* ************************************************************************ */
 
-import { Router } from "express";
+import express, { Router } from "express";
 
 const router = Router();
 
@@ -30,7 +30,7 @@ const router = Router();
   - Handles avatar file uploads
   - Validates file type and size
 */
-import { createUploader } from "../../helpers/upload";
+import { createUploader, UPLOADS_DIR } from "../../helpers/upload";
 /*
   authActions:
   - verifyAccessToken injects `req.me`
@@ -66,6 +66,7 @@ const avatarUploader = createUploader({
 */
 const ME_PATH = "/api/users/me";
 const ME_AVATAR_PATH = "/api/users/me/avatar";
+const UPLOADS_PATH = "/uploads";
 
 /* ************************************************************************ */
 /* Authenticated routes                                                     */
@@ -88,6 +89,19 @@ router
   .all(authActions.verifyAccessToken)
   .post(avatarUploader.single("avatar"), userActions.uploadMeAvatar)
   .delete(userActions.deleteMeAvatar);
+
+/*
+  Uploaded files (avatars) are served to authenticated users only (401
+  otherwise): user content is not public by default.
+
+  Declared here, with the uploads they serve: make:purge removes them
+  together with the user module.
+*/
+router.use(
+  UPLOADS_PATH,
+  authActions.verifyAccessToken,
+  express.static(UPLOADS_DIR),
+);
 
 /* ************************************************************************ */
 /* Export                                                                   */
