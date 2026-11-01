@@ -11,19 +11,18 @@ type Case = {
       options?: { filename?: string; contentType?: string } | string;
     };
     // Mocked JWT payload to simulate different users
-    jwtPayload?: { sub: User["id"] | string } | null;
+    jwtPayload?: { sub: number | string } | null;
     // Explicitly bypass CSRF to test protection
     withoutCsrfProtection?: boolean;
   };
   response: {
     status: number;
-    body?: JsonObject | JsonArray;
+    body?: JsonObject | JsonArray | null;
     headers?: Record<string, string>;
-    // Optional hook to run extra assertions on the response
-    and?: (response: {
-      headers: { [key: string]: string };
-      body?: unknown;
-    }) => void;
+    // Optional hook to add supertest assertions to the request before it
+    // is sent, e.g. (test) => test.expect(cookies.set({ name: "x" })):
+    // supertest runs them on the response, and fails the case if one fails
+    and?: (test: import("supertest").Test) => void;
   };
 };
 

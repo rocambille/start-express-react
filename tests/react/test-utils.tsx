@@ -181,6 +181,8 @@ export const renderHookAsync = async <
 
 type StubRouteObject = Parameters<typeof createRoutesStub>[0][number];
 
+const HydrateFallback = () => null;
+
 // Wrapping render() in act() because React's use() is suspending
 // see https://github.com/testing-library/react-testing-library/issues/1375#issuecomment-2582198933
 export const renderWithStub = async ({
@@ -201,12 +203,8 @@ export const renderWithStub = async ({
   const Stub = createRoutesStub([
     {
       path,
-      HydrateFallback: () => null,
-      Component: () => (
-        <MeProvider initialUser={me}>
-          <Component />
-        </MeProvider>
-      ),
+      HydrateFallback,
+      Component,
       ErrorBoundary:
         ErrorBoundary ??
         (({ error }: { error: unknown }) => {
@@ -216,7 +214,11 @@ export const renderWithStub = async ({
     },
   ]);
   const view = await act(async () =>
-    render(<Stub initialEntries={initialEntries} />),
+    render(
+      <MeProvider initialUser={me}>
+        <Stub initialEntries={initialEntries} />
+      </MeProvider>,
+    ),
   );
   return { ...view, user: userEvent.setup() };
 };

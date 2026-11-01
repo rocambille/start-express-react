@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import fs from "fs-extra";
@@ -18,6 +19,14 @@ const projectRoot = path.join(import.meta.dirname, "../..");
 async function scaffoldProject(rootDir: string) {
   await fs.copy(path.join(projectRoot, "src"), path.join(rootDir, "src"));
   await fs.copy(path.join(projectRoot, "tests"), path.join(rootDir, "tests"));
+
+  // A module-specific test for each example module (see AGENTS.md)
+  for (const module of ["item", "auth", "user"]) {
+    await fs.outputFile(
+      path.join(rootDir, "tests/express/modules", module, "probe.test.ts"),
+      "",
+    );
+  }
 }
 
 const isAlreadyPurged = !fs.existsSync(
@@ -75,6 +84,15 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
       expect(
         await fs.pathExists(path.join(tmpDir, "src/express/modules/auth")),
       ).toBe(false);
+
+      // Module-specific Express tests go with their module
+      for (const module of ["item", "auth", "user"]) {
+        expect(
+          await fs.pathExists(
+            path.join(tmpDir, "tests/express/modules", module),
+          ),
+        ).toBe(false);
+      }
 
       // Run second time to ensure idempotency and cover unmodified files path
       await main(["node", "script", "-n"], tmpDir);
@@ -144,301 +162,109 @@ describe.skipIf(isAlreadyPurged)("make-purge.ts", () => {
     });
   });
 
-  describe("purgeItems", () => {
-    it("removes item table from schema.sql", async () => {
-      await scaffoldProject(tmpDir);
+  /*
+    The purge is checked on its result, not by replaying its replacements:
+    a full copy of the project is purged, then it must type-check and its
+    own test suite must pass. A pattern that no longer matches the code
+    (a renamed hook, a new import) fails here.
+  */
+  describe("purged project", () => {
+    const scaffoldFullProject = async (rootDir: string) => {
+      // The whole project (tests may read any file), but not its local state
+      const skipped = new Set(["node_modules", ".git", "data", "dist", ".env"]);
 
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/database/schema.sql"),
-        "utf8",
+      for (const entry of await fs.readdir(projectRoot)) {
+        if (!skipped.has(entry)) {
+          await fs.copy(
+            path.join(projectRoot, entry),
+            path.join(rootDir, entry),
+          );
+        }
+      }
+
+      await fs.symlink(
+        path.join(projectRoot, "node_modules"),
+        path.join(rootDir, "node_modules"),
       );
+    };
 
-      const itemTableRegex = /create table item[\s\S]*?;\n\n?/m;
-      const result = content.replace(itemTableRegex, "");
+    const run = (rootDir: string, bin: string, args: string[]) =>
+      execFileSync(path.join(projectRoot, "node_modules/.bin", bin), args, {
+        cwd: rootDir,
+        encoding: "utf8",
+        stdio: "pipe",
+        // A clean environment: the outer test run must not leak into it
+        env: {
+          PATH: process.env.PATH,
+          HOME: process.env.HOME,
+          APP_SECRET: "purge-test-secret",
+        },
+      });
 
-      expect(result).not.toContain("create table item");
-      expect(result).toContain("create table user");
-      expect(result).toContain("create table magic_link_token");
-    });
+    // Files of the purged project still referring to removed code
+    const referencesTo = async (rootDir: string, pattern: RegExp) => {
+      const files = await fs.readdir(rootDir, {
+        recursive: true,
+        withFileTypes: true,
+      });
 
-    it("removes item inserts from seeder.sql", async () => {
-      await scaffoldProject(tmpDir);
+      const matches: string[] = [];
 
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/database/seeder.sql"),
-        "utf8",
-      );
+      for (const file of files) {
+        const filePath = path.join(file.parentPath, file.name);
 
-      const itemInsertRegex = /insert into item[\s\S]*?;\n/m;
-      const result = content.replace(itemInsertRegex, "");
+        if (
+          !file.isFile() ||
+          !/\.tsx?$/.test(file.name) ||
+          filePath.includes("node_modules") ||
+          filePath.includes(`${path.sep}scripts${path.sep}`) ||
+          filePath.endsWith("make-purge.test.ts")
+        ) {
+          continue;
+        }
 
-      expect(result).not.toContain("insert into item");
-      expect(result).toContain("insert into user");
-    });
+        if (pattern.test(await fs.readFile(filePath, "utf8"))) {
+          matches.push(path.relative(rootDir, filePath));
+        }
+      }
 
-    it("removes Item type from index.d.ts", async () => {
-      await scaffoldProject(tmpDir);
+      return matches;
+    };
 
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/types/index.d.ts"),
-        "utf8",
-      );
+    // Imports of removed modules (calls to removed endpoints are caught by
+    // the purged project's own test run)
+    const ITEM = /modules\/item\/|components\/item\/|fixtures\/items/;
+    const AUTH =
+      /modules\/(auth|user)\/|components\/auth\/|fixtures\/(auth|users)|MeContext|useMe\(/;
 
-      const result = content.replace(
-        `type Item = import("../express/modules/item/itemSchemas").Item;\n`,
-        "",
-      );
+    it("keeps a working project after --keep-auth", async () => {
+      await scaffoldFullProject(tmpDir);
 
-      expect(result).not.toContain("type Item");
-      expect(result).toContain("type User");
-    });
+      await main(["node", "script", "--keep-auth", "-n"], tmpDir);
 
-    it("removes item link from NavBar.tsx", async () => {
-      await scaffoldProject(tmpDir);
+      expect(await referencesTo(tmpDir, ITEM)).toEqual([]);
+      expect(() =>
+        run(tmpDir, "tsc", ["--noEmit", "-p", "tsconfig.test.json"]),
+      ).not.toThrow();
+      expect(() =>
+        run(tmpDir, "vitest", ["run", "--exclude", "tests/install"]),
+      ).not.toThrow();
+    }, 120_000);
 
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/react/components/NavBar.tsx"),
-        "utf8",
-      );
+    it("keeps a working project after a full purge", async () => {
+      await scaffoldFullProject(tmpDir);
 
-      const result = content.replace(
-        `            {link("/items", "Items")}\n`,
-        "",
-      );
+      await main(["node", "script", "-n"], tmpDir);
 
-      expect(result).not.toContain("/items");
-      expect(result).toContain("/account");
-      expect(result).toContain("Home");
-    });
-
-    it("removes item routes from routes.tsx", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/react/routes.tsx"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(`import { itemRoutes } from "./components/item/index";\n`, "")
-        .replace(`          ...itemRoutes,\n`, "");
-
-      expect(result).not.toContain("itemRoutes");
-      expect(result).toContain("AccountPage");
-    });
-
-    it("removes item route from express routes.ts", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/express/routes.ts"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(`import itemRoutes from "./modules/item/itemRoutes";\n`, "")
-        .replace(`router.use(itemRoutes);\n`, "");
-
-      expect(result).not.toContain("itemRoutes");
-      expect(result).toContain("authRoutes");
-      expect(result).toContain("userRoutes");
-    });
-
-    it("removes item fixtures from tests/fixtures/index.ts", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "tests/fixtures/index.ts"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(`import { seedItems } from "./items";\n`, "")
-        .replace(`  seedItems,\n`, "")
-        .replace(`export * from "./items";\n`, "");
-
-      expect(result).not.toContain("seedItems");
-      expect(result).not.toContain('"./items"');
-      expect(result).toContain("seedUsers");
-      expect(result).toContain("seedAuthTokens");
-    });
-  });
-
-  describe("purgeAuth", () => {
-    it("removes user and magic_link_token tables from schema.sql", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/database/schema.sql"),
-        "utf8",
-      );
-
-      const userTableRegex = /create table user[\s\S]*?;\n\n?/m;
-      const magicLinkTableRegex =
-        /create table magic_link_token[\s\S]*?;\n\n?/m;
-      const result = content
-        .replace(userTableRegex, "")
-        .replace(magicLinkTableRegex, "");
-
-      expect(result).not.toContain("create table user");
-      expect(result).not.toContain("create table magic_link_token");
-      expect(result).toContain("create table item");
-    });
-
-    it("removes user inserts from seeder.sql", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/database/seeder.sql"),
-        "utf8",
-      );
-
-      const userInsertRegex = /insert into user[\s\S]*?;\n\n?/m;
-      const result = content.replace(userInsertRegex, "");
-
-      expect(result).not.toContain("insert into user");
-      expect(result).toContain("insert into item");
-    });
-
-    it("removes User types from index.d.ts", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/types/index.d.ts"),
-        "utf8",
-      );
-
-      const result = content.replace(
-        `type User = import("../express/modules/user/userSchemas").User;\n`,
-        "",
-      );
-
-      expect(result).not.toContain("type User");
-      expect(result).toContain("type Item");
-    });
-
-    it("removes auth imports and loader from routes.tsx", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/react/routes.tsx"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(
-          `import AccountPage from "./components/auth/AccountPage";\n`,
-          "",
-        )
-        .replace(`import VerifyPage from "./components/auth/VerifyPage";\n`, "")
-        .replace(
-          `import { AuthProvider } from "./components/auth/MeContext";\n`,
-          "",
-        )
-        .replace(
-          `import { type RouteObject, useLoaderData } from "react-router";`,
-          `import type { RouteObject } from "react-router";`,
-        )
-        .replace(
-          /Component: \(\) => \{[\s\S]*?\},\n/m,
-          `Component: () => {\n      return <Layout />;\n    },\n`,
-        )
-        .replace(/ {4}\/\*\n {6}Root loader:[\s\S]*?\n {4}\},\n/m, "")
-        .replace(
-          / {10}\{\n {12}path: "account",\n {12}element: <AccountPage \/>,\n {10}\},\n/m,
-          "",
-        )
-        .replace(
-          / {10}\{\n {12}path: "verify",\n {12}element: <VerifyPage \/>,\n {10}\},\n/m,
-          "",
-        );
-
-      expect(result).not.toContain("AccountPage");
-      expect(result).not.toContain("VerifyPage");
-      expect(result).not.toContain("AuthProvider");
-      expect(result).not.toContain("useLoaderData");
-      expect(result).not.toContain("Root loader");
-      expect(result).not.toContain('path: "account"');
-      expect(result).not.toContain('path: "verify"');
-      expect(result).toContain("Layout");
-    });
-
-    it("removes auth code from Layout.tsx", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/react/components/Layout.tsx"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(
-          `import { Outlet, useLocation } from "react-router";`,
-          `import { Outlet } from "react-router";`,
-        )
-        .replace(`import { useMe } from "./auth/MeContext";\n`, "")
-        .replace(`import MagicLinkForm from "./auth/MagicLinkForm";\n`, "")
-        .replace(`  const { isAuthenticated } = useMe();\n`, "")
-        .replace(`  const location = useLocation();\n\n`, "")
-        .replace(
-          / {8}\{isAuthenticated \|\| location\.pathname === "\/verify" \? \(\n[\s\S]*?<Outlet \/>[\s\S]*?<\/Suspense>\n {8}\) : \(\n {10}<MagicLinkForm \/>\n {8}\)\}/m,
-          `        <Suspense fallback={<p>Loading…</p>}>\n          <Outlet />\n        </Suspense>`,
-        );
-
-      expect(result).not.toContain("useMe");
-      expect(result).not.toContain("MagicLinkForm");
-      expect(result).not.toContain("useLocation");
-      expect(result).not.toContain("isAuthenticated");
-      expect(result).toContain("<Outlet />");
-      expect(result).toContain("Suspense");
-      expect(result).toContain("NavBar");
-    });
-
-    it("removes auth code from NavBar.tsx (after purgeItems)", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/react/components/NavBar.tsx"),
-        "utf8",
-      );
-
-      // First simulate purgeItems removing the items link
-      const afterItems = content.replace(
-        `            {link("/items", "Items")}\n`,
-        "",
-      );
-
-      // Then simulate purgeAuth
-      const result = afterItems
-        .replace(`import { useMe } from "./auth/MeContext";\n\n`, "")
-        .replace(`  const { user, isAuthenticated } = useMe();\n`, "")
-        .replace(/ {8}\{isAuthenticated && \(\n[\s\S]*?\n {8}\)}\n/m, "");
-
-      expect(result).not.toContain("useMe");
-      expect(result).not.toContain("isAuthenticated");
-      expect(result).not.toContain("/items");
-      expect(result).not.toContain("/account");
-      expect(result).toContain("Home");
-    });
-
-    it("removes auth/user routes from express routes.ts", async () => {
-      await scaffoldProject(tmpDir);
-
-      const content = await fs.readFile(
-        path.join(tmpDir, "src/express/routes.ts"),
-        "utf8",
-      );
-
-      const result = content
-        .replace(`import authRoutes from "./modules/auth/authRoutes";\n`, "")
-        .replace(`router.use(authRoutes);\n`, "")
-        .replace(`import userRoutes from "./modules/user/userRoutes";\n`, "")
-        .replace(`router.use(userRoutes);\n`, "");
-
-      expect(result).not.toContain("authRoutes");
-      expect(result).not.toContain("userRoutes");
-      expect(result).toContain("itemRoutes");
-    });
+      expect(await referencesTo(tmpDir, ITEM)).toEqual([]);
+      expect(await referencesTo(tmpDir, AUTH)).toEqual([]);
+      expect(() =>
+        run(tmpDir, "tsc", ["--noEmit", "-p", "tsconfig.test.json"]),
+      ).not.toThrow();
+      expect(() =>
+        run(tmpDir, "vitest", ["run", "--exclude", "tests/install"]),
+      ).not.toThrow();
+    }, 120_000);
   });
 
   describe("error handling in remove", () => {

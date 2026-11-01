@@ -22,12 +22,24 @@ describe("React Helpers: mutate", () => {
     });
 
     it("should send a mutation request with a FormData body", async () => {
+      // Tested on mutate itself, not on an upload endpoint of the API
+      vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+        new Response(null, { status: 204 }),
+      );
+
       const formData = new FormData();
-      formData.append("avatar", "test");
+      formData.append("file", "test");
 
-      await mutate(`/api/users/me/avatar`, "post", formData);
+      await mutate("/api/upload", "post", formData);
 
-      expectContractCall("users", "upload_me_avatar", "as_me");
+      const [url, init] = vi.mocked(globalThis.fetch).mock.calls.at(-1) ?? [];
+      const headers = new Headers(init?.headers);
+
+      expect(url).toBe("/api/upload");
+      expect(init?.body).toBe(formData);
+      // The browser sets the multipart Content-Type (with its boundary)
+      expect(headers.has("Content-Type")).toBe(false);
+      expect(headers.has("X-CSRF-Token")).toBe(true);
     });
 
     it("should send a mutation request without a body", async () => {

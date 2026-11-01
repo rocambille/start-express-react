@@ -7,11 +7,21 @@ import { z } from "zod";
 import { serverEnv } from "../../../env/server";
 
 /*
+  Emails are compared and stored trimmed and lowercase:
+  "Foo@Mail.com " is the account of "foo@mail.com".
+*/
+export const EmailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.email().max(255));
+
+/*
   User Master Entity Schema
 */
 export const UserSchema = z.object({
   id: z.number(),
-  email: z.email().max(255),
+  email: EmailSchema,
   name: z.string().max(255),
   avatar_url: z
     .string()

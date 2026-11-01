@@ -11,9 +11,34 @@ import {
 } from "../../../src/react/helpers/cache";
 import { renderHookAsync, setupMocks } from "../test-utils";
 
+/*
+  The cache is tested on its own: fetch answers any path, without relying
+  on the API contracts (paths stay valid whatever modules the project has,
+  e.g. after make:purge).
+*/
+const stubFetch = () => {
+  globalThis.fetch = vi
+    .fn<typeof globalThis.fetch>()
+    .mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/404") {
+        return new Response(null, { status: 404 });
+      }
+
+      const body = url === "/api/health" ? { hello: "world" } : { url };
+
+      return new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+};
+
 describe("React Helpers: cache", () => {
   beforeEach(() => {
     setupMocks();
+    stubFetch();
   });
 
   afterEach(() => {

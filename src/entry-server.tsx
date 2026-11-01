@@ -146,10 +146,13 @@ export const render = async (template: string, req: Request, res: Response) => {
 
     StrictMode helps surface unsafe patterns early.
   */
+  const nonce: string | undefined = res.locals.cspNonce;
+
   const { pipe } = renderToPipeableStream(
     <StrictMode>
-      <StaticRouterProvider router={router} context={context} />
+      <StaticRouterProvider router={router} context={context} nonce={nonce} />
     </StrictMode>,
+    { nonce },
   );
 
   /* ********************************************************************** */

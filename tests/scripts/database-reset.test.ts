@@ -23,9 +23,8 @@ const checkSchema = () => {
 
   const tableNames = tables.map((t) => t.name);
 
-  expect(tableNames).toContain("user");
-  expect(tableNames).toContain("item");
-  expect(tableNames).toContain("magic_link_token");
+  expect(tableNames).toContain("author");
+  expect(tableNames).toContain("note");
 };
 
 describe("database-reset.ts", () => {
@@ -83,13 +82,13 @@ describe("database-reset.ts", () => {
 
     checkSchema();
 
-    const users = database.prepare("select * from user").all();
+    const authors = database.prepare("select * from author").all();
 
-    expect(users.length).toBeGreaterThan(0);
+    expect(authors.length).toBeGreaterThan(0);
 
-    const items = database.prepare("select * from item").all();
+    const notes = database.prepare("select * from note").all();
 
-    expect(items.length).toBeGreaterThan(0);
+    expect(notes.length).toBeGreaterThan(0);
   });
 
   it("loads schema, migrations and seeder in interactive mode", async () => {
@@ -103,13 +102,13 @@ describe("database-reset.ts", () => {
 
     checkSchema();
 
-    const users = database.prepare("select * from user").all();
+    const authors = database.prepare("select * from author").all();
 
-    expect(users.length).toBeGreaterThan(0);
+    expect(authors.length).toBeGreaterThan(0);
 
-    const items = database.prepare("select * from item").all();
+    const notes = database.prepare("select * from note").all();
 
-    expect(items.length).toBeGreaterThan(0);
+    expect(notes.length).toBeGreaterThan(0);
   });
 
   it("populates _migrations table with all executed files", async () => {

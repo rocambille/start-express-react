@@ -2,9 +2,9 @@ name: Test and Lint
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -14,26 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Check code formatting and linting
-      run: npm run biome:check
+      - name: Check code formatting and linting
+        run: npm run biome:check
 
-    - name: Check TypeScript types
-      run: npm run types:check
+      - name: Check TypeScript types
+        run: npm run types:check
 
-    - name: Run tests
-      run: npm run test
-      env:
-        APP_BASE_URL: http://dummy_url_for_testing
-        APP_SECRET: dummy_secret_for_testing
+      - name: Run tests
+        run: npm run test
+        env:
+          APP_BASE_URL: http://dummy_url_for_testing
+          APP_SECRET: dummy_secret_for_testing

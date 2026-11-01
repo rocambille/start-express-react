@@ -106,9 +106,13 @@ app.use(routes);
 /*
   Error logging middleware:
   Logs errors for debugging, then passes them to the error response handler.
+
+  Every server error (5xx) is logged, including errors without a status
+  (a TypeError, a SQLite error…, which end as 500): those are the bugs a
+  failing contract needs to show. Client errors (4xx) stay quiet.
 */
-const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
-  if (err.status === 500) {
+export const logErrors: ErrorRequestHandler = (err, req, _res, next) => {
+  if ((err.status ?? err.statusCode ?? 500) >= 500) {
     console.error(err);
     console.error("on req:", req.method, req.path);
   }
@@ -175,9 +179,17 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
     cookies.push("__Host-x-csrf-token=a-b-c-d-e");
   }
 
-  const response = await apiCall.set("Cookie", cookies);
+  apiCall.set("Cookie", cookies);
+
+  // Extra supertest assertions, registered before the request is sent
+  // (supertest runs them when the response arrives)
+  caseDetails.response.and?.(apiCall);
+
+  let response: Awaited<typeof apiCall> | undefined;
 
   try {
+    response = await apiCall;
+
     expect(response.status).toBe(caseDetails.response.status);
     expect(response.body).toEqual(caseDetails.response.body);
 
@@ -189,11 +201,10 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
       }
     }
 
-    if (caseDetails.response.and) {
-      caseDetails.response.and(response);
-    }
+    return response;
   } finally {
     if (
+      response != null &&
       caseDetails.request.attach != null &&
       typeof response.body === "object" &&
       response.body !== null
@@ -205,6 +216,4 @@ export const check = async (test: Test, caseName: keyof Test["cases"]) => {
       }
     }
   }
-
-  return response;
 };

@@ -15,17 +15,27 @@ FROM node:${NODE_VERSION}-alpine
 # Set working directory for all build stages.
 WORKDIR /home/app
 
+# Run as the unprivileged "node" user (uid 1000) of the base image, not
+# root: the app needs no privilege, and files it writes in mounted volumes
+# (database, uploads) stay owned by a regular user on the host.
+# The user owns the working directory before anything is installed: a
+# chown afterwards would copy node_modules into a second layer.
+RUN chown node:node /home/app
+USER node
+
 # Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
+# Leverage a cache mount to the npm cache of the "node" user to speed up subsequent builds.
 # Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/home/node/.npm,uid=1000,gid=1000 \
     npm ci
 
 # Copy the rest of the source files into the image.
-COPY . .
+# .env and data/ are excluded (.dockerignore): settings come from the
+# container environment, data from a volume.
+COPY --chown=node:node . .
 
 # Run the application.
 # Shell form vs Exec form?

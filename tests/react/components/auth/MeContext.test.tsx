@@ -12,6 +12,10 @@ import {
   setupMocks,
 } from "../../test-utils";
 
+const HelloMeProvider = () => (
+  <MeProvider initialUser={null}>hello, world!</MeProvider>
+);
+
 describe("React Components: MeContext", () => {
   beforeEach(() => {
     setupMocks();
@@ -26,9 +30,7 @@ describe("React Components: MeContext", () => {
     it("should render its children", async () => {
       await renderWithStub({
         path: "/",
-        Component: () => (
-          <MeProvider initialUser={null}>hello, world!</MeProvider>
-        ),
+        Component: HelloMeProvider,
         initialEntries: ["/"],
         me: null,
       });

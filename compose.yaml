@@ -12,7 +12,10 @@ services:
     build:
       context: .
     volumes:
-      - ".:/app"
+      # Live source for development, on the working directory of the image
+      - ".:/home/app"
+      # Keep the dependencies installed in the image (not the host's)
+      - /home/app/node_modules
     ports:
       - ${APP_PORT-5173}:${APP_PORT-5173}
       - 24678:24678

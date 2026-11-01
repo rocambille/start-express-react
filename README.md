@@ -64,26 +64,30 @@ Don't let AI "guess" your architecture. Use `make:clone` to replicate working lo
 ```bash
 npm run make:clone -- src/express/modules/item src/express/modules/task Item Task
 ```
-This enforces consistency by cloning your *actual* code patterns. This keeps your AI agent focused and accurate.
+This enforces consistency by cloning your _actual_ code patterns. This keeps your AI agent focused and accurate.
 
 ### 🧪 Contract-driven verification
+
 You define API behavior in the `tests/contracts/` directory: a central, declarative source of truth.
-*   **For you:** clear, living documentation.
-*   **For AI:** a strict "contract" it must follow when generating endpoints.
-*   **For the app:** instant verification that the AI didn't miss a scenario.
+-   **For you:** clear, living documentation.
+-   **For AI:** a strict "contract" it must follow when generating endpoints.
+-   **For the app:** instant verification that the AI didn't miss a scenario.
 
 ### 🔍 Zero-magic simplicity
-*   **Sync SQLite:** direct data access that AI can read and write without `async`/`await` confusion.
-*   **Single Source of Truth Schemas:** Zod schemas in `*Schemas.ts` validate HTTP inputs at the edge and parse database entity outputs. This prevents silent runtime bugs.
-*   **Transparent stack:** Express 5 + React 19. No black boxes. You understand every line.
+
+-   **Sync SQLite:** direct data access that AI can read and write without `async`/`await` confusion.
+-   **Single Source of Truth Schemas:** Zod schemas in `*Schemas.ts` validate HTTP inputs at the edge and parse database entity outputs. This prevents silent runtime bugs.
+-   **Transparent stack:** Express 5 + React 19. No black boxes. You understand every line.
 
 ## 💻 Tech stack
-*   **Backend**: Node.js, Express 5, Zod (validation)
-*   **Frontend**: React 19, React Router, Vite, Pico CSS
-*   **Database**: SQLite (zero-config, sync API)
-*   **Tooling**: TypeScript, Biome, Vitest, Docker
+
+-   **Backend**: Node.js, Express 5, Zod (validation)
+-   **Frontend**: React 19, React Router, Vite, Pico CSS
+-   **Database**: SQLite (zero-config, sync API)
+-   **Tooling**: TypeScript, Biome, Vitest, Docker
 
 ## 📖 Learn & support
+
 StartER is a pedagogical project. If this framework helps you learn or prototype faster, **give us a ⭐ on GitHub!**
 
 👉 **[Read the wiki](https://github.com/rocambille/start-express-react/wiki)**
