@@ -24,22 +24,30 @@ const MIME_TO_EXTENSION = new Map([
   ["image/gif", ".gif"],
 ]);
 
+/*
+  Root folder of all uploaded files.
+  Never served publicly: a module serving them puts its own access check
+  in front (e.g. authentication).
+*/
+export const UPLOADS_DIR = path.join(
+  import.meta.dirname,
+  "../../../data/uploads",
+);
+
 const DEFAULT_OPTIONS: Required<Omit<UploaderOptions, "subfolder">> = {
   maxSizeBytes: 2 * 1024 * 1024, // 2MB
   allowedMimeTypes: Array.from(MIME_TO_EXTENSION.keys()),
 };
 
-export const createUploader = (options: UploaderOptions): multer.Multer => {
+export const createUploader = (
+  options: UploaderOptions,
+): multer.Multer & { destDir: string } => {
   const { subfolder, allowedMimeTypes, maxSizeBytes } = {
     ...DEFAULT_OPTIONS,
     ...options,
   };
 
-  const destDir = path.join(
-    import.meta.dirname,
-    "../../../data/uploads",
-    subfolder,
-  );
+  const destDir = path.join(UPLOADS_DIR, subfolder);
 
   fs.mkdirSync(destDir, { recursive: true });
 
@@ -54,7 +62,7 @@ export const createUploader = (options: UploaderOptions): multer.Multer => {
     },
   });
 
-  return multer({
+  const uploader = multer({
     storage,
     limits: { fileSize: maxSizeBytes },
     fileFilter: (_req, file, cb) => {
@@ -72,6 +80,8 @@ export const createUploader = (options: UploaderOptions): multer.Multer => {
       }
     },
   });
+
+  return Object.assign(uploader, { destDir });
 };
 
 export const deleteUploadedFile = (relativeUrl?: string | null): void => {
