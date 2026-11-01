@@ -7,6 +7,7 @@ This reference documents the standard database access patterns for StartER repos
 Repositories in StartER encapsulate all persistence logic using the built-in `node:sqlite` driver.
 - Repository files live in `src/express/modules/<name>/<name>Repository.ts`.
 - The database connection is imported from `src/database/index.ts`:
+
   ```typescript
   import database from "../../../database";
   ```

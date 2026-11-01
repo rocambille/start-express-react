@@ -38,16 +38,19 @@ StartER uses the **Client-Side Double-Submit Cookie** pattern:
 `mutate()` automatically inspects the `body` parameter:
 
 ### Standard JSON Mutations
+
 ```typescript
 const addItem = async (data: ItemDTO) => {
   await mutate("/api/items", "post", data, ["/api/items"]);
   navigate("/items");
 };
 ```
+
 - Sets `Content-Type: application/json`.
 - Serializes body with `JSON.stringify(body)`.
 
 ### Multipart / File Upload Mutations
+
 ```typescript
 const uploadAvatar = async (file: File) => {
   const formData = new FormData();
@@ -56,6 +59,7 @@ const uploadAvatar = async (file: File) => {
   await mutate("/api/users/me/avatar", "post", formData, ["/api/users/me"]);
 };
 ```
+
 - Leaves `Content-Type` header unset so the browser automatically sets `multipart/form-data; boundary=...`.
 - Sends raw `FormData` without JSON serialization.
 
@@ -71,12 +75,13 @@ await mutate("/api/items/1", "delete", undefined, "/api/items");
 
 // Multiple related paths:
 await mutate(`/api/items/${id}`, "put", updatedData, [
-  "/api/items",           // Evicts paginated item lists
-  `/api/items/${id}`,     // Evicts specific item detail
+  "/api/items", // Evicts paginated item lists
+  `/api/items/${id}`, // Evicts specific item detail
 ]);
 ```
 
 ### Invalidation Semantics:
+
 1. `refresh(paths)` deletes all cached Promises whose keys match or start with the specified path.
 2. It immediately notifies any mounted component subscribed via `useRefresh(matchingPath)`.
 3. Subscribed components re-render, trigger a new `getOrFetch()`, and re-suspend until the fresh data arrives.

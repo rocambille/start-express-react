@@ -4,6 +4,12 @@ import { data } from "react-router";
 import ErrorPage from "../../../src/react/components/ErrorPage";
 import { renderWithStub, setupMocks } from "../test-utils";
 
+const Hello = () => <p>hello, world!</p>;
+
+const Thrower = () => {
+  throw new Error("Test error");
+};
+
 describe("<ErrorPage />", () => {
   beforeEach(() => {
     setupMocks();
@@ -19,7 +25,7 @@ describe("<ErrorPage />", () => {
   it("should mount successfully", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <ErrorPage />,
+      Component: ErrorPage,
       initialEntries: ["/"],
       me: null,
     });
@@ -30,7 +36,7 @@ describe("<ErrorPage />", () => {
   it("should handle a route error response", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <p>hello, world!</p>,
+      Component: Hello,
       loader: () => {
         throw data("Test error", { status: 404 });
       },
@@ -46,9 +52,7 @@ describe("<ErrorPage />", () => {
   it("should handle a standard error", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => {
-        throw new Error("Test error");
-      },
+      Component: Thrower,
       ErrorBoundary: ErrorPage,
       initialEntries: ["/"],
       me: null,

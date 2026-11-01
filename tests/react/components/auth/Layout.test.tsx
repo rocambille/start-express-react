@@ -20,7 +20,7 @@ describe("<Layout /> with authentication", () => {
   it("should render magic link form when not authenticated", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Layout />,
+      Component: Layout,
       initialEntries: ["/"],
       me: null,
     });
@@ -31,7 +31,7 @@ describe("<Layout /> with authentication", () => {
   it("should render account link when authenticated", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Layout />,
+      Component: Layout,
       initialEntries: ["/"],
       me: standardUser,
     });

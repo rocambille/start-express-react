@@ -1,9 +1,10 @@
 ---
+
 name: starter-auth-and-access-control
 description: >-
-  Use this skill when implementing authentication, protecting routes, verifying resource
-  ownership, enforcing role-based access control (RBAC), accessing req.me, or configuring
-  trusted identity injection in StartER to prevent IDOR security vulnerabilities.
+Use this skill when implementing authentication, protecting routes, verifying resource
+ownership, enforcing role-based access control (RBAC), accessing req.me, or configuring
+trusted identity injection in StartER to prevent IDOR security vulnerabilities.
 ---
 
 # Authentication & Access Control in StartER
@@ -138,12 +139,14 @@ const checkAccess: RequestHandler = (req, res, next) => {
 ## 4. Accessing User Identity
 
 ### Server-side: `req.me`
+
 After passing through `authActions.verifyAccessToken`:
 - `req.me` is populated with the complete `User` record fetched freshly from the database (`userRepository.find(sub)`).
 - If the user was deleted from SQLite, the token is rejected immediately, even if unexpired.
 - TypeScript types for `req.me` are globally augmented.
 
 ### Client-side: `useMe()` Hook
+
 In React components:
 ```tsx
 import { useMe } from "../auth/MeContext";
@@ -158,7 +161,9 @@ function UserProfile() {
   return (
     <div>
       <h2>Welcome, {user.name}!</h2>
-      <button type="button" onClick={logout}>Sign Out</button>
+      <button type="button" onClick={logout}>
+        Sign Out
+      </button>
     </div>
   );
 }

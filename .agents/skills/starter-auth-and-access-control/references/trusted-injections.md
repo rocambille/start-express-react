@@ -9,6 +9,7 @@ This reference documents how StartER uses Zod DTOs and `createValidator` injecti
 An Insecure Direct Object Reference (IDOR) occurs when an application relies on client-supplied identity attributes (such as `user_id`, `account_id`, or `author_id`) to associate records with users.
 
 ### ❌ The Vulnerable Pattern:
+
 ```typescript
 // DANGEROUS: Accepts user_id from client JSON payload
 export const BadItemDTOSchema = z.object({
@@ -81,7 +82,7 @@ const edit = createValidator(
   { body: ItemDTOSchema },
   {
     inject: (req) => ({
-      id: req.item.id,    // Strictly from resolved ParamConverter
+      id: req.item.id, // Strictly from resolved ParamConverter
       user_id: req.me.id, // Strictly from verified session JWT
     }),
   },
@@ -98,6 +99,7 @@ Because `createValidator` replaces `req.body` with the merged, validated payload
 - Downstream actions receive a clean, 100% trusted `req.body`.
 - Actions do not need manual ID reassignment.
 - Repositories receive genuine user IDs:
+
   ```typescript
   const add: RequestHandler = (req, res) => {
     // req.body is typed ItemDTOWithUserId; user_id is guaranteed authentic

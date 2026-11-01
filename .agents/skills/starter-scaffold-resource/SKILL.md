@@ -1,10 +1,11 @@
 ---
+
 name: starter-scaffold-resource
 description: >-
-  Use this skill when the user asks to create, scaffold, or add a new resource,
-  entity, module, CRUD feature, or API endpoint to the StartER framework (e.g., adding
-  posts, comments, products, categories). Guides cloning, schema design, repository
-  patterns, validation, routing, React integration, and contract tests.
+Use this skill when the user asks to create, scaffold, or add a new resource,
+entity, module, CRUD feature, or API endpoint to the StartER framework (e.g., adding
+posts, comments, products, categories). Guides cloning, schema design, repository
+patterns, validation, routing, React integration, and contract tests.
 ---
 
 # Scaffold a Resource in StartER
@@ -69,7 +70,7 @@ Prefer `item` as the default source, or choose a closer existing domain module:
 npm run make:clone -- src/express/modules/<source> src/express/modules/<name> <Source> <Name>
 ```
 
-*Example:*
+_Example:_
 ```bash
 npm run make:clone -- src/express/modules/item src/express/modules/post Item Post
 ```
@@ -168,11 +169,13 @@ router.use(<name>Routes);
 ### Step 11: Clone & Mount React Components
 
 1. Clone the React component tree:
+
    ```bash
    npm run make:clone -- src/react/components/<source> src/react/components/<name> <Source> <Name>
    ```
 
 2. Register the frontend routes in `src/react/routes.tsx`:
+
    ```tsx
    import { <name>Routes } from "./components/<name>/index";
 

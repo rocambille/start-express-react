@@ -1,10 +1,11 @@
 ---
+
 name: starter-contract-driven-testing
 description: >-
-  Use this skill when authoring, modifying, or debugging API endpoint contracts and
-  test fixtures in StartER (tests/contracts/ and tests/fixtures/). Explains declarative
-  contract definitions, fixture factories, topological FK ordering, running contracts
-  via Vitest, and how contracts automatically mock frontend React component tests.
+Use this skill when authoring, modifying, or debugging API endpoint contracts and
+test fixtures in StartER (tests/contracts/ and tests/fixtures/). Explains declarative
+contract definitions, fixture factories, topological FK ordering, running contracts
+via Vitest, and how contracts automatically mock frontend React component tests.
 ---
 
 # Declarative Contract-Driven Testing in StartER
@@ -76,6 +77,7 @@ export default (<Contract>{
 Follow this sequence whenever adding or updating API contracts:
 
 ### Step 1: Create Fixtures (`tests/fixtures/<name>.ts`)
+
 Define frozen entity records and an exported seeder function:
 
 ```typescript
@@ -91,7 +93,9 @@ export const firstPost: Post = Object.freeze({
 export const allPosts: Post[] = Object.freeze([firstPost]) as Post[];
 
 export const seedPosts = (db: DatabaseSync) => {
-  const query = db.prepare("insert into post (id, title, user_id) values (?, ?, ?)");
+  const query = db.prepare(
+    "insert into post (id, title, user_id) values (?, ?, ?)",
+  );
   for (const post of allPosts) {
     query.run(post.id, post.title, post.user_id);
   }
@@ -99,15 +103,16 @@ export const seedPosts = (db: DatabaseSync) => {
 ```
 
 ### Step 2: Register Seeder (`tests/fixtures/index.ts`)
+
 Register the seeder in `seeders` strictly in parent-to-child foreign key order, and re-export the fixtures:
 
 ```typescript
 import { seedPosts } from "./posts";
 
 export const seeders: readonly Seeder[] = Object.freeze([
-  seedUsers,      // 1. Parent
-  seedItems,      // 2. Child
-  seedPosts,      // 3. Child (depends on users)
+  seedUsers, // 1. Parent
+  seedItems, // 2. Child
+  seedPosts, // 3. Child (depends on users)
   seedAuthTokens, // 4. Dependent tokens
 ]);
 
@@ -118,6 +123,7 @@ export * from "./posts";
 > Consult [fixture-seeding.md](./references/fixture-seeding.md) to ensure correct foreign key topological ordering and avoid `FOREIGN KEY constraint failed` errors.
 
 ### Step 3: Declare Contract Cases (`tests/contracts/<name>.ts`)
+
 Declare all test suites (`browse`, `read`, `create`, `edit`, `delete`) with standard cases:
 - `success`: Happy path with valid input and permissions.
 - `bad_request`: Invalid DTO or validation failure (status 400).
@@ -126,6 +132,7 @@ Declare all test suites (`browse`, `read`, `create`, `edit`, `delete`) with stan
 - `not_found`: Non-existent record (status 404, often using `specialPath: /api/.../${NaN}`).
 
 ### Step 4: Register Contract in Index (`tests/contracts/index.ts`)
+
 Mount the contract in the default export object:
 
 ```typescript
@@ -145,11 +152,13 @@ export default {
 ## Executing & Debugging Contracts
 
 ### Run All Contract Tests
+
 ```bash
 npx vitest run tests/express/contracts.test.ts
 ```
 
 ### Isolate a Single Test Case (`only: true`)
+
 When troubleshooting a specific case, add `only: true` to the case definition:
 
 ```typescript
@@ -172,6 +181,7 @@ In React component tests (`tests/react/components/...`):
 - `setupMocks()` in `tests/react/test-utils.tsx` automatically intercepts `globalThis.fetch` and matches incoming calls against registered contracts.
 - **Do not** write custom fetch spies or manual response mocks.
 - Use `requestValue()` and `responseValue()` to pull deterministic fixture data directly from contracts:
+
   ```typescript
   import { expectContractCall, requestValue } from "../../test-utils";
 

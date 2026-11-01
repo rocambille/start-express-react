@@ -4,6 +4,12 @@ import ItemForm from "../../../../src/react/components/item/ItemForm";
 import { standardUser } from "../../../fixtures/users";
 import { renderWithStub, setupMocks } from "../../test-utils";
 
+const EmptyItemForm = () => (
+  <ItemForm defaultValue={{ title: "" }} action={() => {}}>
+    <button type="submit">submit</button>
+  </ItemForm>
+);
+
 describe("<ItemForm />", () => {
   beforeEach(() => {
     setupMocks();
@@ -17,11 +23,7 @@ describe("<ItemForm />", () => {
   it("should mount successfully", async () => {
     await renderWithStub({
       path: "/items/new",
-      Component: () => (
-        <ItemForm defaultValue={{ title: "" }} action={() => {}}>
-          <button type="submit">submit</button>
-        </ItemForm>
-      ),
+      Component: EmptyItemForm,
       initialEntries: ["/items/new"],
       me: standardUser,
     });
@@ -31,11 +33,7 @@ describe("<ItemForm />", () => {
   it("should display inline errors when submitting invalid data", async () => {
     await renderWithStub({
       path: "/items/new",
-      Component: () => (
-        <ItemForm defaultValue={{ title: "" }} action={() => {}}>
-          <button type="submit">submit</button>
-        </ItemForm>
-      ),
+      Component: EmptyItemForm,
       initialEntries: ["/items/new"],
       me: standardUser,
     });

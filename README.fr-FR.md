@@ -26,10 +26,10 @@
 
 StartER est un framework open-source pour **apprendre** et **construire** des applications web fullstack. Il fournit :
 
-* Backend Express
-* Frontend React
-* Types et contrats partagés pour la vérification de l'API
-* Une architecture "sans magie" où vous comprenez chaque ligne
+- Backend Express
+- Frontend React
+- Types et contrats partagés pour la vérification de l'API
+- Une architecture "sans magie" où vous comprenez chaque ligne
 
 Que vous soyez étudiant·e, en reconversion, ou développeur·se expérimenté·e qui prototype une nouvelle idée, StartER vous offre une base solide et lisible.
 
@@ -67,32 +67,32 @@ Ne laissez pas l'IA "deviner" votre architecture. Utilisez `make:clone` pour ré
 ```bash
 npm run make:clone -- src/express/modules/item src/express/modules/task Item Task
 ```
-Cela garantit la cohérence en clonant vos modèles de code *réels*. Votre agent IA reste ainsi concentré et précis.
+Cela garantit la cohérence en clonant vos modèles de code _réels_. Votre agent IA reste ainsi concentré et précis.
 
 ### 🧪 Vérification basée sur un contrat
 
 Vous définissez le comportement de l'API dans le dossier `tests/contracts/` : une source de vérité centrale et déclarative.
 
-* **Pour vous :** une documentation claire et évolutive.
+- **Pour vous :** une documentation claire et évolutive.
 
-* **Pour l'IA :** un "contrat" strict qu'elle doit respecter lors de la génération des endpoints.
+- **Pour l'IA :** un "contrat" strict qu'elle doit respecter lors de la génération des endpoints.
 
-* **Pour l'application :** vérification instantanée que l'IA n'a omis aucun scénario.
+- **Pour l'application :** vérification instantanée que l'IA n'a omis aucun scénario.
 
 ### 🔍 Simplicité sans magie
 
-* **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
+- **SQLite synchrone :** accès direct aux données que l'IA peut lire et écrire sans confusion avec `async`/`await`.
 
-* **Schémas comme cource unique de Vvrité :** des schémas Zod centralisés dans `*Schemas.ts` qui valident les entrées HTTP et analysent les sorties de la base de données pour éviter les bugs silencieux.
+- **Schémas comme cource unique de Vvrité :** des schémas Zod centralisés dans `*Schemas.ts` qui valident les entrées HTTP et analysent les sorties de la base de données pour éviter les bugs silencieux.
 
-* **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
+- **Stack transparente :** Express 5 + React 19. Aucune boîte noire. Vous comprenez chaque ligne.
 
 ## 💻 Stack technique
 
-* **Backend** : Node.js, Express 5, Zod (validation)
-* **Frontend** : React 19, React Router, Vite, Pico CSS
-* **Database** : SQLite (zero-config, API synchrone)
-* **Tooling** : TypeScript, Biome, Vitest, Docker
+- **Backend** : Node.js, Express 5, Zod (validation)
+- **Frontend** : React 19, React Router, Vite, Pico CSS
+- **Database** : SQLite (zero-config, API synchrone)
+- **Tooling** : TypeScript, Biome, Vitest, Docker
 
 ## 📖 Documentation
 

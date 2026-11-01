@@ -181,9 +181,9 @@ return row as Item;
 
 ### Synchronous SQLite — no async/await for database calls
 
-`node:sqlite` is synchronous by design. Repository methods must execute SQL queries synchronously and must not wrap database calls in `async`/`await`. 
+`node:sqlite` is synchronous by design. Repository methods must execute SQL queries synchronously and must not wrap database calls in `async`/`await`.
 
-However, a repository method *may* be marked `async` if it strictly requires interaction with genuinely asynchronous external resources (e.g., third-party APIs, asynchronous file system reads). Actions (in `*Actions.ts`) generally remain `async` to handle `req.body` and orchestrate these calls.
+However, a repository method _may_ be marked `async` if it strictly requires interaction with genuinely asynchronous external resources (e.g., third-party APIs, asynchronous file system reads). Actions (in `*Actions.ts`) generally remain `async` to handle `req.body` and orchestrate these calls.
 
 ```ts
 // ✅ Correct SQLite query
@@ -219,7 +219,7 @@ Input validation belongs in a `*Validators.ts` file using `createValidator` and 
 // In itemValidators.ts
 const add = createValidator(
   { body: ItemDTOSchema },
-  { inject: (req) => ({ user_id: req.me.id }) }
+  { inject: (req) => ({ user_id: req.me.id }) },
 );
 
 // In itemRoutes.ts
@@ -293,16 +293,16 @@ Never commit `.env`. Never commit `data/sqlite/database.sqlite`. Both are in `.g
 
 ## Terminology
 
-| Term | What it means in this codebase |
-|---|---|
-| **Module** | A self-contained Express feature folder: `*Routes.ts`, `*Actions.ts`, `*Repository.ts`, `*Schemas.ts`, `*Validators.ts` |
-| **Action** | An Express `RequestHandler` — thin, delegates to repository, sends HTTP response |
-| **Repository** | Class encapsulating all SQL for one table — the only place raw SQL is allowed |
-| **Schema** | Centralized Zod schema in `*Schemas.ts` defining master entity and derived input DTO shapes |
-| **Validator** | Express middleware in `*Validators.ts` created via `createValidator` to validate request targets |
-| **Contract** | A test declaration in `tests/contracts/` describing expected API behavior |
-| **SSR outlet** | The `<!--ssr-outlet-->` placeholder in `index.html` where server-rendered HTML is injected |
-| **Hydration** | Client-side React taking over the server-rendered DOM via `hydrateRoot` in `entry-client.tsx` |
-| **Soft delete** | Setting `deleted_at` timestamp instead of removing a row — default delete strategy |
-| **Hard delete** | Permanently removing a row — use only when explicitly required |
-| **`make:clone`** | CLI script to duplicate a module with automatic name replacement |
+| Term             | What it means in this codebase                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Module**       | A self-contained Express feature folder: `*Routes.ts`, `*Actions.ts`, `*Repository.ts`, `*Schemas.ts`, `*Validators.ts` |
+| **Action**       | An Express `RequestHandler` — thin, delegates to repository, sends HTTP response                                        |
+| **Repository**   | Class encapsulating all SQL for one table — the only place raw SQL is allowed                                           |
+| **Schema**       | Centralized Zod schema in `*Schemas.ts` defining master entity and derived input DTO shapes                             |
+| **Validator**    | Express middleware in `*Validators.ts` created via `createValidator` to validate request targets                        |
+| **Contract**     | A test declaration in `tests/contracts/` describing expected API behavior                                               |
+| **SSR outlet**   | The `<!--ssr-outlet-->` placeholder in `index.html` where server-rendered HTML is injected                              |
+| **Hydration**    | Client-side React taking over the server-rendered DOM via `hydrateRoot` in `entry-client.tsx`                           |
+| **Soft delete**  | Setting `deleted_at` timestamp instead of removing a row — default delete strategy                                      |
+| **Hard delete**  | Permanently removing a row — use only when explicitly required                                                          |
+| **`make:clone`** | CLI script to duplicate a module with automatic name replacement                                                        |

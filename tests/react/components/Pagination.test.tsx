@@ -2,6 +2,28 @@ import { screen } from "@testing-library/react";
 import Pagination from "../../../src/react/components/Pagination";
 import { renderWithStub, setupMocks } from "../test-utils";
 
+const OneItemPerPage = () => (
+  <Pagination total={10} pageSize={1} currentPage={1} />
+);
+
+const FirstPage = () => (
+  <Pagination total={100} pageSize={10} currentPage={1} />
+);
+
+const MiddlePage = () => (
+  <Pagination total={100} pageSize={10} currentPage={5} />
+);
+
+const LastPage = () => (
+  <Pagination total={100} pageSize={10} currentPage={10} />
+);
+
+const OnlyPage = () => <Pagination total={10} pageSize={10} currentPage={1} />;
+
+const SecondOfThreePages = () => (
+  <Pagination total={30} pageSize={10} currentPage={2} />
+);
+
 describe("<Pagination />", () => {
   beforeEach(() => {
     setupMocks();
@@ -15,7 +37,7 @@ describe("<Pagination />", () => {
   it("should mount successfully", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={10} pageSize={1} currentPage={1} />,
+      Component: OneItemPerPage,
       initialEntries: ["/"],
       me: null,
     });
@@ -26,7 +48,7 @@ describe("<Pagination />", () => {
   it("should display Previous and Next when needed", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={100} pageSize={10} currentPage={5} />,
+      Component: MiddlePage,
       initialEntries: ["/"],
       me: null,
     });
@@ -38,7 +60,7 @@ describe("<Pagination />", () => {
   it("should not display Previous on first page", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={100} pageSize={10} currentPage={1} />,
+      Component: FirstPage,
       initialEntries: ["/"],
       me: null,
     });
@@ -50,9 +72,7 @@ describe("<Pagination />", () => {
   it("should not display Next on last page", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => (
-        <Pagination total={100} pageSize={10} currentPage={10} />
-      ),
+      Component: LastPage,
       initialEntries: ["/"],
       me: null,
     });
@@ -64,7 +84,7 @@ describe("<Pagination />", () => {
   it("should not display Previous nor Next when only one page", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={10} pageSize={10} currentPage={1} />,
+      Component: OnlyPage,
       initialEntries: ["/"],
       me: null,
     });
@@ -76,7 +96,7 @@ describe("<Pagination />", () => {
   it("should display all page numbers when needed", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={100} pageSize={10} currentPage={5} />,
+      Component: MiddlePage,
       initialEntries: ["/"],
       me: null,
     });
@@ -96,7 +116,7 @@ describe("<Pagination />", () => {
   it("should mark current page with aria-current", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={100} pageSize={10} currentPage={5} />,
+      Component: MiddlePage,
       initialEntries: ["/"],
       me: null,
     });
@@ -107,7 +127,7 @@ describe("<Pagination />", () => {
   it("should keep the other search params", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Pagination total={30} pageSize={10} currentPage={2} />,
+      Component: SecondOfThreePages,
       initialEntries: ["/?q=stuff&sort=title&page=2"],
       me: null,
     });

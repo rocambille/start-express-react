@@ -15,7 +15,7 @@ describe("<Home />", () => {
   it("should mount successfully", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Home />,
+      Component: Home,
       initialEntries: ["/"],
       me: null,
     });
@@ -26,7 +26,7 @@ describe("<Home />", () => {
   it("should count", async () => {
     const { user } = await renderWithStub({
       path: "/",
-      Component: () => <Home />,
+      Component: Home,
       initialEntries: ["/"],
       me: null,
     });

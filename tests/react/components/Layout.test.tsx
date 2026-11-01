@@ -19,7 +19,7 @@ describe("<Layout />", () => {
   it("should mount successfully", async () => {
     await renderWithStub({
       path: "/",
-      Component: () => <Layout />,
+      Component: Layout,
       initialEntries: ["/"],
       me: null,
     });

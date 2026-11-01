@@ -58,9 +58,9 @@ import { seedUsers } from "./users";
 import { seedPosts } from "./posts"; // child of users
 
 export const seeders: readonly Seeder[] = Object.freeze([
-  seedUsers,      // 1. Independent parent
-  seedItems,      // 2. References user
-  seedPosts,      // 3. References user
+  seedUsers, // 1. Independent parent
+  seedItems, // 2. References user
+  seedPosts, // 3. References user
   seedAuthTokens, // 4. References user
 ]);
 

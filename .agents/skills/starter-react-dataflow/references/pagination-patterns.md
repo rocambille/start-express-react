@@ -75,6 +75,7 @@ export default ItemList;
 
 In `src/react/helpers/cache.ts`:
 - The cache key includes the serialized request headers:
+
   ```typescript
   const cacheKey = options?.headers
     ? `${url}\0${JSON.stringify(options.headers)}`

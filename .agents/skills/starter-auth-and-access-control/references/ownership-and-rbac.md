@@ -40,6 +40,7 @@ router
 ```
 
 ### Why `.all(checkAccess)`:
+
 - Guarantees neither `PUT` nor `DELETE` can execute without ownership verification.
 - Rejects unauthorized users before validation middleware (`itemValidators.edit`) runs.
 - Eliminates repetitive `if (item.user_id !== req.me.id)` conditionals inside controller actions.
@@ -64,6 +65,7 @@ const checkAccessOrAdmin: RequestHandler = (req, res, next) => {
 ```
 
 ### Dedicated Admin-Only Guards
+
 For endpoints restricted exclusively to staff or administrators:
 
 ```typescript
@@ -110,6 +112,7 @@ router
 ```
 
 ### Benefits of the Wall:
+
 - **Zero Duplication**: `verifyAccessToken` is applied once to `BASE_PATH`, protecting all subsequent routes automatically.
 - **Fail-Fast**: Anonymous users receive a `401 Unauthorized` before any validator or action executes.
 - **Clear Security Audit**: Developers can instantly verify which routes are public vs protected simply by reading the router from top to bottom.

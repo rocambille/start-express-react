@@ -10,6 +10,7 @@ Contract tests execute against an isolated in-memory SQLite database (`:memory:`
 
 In `tests/express/test-utils.ts`:
 1. `database` is mocked with a new in-memory instance:
+
    ```typescript
    vi.mock("../../src/database", () => ({
      default: new DatabaseSync(":memory:"),
@@ -64,6 +65,7 @@ export const seedItems = (db: DatabaseSync) => {
 ```
 
 ### Best Practices for Fixtures:
+
 - **`Object.freeze()`**: Ensures tests cannot accidentally mutate shared fixture objects during test execution.
 - **Explicit Primary Keys**: Assign explicit IDs (`1`, `2`) so contract endpoints can reference known IDs deterministically.
 - **Relate via Parents**: Reference parent fixture IDs directly (e.g. `user_id: standardUser.id`) to avoid foreign key violations.
@@ -87,9 +89,9 @@ export type Seeder = (db: DatabaseSync) => void;
 // 2. Child tables (items, posts) seed next
 // 3. Dependent cross-reference tokens seed last
 export const seeders: readonly Seeder[] = Object.freeze([
-  seedUsers,      // Parent (no foreign keys)
-  seedItems,      // References user(id)
-  seedPosts,      // References user(id)
+  seedUsers, // Parent (no foreign keys)
+  seedItems, // References user(id)
+  seedPosts, // References user(id)
   seedAuthTokens, // References user(id)
 ]);
 

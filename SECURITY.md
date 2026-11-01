@@ -13,9 +13,9 @@ The versioning scheme carries an explicit compatibility contract:
 
 Because each release is a clean git snapshot, users who started from an older release can always **diff two releases** to identify relevant fixes and cherry-pick them into their own project.
 
-| Branch | Purpose |
-| ------ | ------- |
-| `main` | Current stable release: receives hotfixes and security patches during the month |
+| Branch | Purpose                                                                                     |
+| ------ | ------------------------------------------------------------------------------------------- |
+| `main` | Current stable release: receives hotfixes and security patches during the month             |
 | `dev`  | Next month's release in progress: new features and breaking changes, tracked via an open PR |
 
 ## Reporting a Vulnerability

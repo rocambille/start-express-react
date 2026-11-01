@@ -262,8 +262,8 @@ async function purgeAuth(rootDir: string) {
         "",
       )
       .replace(
-        /Component: \(\) => \(\n {8}<MeProvider initialUser=\{me\}>\n {10}<Component \/>\n {8}<\/MeProvider>\n {6}\),/m,
-        "Component,",
+        /render\(\n {6}<MeProvider initialUser=\{me\}>\n {8}<Stub initialEntries=\{initialEntries\} \/>\n {6}<\/MeProvider>,\n {4}\),/m,
+        "render(<Stub initialEntries={initialEntries} />),",
       )
       .replace(`  me,\n`, "")
       .replace(`  me: User | null;\n`, ""),

@@ -1,10 +1,11 @@
 ---
+
 name: starter-react-dataflow
 description: >-
-  Use this skill when creating, modifying, or debugging React components in StartER
-  that fetch data, execute mutations, use forms, handle pagination, subscribe to cache
-  updates, or interact with user authentication session state. Enforces React 19 use(),
-  getOrFetch(), mutate(), useRefresh(), Range headers, and pure idempotent rendering.
+Use this skill when creating, modifying, or debugging React components in StartER
+that fetch data, execute mutations, use forms, handle pagination, subscribe to cache
+updates, or interact with user authentication session state. Enforces React 19 use(),
+getOrFetch(), mutate(), useRefresh(), Range headers, and pure idempotent rendering.
 ---
 
 # React Dataflow & Component Architecture in StartER
@@ -51,6 +52,7 @@ function ItemShow() {
 ```
 
 #### Why `getOrFetch()` is Required
+
 Calling `use(fetch(...))` directly would instantiate a new Promise on every render cycle, causing an infinite suspension loop. `getOrFetch()` memoizes Promises in an in-memory cache (`promisesByUrl`), guaranteeing that concurrent render passes share the exact same Promise identity.
 
 **Options**:
@@ -92,10 +94,10 @@ import { mutate } from "../../helpers/mutate";
 
 const saveItem = async (data: ItemDTO) => {
   await mutate(
-    `/api/items/${id}`,   // URL
-    "put",                 // Method: "post" | "put" | "delete"
-    data,                  // Request body (JSON object or FormData)
-    ["/api/items", `/api/items/${id}`] // Paths to invalidate in cache
+    `/api/items/${id}`, // URL
+    "put", // Method: "post" | "put" | "delete"
+    data, // Request body (JSON object or FormData)
+    ["/api/items", `/api/items/${id}`], // Paths to invalidate in cache
   );
 
   navigate(`/items/${id}`);
@@ -143,7 +145,11 @@ function ItemList() {
 
   return (
     <>
-      <ul>{items.map((item) => <li key={item.id}>{item.title}</li>)}</ul>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>{item.title}</li>
+        ))}
+      </ul>
       <Pagination total={total} pageSize={PAGE_SIZE} currentPage={page} />
     </>
   );
@@ -168,9 +174,7 @@ function ActionsMenu({ item }: { item: Item }) {
   const isOwner = isAuthenticated && user?.id === item.user_id;
 
   return (
-    <div>
-      {isOwner && <Link to={`/items/${item.id}/edit`}>Edit</Link>}
-    </div>
+    <div>{isOwner && <Link to={`/items/${item.id}/edit`}>Edit</Link>}</div>
   );
 }
 ```
