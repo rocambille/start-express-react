@@ -58,4 +58,19 @@ describe("clientAssets", () => {
 
     expect(response.text).toBe("server-side rendering");
   });
+
+  it.each(["/index.html", "/%69ndex.html", "/INDEX.HTML", "/about.html"])(
+    "leaves %s to server-side rendering",
+    async (url) => {
+      const response = await api.get(url);
+
+      expect(response.text).toBe("server-side rendering");
+    },
+  );
+
+  it("does not fail on a malformed URL", async () => {
+    const response = await api.get("/%E0%A4%A");
+
+    expect(response.status).toBeLessThan(500);
+  });
 });
