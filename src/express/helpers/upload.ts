@@ -39,7 +39,9 @@ const DEFAULT_OPTIONS: Required<Omit<UploaderOptions, "subfolder">> = {
   allowedMimeTypes: Array.from(MIME_TO_EXTENSION.keys()),
 };
 
-export const createUploader = (options: UploaderOptions): multer.Multer => {
+export const createUploader = (
+  options: UploaderOptions,
+): multer.Multer & { destDir: string } => {
   const { subfolder, allowedMimeTypes, maxSizeBytes } = {
     ...DEFAULT_OPTIONS,
     ...options,
@@ -60,7 +62,7 @@ export const createUploader = (options: UploaderOptions): multer.Multer => {
     },
   });
 
-  return multer({
+  const uploader = multer({
     storage,
     limits: { fileSize: maxSizeBytes },
     fileFilter: (_req, file, cb) => {
@@ -78,6 +80,8 @@ export const createUploader = (options: UploaderOptions): multer.Multer => {
       }
     },
   });
+
+  return Object.assign(uploader, { destDir });
 };
 
 export const deleteUploadedFile = (relativeUrl?: string | null): void => {

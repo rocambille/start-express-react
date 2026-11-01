@@ -30,7 +30,7 @@ const router = Router();
   - Handles avatar file uploads
   - Validates file type and size
 */
-import { createUploader, UPLOADS_DIR } from "../../helpers/upload";
+import { createUploader } from "../../helpers/upload";
 /*
   authActions:
   - verifyAccessToken injects `req.me`
@@ -66,7 +66,7 @@ const avatarUploader = createUploader({
 */
 const ME_PATH = "/api/users/me";
 const ME_AVATAR_PATH = "/api/users/me/avatar";
-const UPLOADS_PATH = "/uploads";
+const UPLOADS_PATH = "/uploads/avatars";
 
 /* ************************************************************************ */
 /* Authenticated routes                                                     */
@@ -100,7 +100,7 @@ router
 router.use(
   UPLOADS_PATH,
   authActions.verifyAccessToken,
-  express.static(UPLOADS_DIR),
+  express.static(avatarUploader.destDir, { index: false }),
 );
 
 /* ************************************************************************ */
