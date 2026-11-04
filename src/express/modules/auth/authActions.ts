@@ -42,7 +42,8 @@ declare global {
 /* Security options                                                         */
 /* ************************************************************************ */
 
-const magicLinkTimeout = 15 * 60 * 1000; // 15 minutes
+const magicLinkTtlMs = 15 * 60 * 1000; // 15 minutes
+const sessionTimeoutMs = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 /*
   Cookie configuration for authentication token.
@@ -56,7 +57,7 @@ const cookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: sessionTimeoutMs,
 };
 
 /*
@@ -72,7 +73,10 @@ class TokenSigner<Payload extends JwtPayload | string = JwtPayload> {
   }
 
   signSession(payload: Payload): string {
-    return jwt.sign(payload, this.#secret, { expiresIn: cookieOptions.maxAge });
+    // jsonwebtoken reads a numeric expiresIn as seconds, not milliseconds
+    return jwt.sign(payload, this.#secret, {
+      expiresIn: sessionTimeoutMs / 1000,
+    });
   }
 
   verify(token: string): Payload {
@@ -128,7 +132,7 @@ const sendMagicLink: RequestHandler = async (req, res) => {
   const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
   // Store in DB
-  const expiresAt = new Date(Date.now() + magicLinkTimeout);
+  const expiresAt = new Date(Date.now() + magicLinkTtlMs);
   authRepository.insertToken(userId, tokenHash, expiresAt);
 
   const magicLink = `${trustedBaseUrl}/verify?token=${rawToken}`;
